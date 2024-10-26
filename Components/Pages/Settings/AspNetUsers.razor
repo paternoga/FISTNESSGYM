@@ -1,0 +1,66 @@
+@page "/asp-net-users"
+
+@attribute [Authorize]
+
+<PageTitle>AspNetUsers</PageTitle>
+<RadzenStack>
+    <RadzenRow AlignItems="AlignItems.Center">
+        <RadzenColumn Size="12" SizeMD="6">
+            <RadzenText Text="AspNetUsers" TextStyle="TextStyle.H3" TagName="TagName.H1" style="margin: 0" />
+        </RadzenColumn>
+        <RadzenColumn Size="12" SizeMD="6">
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.End" Gap="0.5rem">
+                <RadzenButton Icon="add_circle_outline" Text="Add" Click="@AddButtonClick" Variant="Variant.Flat" />
+            </RadzenStack>
+        </RadzenColumn>
+    </RadzenRow>
+    <RadzenRow>
+      <RadzenColumn SizeMD=12>
+        <RadzenDataGrid @ref="grid0" ColumnWidth="200px"   AllowFiltering="true" FilterMode="FilterMode.Advanced" AllowPaging="true" AllowSorting="true" ShowPagingSummary="true" PageSizeOptions=@(new int[]{5, 10, 20, 30})
+            Data="@aspNetUsers" TItem="FISTNESSGYM.Models.database.AspNetUser" RowSelect="@EditRow">
+            <Columns>
+                <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.AspNetUser" Property="Id" Title="Id">
+                </RadzenDataGridColumn>
+                <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.AspNetUser" Property="AccessFailedCount" Title="Access Failed Count">
+                </RadzenDataGridColumn>
+                <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.AspNetUser" Property="ConcurrencyStamp" Title="Concurrency Stamp">
+                </RadzenDataGridColumn>
+                <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.AspNetUser" Property="Email" Title="Email">
+                </RadzenDataGridColumn>
+                <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.AspNetUser" Property="EmailConfirmed" Title="Email Confirmed">
+                </RadzenDataGridColumn>
+                <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.AspNetUser" Property="LockoutEnabled" Title="Lockout Enabled">
+                </RadzenDataGridColumn>
+                <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.AspNetUser" Property="LockoutEnd" Title="Lockout End">
+                </RadzenDataGridColumn>
+                <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.AspNetUser" Property="NormalizedEmail" Title="Normalized Email">
+                </RadzenDataGridColumn>
+                <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.AspNetUser" Property="NormalizedUserName" Title="Normalized User Name">
+                </RadzenDataGridColumn>
+                <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.AspNetUser" Property="PasswordHash" Title="Password Hash">
+                </RadzenDataGridColumn>
+                <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.AspNetUser" Property="PhoneNumber" Title="Phone Number">
+                </RadzenDataGridColumn>
+                <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.AspNetUser" Property="PhoneNumberConfirmed" Title="Phone Number Confirmed">
+                </RadzenDataGridColumn>
+                <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.AspNetUser" Property="SecurityStamp" Title="Security Stamp">
+                </RadzenDataGridColumn>
+                <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.AspNetUser" Property="TwoFactorEnabled" Title="Two Factor Enabled">
+                </RadzenDataGridColumn>
+                <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.AspNetUser" Property="UserName" Title="User Name">
+                </RadzenDataGridColumn>
+                <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.AspNetUser" Filterable="false" Sortable="false" Width="70px" TextAlign="TextAlign.Center">
+                    <Template Context="aspNetUser">
+
+                        <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="delete" Size="ButtonSize.Medium"
+                            Shade="Shade.Lighter" Variant="Variant.Flat"
+                            Click=@(args => GridDeleteButtonClick(args, aspNetUser)) @onclick:stopPropagation="true" />
+                    </Template>
+                </RadzenDataGridColumn>
+            </Columns>
+
+        </RadzenDataGrid>
+
+    </RadzenColumn>
+  </RadzenRow>
+</RadzenStack>

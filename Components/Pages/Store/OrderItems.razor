@@ -1,0 +1,95 @@
+@page "/order-items"
+@attribute [Authorize]
+
+<PageTitle>OrderItems</PageTitle>
+<RadzenStack>
+    <RadzenRow AlignItems="AlignItems.Center">
+        <RadzenColumn Size="12" SizeMD="6">
+            <RadzenText Text="OrderItems" TextStyle="TextStyle.H3" TagName="TagName.H1" style="margin: 0" />
+        </RadzenColumn>
+        <RadzenColumn Size="12" SizeMD="6">
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.End" Gap="0.5rem">
+                <RadzenButton Icon="add_circle_outline" Text="Add" Click="@AddButtonClick" Variant="Variant.Flat" />
+            </RadzenStack>
+        </RadzenColumn>
+    </RadzenRow>
+    <RadzenRow>
+      <RadzenColumn SizeMD=6>
+     <RadzenCard style="height: 100%">
+        <RadzenDataGrid @ref="grid0" ColumnWidth="200px"   AllowFiltering="true" FilterMode="FilterMode.Advanced" AllowPaging="true" AllowSorting="true" ShowPagingSummary="true" PageSizeOptions=@(new int[]{5, 10, 20, 30})
+            Data="@orderItems" TItem="FISTNESSGYM.Models.database.OrderItem" RowSelect="@EditRow">
+            <Columns>
+                <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.OrderItem" Property="Id" Title="Id">
+                </RadzenDataGridColumn>
+                <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.OrderItem" Property="Order.OrderStatusName" Title="Order">
+                </RadzenDataGridColumn>
+                <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.OrderItem" Property="Product.Category" Title="Product">
+                </RadzenDataGridColumn>
+                <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.OrderItem" Property="Quantity" Title="Quantity">
+                </RadzenDataGridColumn>
+                <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.OrderItem" Property="UnitPrice" Title="Unit Price">
+                </RadzenDataGridColumn>
+                <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.OrderItem" Filterable="false" Sortable="false" Width="70px" TextAlign="TextAlign.Center">
+                    <Template Context="orderItem">
+
+                        <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="delete" Size="ButtonSize.Medium"
+                            Shade="Shade.Lighter" Variant="Variant.Flat"
+                            Click=@(args => GridDeleteButtonClick(args, orderItem)) @onclick:stopPropagation="true" />
+                    </Template>
+                </RadzenDataGridColumn>
+            </Columns>
+
+        </RadzenDataGrid>
+    </RadzenCard>
+
+    </RadzenColumn>
+        <RadzenColumn SizeMD=6>
+        <RadzenCard style="height: 100%;margin-top:0px;">
+            <RadzenAlert Shade="Shade.Lighter" Variant="Variant.Flat" Size="AlertSize.Small" AlertStyle="AlertStyle.Danger" Visible="@errorVisible">Cannot save OrderItem</RadzenAlert>
+            <RadzenTemplateForm TItem="FISTNESSGYM.Models.database.OrderItem" Data="@orderItem" Visible="@(orderItem != null)" Submit="@FormSubmit">
+                <RadzenRow style="margin-bottom: 1rem">
+                    <RadzenColumn SizeMD="3">
+                        <RadzenLabel Text="Order" Component="Order" style="width: 100%" />
+                    </RadzenColumn>
+                    <RadzenColumn SizeMD="9">
+                        <RadzenDropDown Data="@ordersForOrderId" TextProperty="OrderStatusName" ValueProperty="Id" AllowClear=true
+                             Placeholder="Choose Order" style="display: block; width: 100%" @bind-Value="@orderItem.OrderId" Name="OrderId"
+                               />
+                    </RadzenColumn>
+                </RadzenRow>
+                <RadzenRow style="margin-bottom: 1rem">
+                    <RadzenColumn SizeMD="3">
+                        <RadzenLabel Text="Product" Component="Product" style="width: 100%" />
+                    </RadzenColumn>
+                    <RadzenColumn SizeMD="9">
+                        <RadzenDropDown Data="@productsForProductId" TextProperty="Category" ValueProperty="Id" AllowClear=true
+                             Placeholder="Choose Product" style="display: block; width: 100%" @bind-Value="@orderItem.ProductId" Name="ProductId"
+                               />
+                    </RadzenColumn>
+                </RadzenRow>
+                <RadzenRow style="margin-bottom: 1rem">
+                    <RadzenColumn SizeMD="3">
+                        <RadzenLabel Text="Quantity" Component="Quantity" style="width: 100%" />
+                    </RadzenColumn>
+                    <RadzenColumn SizeMD="9">
+                        <RadzenNumeric style="display: block; width: 100%" @bind-Value="@orderItem.Quantity" Name="Quantity" />
+                        <RadzenRequiredValidator Component="Quantity" Text="Quantity is required" />
+                    </RadzenColumn>
+                </RadzenRow>
+                <RadzenRow style="margin-bottom: 1rem">
+                    <RadzenColumn SizeMD="3">
+                        <RadzenLabel Text="Unit Price" Component="UnitPrice" style="width: 100%" />
+                    </RadzenColumn>
+                    <RadzenColumn SizeMD="9">
+                        <RadzenNumeric style="display: block; width: 100%" @bind-Value="@orderItem.UnitPrice" Name="UnitPrice" />
+                        <RadzenRequiredValidator Component="UnitPrice" Text="UnitPrice is required" />
+                    </RadzenColumn>
+                </RadzenRow>
+              <RadzenStack  Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.End" Gap="0.5rem">
+                        <RadzenButton ButtonStyle="ButtonStyle.Primary" ButtonType="ButtonType.Submit" Icon="save" Text="Save" Variant="Variant.Flat" />
+                        <RadzenButton ButtonStyle="ButtonStyle.Light" Text="Cancel" Variant="Variant.Flat" Click="@CancelButtonClick" Visible=false />
+              </RadzenStack>
+            </RadzenTemplateForm>
+        </RadzenCard>
+        </RadzenColumn>  </RadzenRow>
+</RadzenStack>
