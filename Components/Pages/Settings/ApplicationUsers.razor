@@ -1,11 +1,11 @@
-@page "/application-users"
+@page "/settings/application-users"
 @attribute [Authorize]
 
 <PageTitle>Users</PageTitle>
 <RadzenStack>
     <RadzenRow AlignItems="AlignItems.Center">
         <RadzenColumn Size="12" SizeMD="6">
-            <RadzenText Text="Users" TextStyle="TextStyle.H3" TagName="TagName.H1" style="margin: 0" />
+            <RadzenText Text="Użytkownicy" TextStyle="TextStyle.H3" TagName="TagName.H1" style="margin: 0" />
         </RadzenColumn>
         <RadzenColumn Size="12" SizeMD="6">
             <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.End" Gap="0.5rem">
@@ -15,11 +15,11 @@
     </RadzenRow>
     <RadzenRow>
         <RadzenColumn SizeMD="12">
-            <RadzenAlert Size="AlertSize.Large" Shade="Shade.Light" AlertStyle="AlertStyle.Danger" Variant="Variant.Flat" Title="Cannot delete user" Visible="@errorVisible">@error</RadzenAlert>
+            <RadzenAlert Size="AlertSize.Large" Shade="Shade.Light" AlertStyle="AlertStyle.Danger" Variant="Variant.Flat" Title="Nie można usunąć użytkownika" Visible="@errorVisible">@error</RadzenAlert>
             <RadzenDataGrid @ref="grid0" AllowFiltering="true" AllowPaging="true" ShowPagingSummary="true" PageSizeOptions=@(new int[]{5, 10, 20, 30}) AllowSorting="true" Data="@users"
                 TItem="FISTNESSGYM.Models.ApplicationUser" RowSelect="@RowSelect">
                 <Columns>
-                    <RadzenDataGridColumn TItem="FISTNESSGYM.Models.ApplicationUser" Property="UserName" Title="User Name" />
+                    <RadzenDataGridColumn TItem="FISTNESSGYM.Models.ApplicationUser" Property="UserName" Title="Nazwa użytkownika" />
                     <RadzenDataGridColumn TItem="FISTNESSGYM.Models.ApplicationUser" Property="Email" Title="Email" />
                     <RadzenDataGridColumn TItem="FISTNESSGYM.Models.ApplicationUser" Filterable="false" Sortable="false" TextAlign="TextAlign.Center" Width="70px">
                         <Template Context="user">
