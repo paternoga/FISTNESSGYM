@@ -1,4 +1,4 @@
-@page "/orders"
+@page "/store/orders"
 
 @attribute [Authorize]
 
@@ -6,11 +6,11 @@
 <RadzenStack>
     <RadzenRow AlignItems="AlignItems.Center">
         <RadzenColumn Size="12" SizeMD="6">
-            <RadzenText Text="Orders" TextStyle="TextStyle.H3" TagName="TagName.H1" style="margin: 0" />
+            <RadzenText Text="Zamówienia" TextStyle="TextStyle.H3" TagName="TagName.H1" style="margin: 0" />
         </RadzenColumn>
         <RadzenColumn Size="12" SizeMD="6">
             <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.End" Gap="0.5rem">
-                <RadzenButton Icon="add_circle_outline" Text="Add" Click="@AddButtonClick" Variant="Variant.Flat" />
+                <RadzenButton Icon="add_circle_outline" Text="Dodaj" Click="@AddButtonClick" Variant="Variant.Flat" />
             </RadzenStack>
         </RadzenColumn>
     </RadzenRow>
@@ -22,15 +22,15 @@
             <Columns>
                 <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.Order" Property="Id" Title="Id">
                 </RadzenDataGridColumn>
-                <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.Order" Property="AspNetUser.UserName" Title="Asp Net User">
+                <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.Order" Property="AspNetUser.UserName" Title="Nazwa użytkownika">
                 </RadzenDataGridColumn>
-                <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.Order" Property="OrderDate" Title="Order Date">
+                <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.Order" Property="OrderDate" Title="Data zamówienia">
                 </RadzenDataGridColumn>
-                <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.Order" Property="TotalAmount" Title="Total Amount">
+                <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.Order" Property="TotalAmount" Title="Łączna wartość">
                 </RadzenDataGridColumn>
-                <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.Order" Property="OrderStatus.Name" Title="Order Status">
+                <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.Order" Property="OrderStatus.Name" Title="Status">
                 </RadzenDataGridColumn>
-                <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.Order" Property="OrderStatusName" Title="Order Status Name">
+                <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.Order" Property="OrderStatusName" Title="Nazwa status">
                 </RadzenDataGridColumn>
                 <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.Order" Filterable="false" Sortable="false" Width="70px" TextAlign="TextAlign.Center">
                     <Template Context="order">
@@ -48,25 +48,25 @@
     </RadzenColumn>
         <RadzenColumn SizeMD=6>
         <RadzenCard style="height: 100%;margin-top:0px;">
-            <RadzenAlert Shade="Shade.Lighter" Variant="Variant.Flat" Size="AlertSize.Small" AlertStyle="AlertStyle.Danger" Visible="@errorVisible">Cannot save Order</RadzenAlert>
+            <RadzenAlert Shade="Shade.Lighter" Variant="Variant.Flat" Size="AlertSize.Small" AlertStyle="AlertStyle.Danger" Visible="@errorVisible">Nie można zapisać zamówienia</RadzenAlert>
             <RadzenTemplateForm TItem="FISTNESSGYM.Models.database.Order" Data="@order" Visible="@(order != null)" Submit="@FormSubmit">
                 <RadzenRow style="margin-bottom: 1rem">
                     <RadzenColumn SizeMD="3">
-                        <RadzenLabel Text="Asp Net User" Component="AspNetUser" style="width: 100%" />
+                        <RadzenLabel Text="Nazwa użytkownika" Component="AspNetUser" style="width: 100%" />
                     </RadzenColumn>
                     <RadzenColumn SizeMD="9">
                         <RadzenDropDown Data="@aspNetUsersForUserId" TextProperty="UserName" ValueProperty="Id" AllowClear=true
-                             Placeholder="Choose AspNetUser" style="display: block; width: 100%" @bind-Value="@order.UserId" Name="UserId"
+                             Placeholder="Wybierz użytkownika" style="display: block; width: 100%" @bind-Value="@order.UserId" Name="UserId"
                                />
                     </RadzenColumn>
                 </RadzenRow>
                 <RadzenRow style="margin-bottom: 1rem">
                     <RadzenColumn SizeMD="3">
-                        <RadzenLabel Text="Order Date" Component="OrderDate" style="width: 100%" />
+                        <RadzenLabel Text="Data zamówienia" Component="OrderDate" style="width: 100%" />
                     </RadzenColumn>
                     <RadzenColumn SizeMD="9">
                         <RadzenDatePicker DateFormat="MM/dd/yyyy" style="display: block; width: 100%" @bind-Value="@order.OrderDate" Name="OrderDate" />
-                        <RadzenRequiredValidator Component="OrderDate" Text="OrderDate is required" />
+                        <RadzenRequiredValidator Component="OrderDate" Text="Data jest wymagana" />
                     </RadzenColumn>
                 </RadzenRow>
                 <RadzenRow style="margin-bottom: 1rem">
@@ -75,22 +75,22 @@
                     </RadzenColumn>
                     <RadzenColumn SizeMD="9">
                         <RadzenNumeric style="display: block; width: 100%" @bind-Value="@order.TotalAmount" Name="TotalAmount" />
-                        <RadzenRequiredValidator Component="TotalAmount" Text="TotalAmount is required" />
+                        <RadzenRequiredValidator Component="TotalAmount" Text="Kwota jest wymagana" />
                     </RadzenColumn>
                 </RadzenRow>
                 <RadzenRow style="margin-bottom: 1rem">
                     <RadzenColumn SizeMD="3">
-                        <RadzenLabel Text="Order Status" Component="OrderStatus" style="width: 100%" />
+                        <RadzenLabel Text="Status zamówienia" Component="OrderStatus" style="width: 100%" />
                     </RadzenColumn>
                     <RadzenColumn SizeMD="9">
                         <RadzenDropDown Data="@orderStatusesForOrderStatusId" TextProperty="Name" ValueProperty="Id" AllowClear=true
-                             Placeholder="Choose OrderStatus" style="display: block; width: 100%" @bind-Value="@order.OrderStatusId" Name="OrderStatusId"
+                             Placeholder="Wybierz status zamówienia" style="display: block; width: 100%" @bind-Value="@order.OrderStatusId" Name="OrderStatusId"
                                />
                     </RadzenColumn>
                 </RadzenRow>
                 <RadzenRow style="margin-bottom: 1rem">
                     <RadzenColumn SizeMD="3">
-                        <RadzenLabel Text="Order Status Name" Component="OrderStatusName" style="width: 100%" />
+                        <RadzenLabel Text="Nazwa statusu" Component="OrderStatusName" style="width: 100%" />
                     </RadzenColumn>
                     <RadzenColumn SizeMD="9">
                         <RadzenTextBox style="display: block; width: 100%" @bind-Value="@order.OrderStatusName" Name="OrderStatusName" />
