@@ -1,0 +1,82 @@
+﻿@inject DialogService DialogService
+@inject databaseService databaseService
+
+<RadzenTemplateForm TItem="SchedulerEvent" Data="@model" Submit="@OnSubmit">
+    <RadzenStack Gap="1rem">
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap">
+            <RadzenLabel Text="Tytuł" Style="width: 8rem;" />
+            <RadzenTextBox @bind-Value="model.Title" Name="Title" Style="width: 15rem;" />
+            <RadzenRequiredValidator Component="Title" Text="Tytuł jest wymagany" />
+        </RadzenStack>
+
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap">
+            <RadzenLabel Text="Instruktor" Style="width: 8rem;" />
+            <RadzenTextBox @bind-Value="model.InstructorName" Name="InstructorName" Style="width: 15rem;" />
+            <RadzenRequiredValidator Component="InstructorName" Text="Imię instruktora jest wymagane" />
+        </RadzenStack>
+
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap">
+            <RadzenLabel Text="Początek" Style="width: 8rem;" />
+            <RadzenDatePicker @bind-Value="model.Start" Name="Start" ShowTime="true" Style="width: 15rem;" />
+            <RadzenRequiredValidator Component="Start" Text="Czas rozpoczęcia jest wymagany" />
+        </RadzenStack>
+
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap">
+            <RadzenLabel Text="Koniec" Style="width: 8rem;" />
+            <RadzenDatePicker Name="End" @bind-Value="model.End" ShowTime="true" Style="width: 15rem;" />
+            <RadzenRequiredValidator Component="End" Text="Czas zakończenia jest wymagany" />
+        </RadzenStack>
+
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap">
+            <RadzenLabel Text="Liczba uczestników" Style="width: 8rem;" />
+            <RadzenNumeric @bind-Value="model.MaxParticipants" Name="MaxParticipants" Style="width: 15rem;" />
+            <RadzenRequiredValidator Component="MaxParticipants" Text="Maksymalna liczba uczestników jest wymagana" />
+        </RadzenStack>
+
+        <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween">
+            <RadzenButton ButtonType="ButtonType.Submit" Text="Zapisz" />
+            <RadzenButton ButtonType="ButtonType.Button" Text="Usuń" Style="background-color: #ec5353; color: white;" Click="@OnDelete" />
+        </RadzenStack>
+    </RadzenStack>
+</RadzenTemplateForm>
+
+@code {
+    [Parameter]
+    public SchedulerEvent EventItem { get; set; } // Pass the existing event for editing
+
+    SchedulerEvent model = new SchedulerEvent();
+
+    protected override void OnParametersSet()
+    {
+        // Assign the passed event to the model to populate the form
+        model = EventItem != null ? new SchedulerEvent
+            {
+                Id = EventItem.Id,
+                Title = EventItem.Title,
+                InstructorName = EventItem.InstructorName,
+                Start = EventItem.Start,
+                End = EventItem.End,
+                MaxParticipants = EventItem.MaxParticipants
+            } : new SchedulerEvent();
+    }
+
+    void OnSubmit()
+    {
+        // Close the dialog and return the modified event
+        DialogService.Close(model);
+    }
+
+    async Task OnDelete()
+    {
+        bool? confirmed = await DialogService.Confirm("Czy na pewno chcesz usunąć to wydarzenie?", "Potwierdzenie usunięcia");
+
+        if (confirmed == true && model.Id != 0)
+        {
+            // Remove event through the service
+            await databaseService.RemoveEventAsync(model.Id);
+
+            // Close the dialog and return null to indicate deletion
+            DialogService.Close(null);
+        }
+    }
+}

@@ -1,0 +1,69 @@
+@page "/calendar"
+@using FISTNESSGYM.Models
+@using Radzen.Blazor
+@inject databaseService databaseService
+@inject DialogService DialogService
+
+<RadzenScheduler TItem="SchedulerEvent" Data="@events" StartProperty="Start" EndProperty="End" TextProperty="Title"
+                 Style="height: 680px; width: 1400px" SlotSelect="OnSlotSelect" AppointmentSelect="OnEventSelect">
+    <RadzenDayView TimeFormat="HH:mm"></RadzenDayView>
+    <RadzenWeekView TimeFormat="HH:mm"></RadzenWeekView>
+</RadzenScheduler>
+
+@code {
+    List<SchedulerEvent> events;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadEventsAsync();
+    }
+
+    // Load events from the database
+    private async Task LoadEventsAsync()
+    {
+        events = await databaseService.GetAllEventsAsync();
+        StateHasChanged();  // Refresh UI
+    }
+
+    async Task OnSlotSelect(SchedulerSlotSelectEventArgs args)
+    {
+        // Set the end time to one hour after the start time
+        var newEvent = await DialogService.OpenAsync<EventDialog>("Dodaj wydarzenie", new Dictionary<string, object>
+    {
+        { "Start", args.Start },
+        { "End", args.Start.AddHours(1) } // Add 1 hour to start time
+    });
+
+        if (newEvent != null)
+        {
+            // Save new event through the service
+            await databaseService.CreateEventAsync(newEvent);
+
+            // Reload events after adding a new one
+            await LoadEventsAsync();
+        }
+    }
+
+
+    async Task OnEventSelect(SchedulerAppointmentSelectEventArgs<SchedulerEvent> args)
+    {
+        var editedEvent = await DialogService.OpenAsync<EditEventDialog>("Edytuj wydarzenie", new Dictionary<string, object>
+        {
+            { "EventItem", args.Data }
+        });
+
+        if (editedEvent == null)
+        {
+            // Event was deleted, so reload events
+            await LoadEventsAsync();
+        }
+        else
+        {
+            // Update the event through the service
+            await databaseService.UpdateEventAsync(editedEvent);
+
+            // Reload events after editing
+            await LoadEventsAsync();
+        }
+    }
+}

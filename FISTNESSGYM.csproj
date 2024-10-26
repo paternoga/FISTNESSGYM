@@ -16,7 +16,6 @@
     <PackageReference Include="Microsoft.AspNetCore.OData" Version="8.2.3" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Components\Pages\Calendar\" />
     <Folder Include="Components\Pages\Events\" />
     <Folder Include="Components\Pages\Analytics\" />
   </ItemGroup>

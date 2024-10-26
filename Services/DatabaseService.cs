@@ -11,6 +11,8 @@ using Microsoft.EntityFrameworkCore;
 using Radzen;
 
 using FISTNESSGYM.Data;
+using FISTNESSGYM.Components.Pages.Calendar;
+using FISTNESSGYM.Models.database;
 
 namespace FISTNESSGYM
 {
@@ -2525,5 +2527,85 @@ namespace FISTNESSGYM
 
             return itemToDelete;
         }
+        public async Task<List<SchedulerEvent>> GetAllEventsAsync()
+        {
+            return await Context.Events
+                .Select(e => new SchedulerEvent
+                {
+                    Id = e.Id,
+                    Title = e.EventName,
+                    Start = e.EventStartDate,
+                    End = e.EventEndDate,
+                    InstructorName = e.InstructorName,
+                    MaxParticipants = e.MaxParticipants
+                })
+                .ToListAsync();
         }
+
+        public async Task<SchedulerEvent> CreateEventAsync(SchedulerEvent schedulerEvent)
+        {
+            // Map SchedulerEvent to database model Event
+            var newEvent = new Event
+            {
+                EventName = schedulerEvent.Title,
+                InstructorName = schedulerEvent.InstructorName,
+                EventStartDate = schedulerEvent.Start,
+                EventEndDate = schedulerEvent.End,
+                MaxParticipants = schedulerEvent.MaxParticipants,
+                Participants = 0
+            };
+
+            Context.Events.Add(newEvent);
+            await Context.SaveChangesAsync();
+
+            schedulerEvent.Id = newEvent.Id; // Set the database ID
+            return schedulerEvent;
+        }
+
+        public async Task<SchedulerEvent> UpdateEventAsync(SchedulerEvent schedulerEvent)
+        {
+            // Find the event in the database by ID
+            var eventToUpdate = await Context.Events.FindAsync(schedulerEvent.Id);
+            if (eventToUpdate != null)
+            {
+                // Update the event details without modifying `Participants`
+                eventToUpdate.EventName = schedulerEvent.Title;
+                eventToUpdate.InstructorName = schedulerEvent.InstructorName;
+                eventToUpdate.EventStartDate = schedulerEvent.Start;
+                eventToUpdate.EventEndDate = schedulerEvent.End;
+                eventToUpdate.MaxParticipants = schedulerEvent.MaxParticipants;
+
+                await Context.SaveChangesAsync();
+            }
+            return schedulerEvent;
+        }
+
+        public async Task<bool> DeleteEventAsync(int id)
+        {
+            var eventToDelete = await Context.Events.FindAsync(id);
+            if (eventToDelete != null)
+            {
+                Context.Events.Remove(eventToDelete);
+                await Context.SaveChangesAsync();
+                return true;
+            }
+            return false;
+        }
+        public async Task RemoveEventAsync(int eventId)
+        {
+            // Znajdujemy wydarzenie do usuniêcia na podstawie jego Id
+            var eventToDelete = await Context.Events.FindAsync(eventId);
+
+            if (eventToDelete == null)
+            {
+                throw new Exception("Event not found");
+            }
+
+            // Usuwamy wydarzenie z kontekstu
+            Context.Events.Remove(eventToDelete);
+
+            // Zapisujemy zmiany asynchronicznie
+            await Context.SaveChangesAsync();
+        }
+    }
 }
