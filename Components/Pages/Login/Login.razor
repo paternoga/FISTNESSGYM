@@ -2,17 +2,31 @@
 @page "/login"
 
 <PageTitle>Login</PageTitle>
-<RadzenText Text="Login" TextStyle="Radzen.Blazor.TextStyle.H5" class="mb-4" TagName="Radzen.Blazor.TagName.H2" />
 <RadzenRow>
     <RadzenColumn SizeMD="12">
         <RadzenTemplateForm Action="@($"account/login?redirectUrl={redirectUrl}")" Data="@("login")"
             Method="post">
-            <RadzenAlert Shade="Radzen.Shade.Lighter" Variant="Radzen.Variant.Flat" Size="Radzen.AlertSize.Small" AlertStyle="Radzen.AlertStyle.Danger" Visible="@errorVisible">@error</RadzenAlert>
-            <RadzenAlert Shade="Radzen.Shade.Lighter" Variant="Radzen.Variant.Flat" Size="Radzen.AlertSize.Small" AlertStyle="Radzen.AlertStyle.Info" Visible="@infoVisible">@info</RadzenAlert>
+            <RadzenText Text="Zaloguj się" TextStyle="Radzen.Blazor.TextStyle.H5" class="mb-4" TagName="Radzen.Blazor.TagName.H2" />
+            <RadzenAlert Shade="Radzen.Shade.Lighter" Variant="Radzen.Variant.Flat" Size="Radzen.AlertSize.ExtraSmall" AlertStyle="Radzen.AlertStyle.Danger" Visible="@errorVisible">@error</RadzenAlert>
+            <RadzenAlert Shade="Radzen.Shade.Lighter" Variant="Radzen.Variant.Flat" Size="Radzen.AlertSize.ExtraSmall" AlertStyle="Radzen.AlertStyle.Info" Visible="@infoVisible">@info</RadzenAlert>
             <RadzenLogin AllowResetPassword="true" AllowRegister="true" 
-                    ResetPassword="@ResetPassword"
-                    Register="@Register"
-            />
+                                ResetPassword="@ResetPassword"
+                                Register="@Register" 
+                                FormFieldVariant="Radzen.Variant.Text" 
+                                PasswordAutoCompleteType="Radzen.Blazor.AutoCompleteType.Off" 
+                                UserNameAutoCompleteType="Radzen.Blazor.AutoCompleteType.Off" 
+                                UserText="Nazwa" 
+                                UserRequired="Nazwa jest wymagana" 
+                                PasswordText="Hasło" 
+                                PasswordRequired="Hasło jest wymagane" 
+                                ResetPasswordText="Zapomniałeś hasła?" 
+                                RememberMeText="Zapamiętaj dane" 
+                                RegisterText="Zarejestruj się" 
+                                RegisterMessageText="Nie masz jeszcze konta?" 
+                                LoginText="Zaloguj się" 
+                                RememberMe="true" 
+                                AllowRememberMe="true" AutoComplete="true" Style="width: 382px; height: 346px" ShowLoginButton="true" Visible="true"
+                        />
         </RadzenTemplateForm>
     </RadzenColumn>
 </RadzenRow>

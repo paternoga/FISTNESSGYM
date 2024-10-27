@@ -82,12 +82,12 @@ namespace FISTNESSGYM.Controllers
 
                 if (user == null)
                 {
-                    return RedirectWithError("Invalid user or password", redirectUrl);
+                    return RedirectWithError("Nieprawid³owy u¿ytkownik lub has³o.", redirectUrl);
                 }
 
                 if (!user.EmailConfirmed)
                 {
-                    return RedirectWithError("User email not confirmed", redirectUrl);
+                    return RedirectWithError("Adres e-mail u¿ytkownika nie zosta³ potwierdzony.", redirectUrl);
                 }
                 var result = await signInManager.PasswordSignInAsync(userName, password, false, false);
 
@@ -97,7 +97,7 @@ namespace FISTNESSGYM.Controllers
                 }
             }
 
-            return RedirectWithError("Invalid user or password", redirectUrl);
+            return RedirectWithError("Nieprawid³owy u¿ytkownik lub has³o.", redirectUrl);
         }
         [HttpPost]
         [Authorize]
@@ -105,7 +105,7 @@ namespace FISTNESSGYM.Controllers
         {
             if (string.IsNullOrEmpty(oldPassword) || string.IsNullOrEmpty(newPassword))
             {
-                return BadRequest("Invalid password");
+                return BadRequest("Nieprawid³owe has³o.");
             }
 
             var id = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -146,7 +146,7 @@ namespace FISTNESSGYM.Controllers
         {
             if (string.IsNullOrEmpty(userName) || string.IsNullOrEmpty(password))
             {
-                return BadRequest("Invalid user name or password.");
+                return BadRequest("Nieprawid³owy u¿ytkownik lub has³o.");
             }
 
             var user = new ApplicationUser { UserName = userName, Email = userName };
@@ -160,12 +160,12 @@ namespace FISTNESSGYM.Controllers
 
                     var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code }, protocol: Request.Scheme);
 
-                    var text = $@"Hi, <br /> <br />
-We received your registration request for FISTNESSGYM. <br /> <br />
-To confirm your registration please click the following link: <a href=""{callbackUrl}"">confirm your registration</a> <br /> <br />
-If you didn't request this registration, you can safely ignore this email. Someone else might have typed your email address by mistake.";                    
+                    var text = $@"Czeœæ, <br /> <br />
+                    Otrzymaliœmy Twoj¹ proœbê o rejestracjê w FISTNESSGYM. <br /> <br />
+                    Aby potwierdziæ rejestracjê, kliknij poni¿szy link: <a href=""{callbackUrl}"">potwierdŸ rejestracjê</a> <br /> <br />
+                    Jeœli nie prosi³eœ o tê rejestracjê, mo¿esz bezpiecznie zignorowaæ tê wiadomoœæ e-mail. Ktoœ inny móg³ przez pomy³kê wpisaæ Twój adres e-mail.";
 
-                    await SendEmailAsync(user.Email, "Confirm your registration", text);
+                    await SendEmailAsync(user.Email, "PotwierdŸ swoj¹ rejestracjê", text);
 
 
                     return Ok();
@@ -192,7 +192,7 @@ If you didn't request this registration, you can safely ignore this email. Someo
                 return Redirect("~/Login?info=Your registration has been confirmed");
             }
 
-            return RedirectWithError("Invalid user or confirmation code");
+            return RedirectWithError("Nieprawid³owy u¿ytkownik lub kod potwierdzaj¹cy.");
         }
 
         public async Task<IActionResult> ResetPassword(string userName)
@@ -201,7 +201,7 @@ If you didn't request this registration, you can safely ignore this email. Someo
 
             if (user == null)
             {
-                return BadRequest("Invalid user name.");
+                return BadRequest("Nieprawid³owa nazwa u¿ytkownika.");
             }
 
             try
@@ -210,9 +210,9 @@ If you didn't request this registration, you can safely ignore this email. Someo
 
                 var callbackUrl = Url.Action("ConfirmPasswordReset", "Account", new { userId = user.Id, code }, protocol: Request.Scheme);
 
-                var body = string.Format(@"<a href=""{0}"">{1}</a>", callbackUrl, "Please confirm your password reset.");
+                var body = string.Format(@"<a href=""{0}"">{1}</a>", callbackUrl, "Proszê potwierdŸ resetowanie has³a.");
 
-                await SendEmailAsync(user.Email, "Confirm your password reset", body);
+                await SendEmailAsync(user.Email, "PotwierdŸ resetowanie has³a", body);
 
                 return Ok();
             }
@@ -237,12 +237,12 @@ If you didn't request this registration, you can safely ignore this email. Someo
 
             if (result.Succeeded)
             {
-                await SendEmailAsync(user.Email, "New password", $"<p>Your new password is: {password}</p><p>Please change it after login.</p>");
+                await SendEmailAsync(user.Email, "Nowe has³o", $"<p>Twoje nowe has³o to: {password} </p><p> Zmieñ je po zalogowaniu.</p>");
 
-                return Redirect("~/Login?info=Password reset successful. You will receive an email with your new password.");
+                return Redirect("~/Login?info=Resetowanie has³a powiod³o siê. Otrzymasz wiadomoœæ e-mail z nowym has³em.");
             }
 
-            return Redirect("~/Login?error=Invalid user or confirmation code");
+            return Redirect("~/Login?error=Nieprawid³owy u¿ytkownik lub kod potwierdzaj¹cy");
         }
 
         private static string GenerateRandomPassword()

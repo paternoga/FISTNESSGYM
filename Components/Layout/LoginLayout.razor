@@ -7,22 +7,24 @@
 
 <RadzenLayout style="background: url('images/login.jpg'); background-size: cover;">
     <RadzenBody>
-        <RadzenStack JustifyContent="Radzen.JustifyContent.Center" Class="rz-mx-auto rz-p-4" Style="max-width: 1440px; height: 100%;">
-            <RadzenCard class="rz-shadow-3 rz-border-radius-4" style="padding: 0; overflow: hidden; background-color: var(--rz-base-background-color);">
-                <RadzenRow Gap="0">
-                    <RadzenColumn Size="12" SizeSM="6" Class="rz-background-color-primary rz-p-12" style="background-image: radial-gradient(circle at 4rem 4rem, var(--rz-primary) 0%, var(--rz-primary-darker) 80%); position: relative;">
-                        <RadzenImage Path="images/logo-login.png" style="width: 120px"></RadzenImage>
-                        <RadzenText Text="Welcome!" TextStyle="Radzen.Blazor.TextStyle.H2" class="rz-mt-4 rz-mt-md-12 rz-pt-0 rz-pt-md-12 rz-mb-6 rz-color-on-primary rz-display-none rz-display-sm-block" />
-                        <RadzenText TextStyle="Radzen.Blazor.TextStyle.Body1" class="rz-mb-12 rz-pb-0 rz-pb-md-12 rz-color-on-primary rz-display-none rz-display-sm-block">
-                            Fill in your login credentials to proceed.
+        <div style="display: flex; justify-content: center; align-items: center; height: 100vh;">
+            <RadzenCard class="rz-shadow-3 rz-border-radius-4" style="padding: 0; overflow: hidden; background-color: var(--rz-base-background-color); width: 955px">
+                <RadzenRow Gap="0" Style="max-width: 1440px; width: 957px">
+                    <RadzenColumn Size="12" SizeSM="6" Class="rz-background-color-primary rz-p-12" style="background-image: radial-gradient(circle at 4rem 4rem, var(--rz-black) 0%, var(--rz-primary-darker) 80%); position: relative; color: #000000; background-color: #050505; height: 517px; width: 478px">
+                        <div style="display: flex; justify-content: center;">
+                            <RadzenImage Path="images/logo3.png" style="width: 424px; height: 159px; text-align: center; position: relative"></RadzenImage>
+                        </div>
+                        <RadzenText Text="Witaj w naszym serwisie!" TextStyle="Radzen.Blazor.TextStyle.H4" class="rz-color-on-primary rz-display-none rz-display-sm-block" Style="height: 57px; width: 405px text-align: center;" />
+                        <RadzenText TextStyle="Radzen.Blazor.TextStyle.Body1" class="rz-mb-12 rz-pb-0 rz-pb-md-12 rz-color-on-primary rz-display-none rz-display-sm-block" Style="height: 201px; position: static; width: 382px">
+                            Aby uzyskać dostęp do swojego konta, prosimy o zalogowanie się.
+                            <br><br>Nie masz jeszcze konta? Zarejestruj się, aby rozpocząć korzystanie z naszych usług.
                         </RadzenText>
                     </RadzenColumn>
-                    <RadzenColumn Size="12" SizeSM="6" class="rz-p-12">
+                    <RadzenColumn Size="12" SizeSM="6" class="rz-p-12" Style="width: 550px">
                         @Body
                     </RadzenColumn>
                 </RadzenRow>
             </RadzenCard>
-            <RadzenText Text="FISTNESSGYM v1.0.0, Copyright Ⓒ 2024" TextStyle="Radzen.Blazor.TextStyle.Caption" TextAlign="Radzen.TextAlign.Center" Style="width: 100%; margin-top: 20px" TagName="Radzen.Blazor.TagName.P"/>
-        </RadzenStack>
+        </div>
     </RadzenBody>
 </RadzenLayout>

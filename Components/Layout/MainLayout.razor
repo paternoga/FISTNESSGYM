@@ -4,14 +4,14 @@
 
 <RadzenLayout style="grid-template-areas: 'rz-sidebar rz-header' 'rz-sidebar rz-body';">
     <RadzenHeader>
-        <RadzenRow JustifyContent="JustifyContent.Start" AlignItems="AlignItems.Center" Gap="0">
+        <RadzenRow JustifyContent="JustifyContent.Start" AlignItems="AlignItems.Center" Gap="0" style="background-color: #000000;">
             <RadzenColumn Size="5">
                 <RadzenSidebarToggle Click="@SidebarToggleClick"></RadzenSidebarToggle>
             </RadzenColumn>
             <RadzenColumn Size="7">
-                <RadzenStack AlignItems="AlignItems.Center" Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End" Gap="0.5rem" class="rz-px-2">
+                <RadzenStack AlignItems="AlignItems.Center" Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End" Gap="0.5rem" class="">
                     <RadzenAppearanceToggle />
-                    <RadzenProfileMenu Visible="@Security.IsAuthenticated()" Click="@ProfileMenuClick">
+                    <RadzenProfileMenu Visible="@Security.IsAuthenticated()" Click="@ProfileMenuClick" Style="background-color: #000000" >
                         <ChildContent>
                             <RadzenProfileMenuItem Path="profile" Icon="settings" Text="Profile" />
                             <RadzenProfileMenuItem Path="application-users" Icon="person" Text="Users" />
@@ -35,8 +35,8 @@
         </RadzenRow>
     </RadzenBody>
     <RadzenSidebar Expanded="@sidebarExpanded" style="z-index: 2; width: 258px">
-        <RadzenStack AlignItems="Radzen.AlignItems.Center" class="rz-py-4 rz-py-lg-6" Style="padding: var(--rz-panel-menu-item-padding); border-bottom: var(--rz-panel-menu-item-border); height: 107px">
-            <RadzenImage Path="images\logo.png"  style="width: 241px; height: 82px" AlternateText=""></RadzenImage>
+        <RadzenStack AlignItems="Radzen.AlignItems.Center" Style="padding: var(--rz-panel-menu-item-padding); border-bottom: var(--rz-panel-menu-item-border); height: 81px">
+            <RadzenImage Path="images\logo.png"  style="width: 251px; height: 83px; float: none; visibility: visible" AlternateText=""></RadzenImage>
         </RadzenStack>
         <RadzenPanelMenu>
             <RadzenPanelMenuItem Text="Strona główna" Icon="home" Path="" />
@@ -54,7 +54,7 @@
         </RadzenPanelMenu>
         
         <RadzenPanelMenu>
-            <RadzenPanelMenuItem Text="Analityka" Icon="calendar_month" Path="/calendar" />
+            <RadzenPanelMenuItem Text="Analityka" Icon="monitoring" Path="/analytics" />
         </RadzenPanelMenu>
 
         <RadzenPanelMenu>

@@ -57,25 +57,25 @@ namespace FISTNESSGYM.Components.Pages.Login
 
         protected async Task Register()
         {
-            var result = await DialogService.OpenAsync<RegisterApplicationUser>("Register Application User");
+            var result = await DialogService.OpenAsync<RegisterApplicationUser>("Rejestracja użytkownika");
 
             if (result == true)
             {
                 infoVisible = true;
 
-                info = "Registration accepted. Please check your email for further instructions.";
+                info = "Rejestracja powiodła się. Aby uzyskać dalsze instrukcje, sprawdź swoją pocztę e-mail.";
             }
         }
 
         protected async Task ResetPassword()
         {
-            var result = await DialogService.OpenAsync<ResetPassword>("Reset password");
+            var result = await DialogService.OpenAsync<ResetPassword>("Reset hasła");
 
             if (result == true)
             {
                 infoVisible = true;
 
-                info = "Password reset successfully. Please check your email for further instructions.";
+                info = "Reset hasła powiódł się. Aby uzyskać dalsze instrukcje, sprawdź swoją pocztę e-mail.";
             }
         }
     }
