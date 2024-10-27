@@ -82,7 +82,7 @@ namespace FISTNESSGYM.Controllers
 
                 if (user == null)
                 {
-                    return RedirectWithError("Nieprawid³owy u¿ytkownik lub has³o.", redirectUrl);
+                    return RedirectWithError("Nieprawidlowy uzytkownik lub haslo.", redirectUrl);
                 }
 
                 if (!user.EmailConfirmed)
@@ -97,7 +97,7 @@ namespace FISTNESSGYM.Controllers
                 }
             }
 
-            return RedirectWithError("Nieprawid³owy u¿ytkownik lub has³o.", redirectUrl);
+            return RedirectWithError("Nieprawidlowy uzytkownik lub haslo.", redirectUrl);
         }
         [HttpPost]
         [Authorize]
@@ -105,7 +105,7 @@ namespace FISTNESSGYM.Controllers
         {
             if (string.IsNullOrEmpty(oldPassword) || string.IsNullOrEmpty(newPassword))
             {
-                return BadRequest("Nieprawid³owe has³o.");
+                return BadRequest("Nieprawidlowe haslo.");
             }
 
             var id = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -146,7 +146,7 @@ namespace FISTNESSGYM.Controllers
         {
             if (string.IsNullOrEmpty(userName) || string.IsNullOrEmpty(password))
             {
-                return BadRequest("Nieprawid³owy u¿ytkownik lub has³o.");
+                return BadRequest("Nieprawidlowy uzytkownik lub haslo.");
             }
 
             var user = new ApplicationUser { UserName = userName, Email = userName };
@@ -160,13 +160,12 @@ namespace FISTNESSGYM.Controllers
 
                     var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code }, protocol: Request.Scheme);
 
-                    var text = $@"Czeœæ, <br /> <br />
-                    Otrzymaliœmy Twoj¹ proœbê o rejestracjê w FISTNESSGYM. <br /> <br />
-                    Aby potwierdziæ rejestracjê, kliknij poni¿szy link: <a href=""{callbackUrl}"">potwierdŸ rejestracjê</a> <br /> <br />
-                    Jeœli nie prosi³eœ o tê rejestracjê, mo¿esz bezpiecznie zignorowaæ tê wiadomoœæ e-mail. Ktoœ inny móg³ przez pomy³kê wpisaæ Twój adres e-mail.";
+                    var text = $@"Czesc, <br /> <br />
+            Otrzymalismy Twoja prosbe o rejestracje w FISTNESSGYM. <br /> <br />
+            Aby potwierdzic rejestracje, kliknij ponizszy link: <a href=""{callbackUrl}"">potwierdz rejestracje</a> <br /> <br />
+            Jesli nie prosiles o te rejestracje, mozesz bezpiecznie zignorowac te wiadomosc e-mail. Ktos inny mogl przez pomylke wpisac Twoj adres e-mail.";
 
-                    await SendEmailAsync(user.Email, "PotwierdŸ swoj¹ rejestracjê", text);
-
+                    await SendEmailAsync(user.Email, "Potwierdz swoja rejestracje", text);
 
                     return Ok();
                 }
@@ -192,7 +191,7 @@ namespace FISTNESSGYM.Controllers
                 return Redirect("~/Login?info=Your registration has been confirmed");
             }
 
-            return RedirectWithError("Nieprawid³owy u¿ytkownik lub kod potwierdzaj¹cy.");
+            return RedirectWithError("Nieprawidlowy uzytkownik lub kod potwierdzajacy.");
         }
 
         public async Task<IActionResult> ResetPassword(string userName)
@@ -201,7 +200,7 @@ namespace FISTNESSGYM.Controllers
 
             if (user == null)
             {
-                return BadRequest("Nieprawid³owa nazwa u¿ytkownika.");
+                return BadRequest("Nieprawidlowa nazwa uzytkownika.");
             }
 
             try
@@ -210,9 +209,9 @@ namespace FISTNESSGYM.Controllers
 
                 var callbackUrl = Url.Action("ConfirmPasswordReset", "Account", new { userId = user.Id, code }, protocol: Request.Scheme);
 
-                var body = string.Format(@"<a href=""{0}"">{1}</a>", callbackUrl, "Proszê potwierdŸ resetowanie has³a.");
+                var body = string.Format(@"<a href=""{0}"">{1}</a>", callbackUrl, "Prosze potwierdz resetowanie hasla.");
 
-                await SendEmailAsync(user.Email, "PotwierdŸ resetowanie has³a", body);
+                await SendEmailAsync(user.Email, "Potwierdz resetowanie hasla", body);
 
                 return Ok();
             }
@@ -237,12 +236,12 @@ namespace FISTNESSGYM.Controllers
 
             if (result.Succeeded)
             {
-                await SendEmailAsync(user.Email, "Nowe has³o", $"<p>Twoje nowe has³o to: {password} </p><p> Zmieñ je po zalogowaniu.</p>");
+                await SendEmailAsync(user.Email, "Nowe haslo", $"<p>Twoje nowe haslo to: {password} </p><p> Zmien je po zalogowaniu.</p>");
 
-                return Redirect("~/Login?info=Resetowanie has³a powiod³o siê. Otrzymasz wiadomoœæ e-mail z nowym has³em.");
+                return Redirect("~/Login?info=Resetowanie hasla powiodlo sie. Otrzymasz wiadomosc e-mail z nowym haslem.");
             }
 
-            return Redirect("~/Login?error=Nieprawid³owy u¿ytkownik lub kod potwierdzaj¹cy");
+            return Redirect("~/Login?error=Nieprawidlowy uzytkownik lub kod potwierdzajacy");
         }
 
         private static string GenerateRandomPassword()
