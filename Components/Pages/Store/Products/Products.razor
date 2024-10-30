@@ -2,15 +2,15 @@
 
 @attribute [Authorize]
 
-<PageTitle>Products</PageTitle>
+<PageTitle>Produkty</PageTitle>
 <RadzenStack>
     <RadzenRow AlignItems="AlignItems.Center">
         <RadzenColumn Size="12" SizeMD="6">
-            <RadzenText Text="Products" TextStyle="TextStyle.H3" TagName="TagName.H1" style="margin: 0" />
+            <RadzenText Text="Produkty" TextStyle="TextStyle.H3" TagName="TagName.H1" style="margin: 0" />
         </RadzenColumn>
         <RadzenColumn Size="12" SizeMD="6">
             <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.End" Gap="0.5rem">
-                <RadzenButton Icon="add_circle_outline" Text="Add" Click="@AddButtonClick" Variant="Variant.Flat" />
+                <RadzenButton Icon="add_circle_outline" Text="Dodaj" Click="@AddButtonClick" Variant="Variant.Flat" />
             </RadzenStack>
         </RadzenColumn>
     </RadzenRow>
@@ -21,17 +21,15 @@
             <Columns>
                 <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.Product" Property="Id" Title="Id">
                 </RadzenDataGridColumn>
-                <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.Product" Property="Name" Title="Name">
+                <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.Product" Property="Name" Title="Nazwa">
                 </RadzenDataGridColumn>
-                <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.Product" Property="Description" Title="Description">
+                <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.Product" Property="Description" Title="Opis">
                 </RadzenDataGridColumn>
-                <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.Product" Property="Price" Title="Price">
+                <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.Product" Property="Price" Title="Cena">
                 </RadzenDataGridColumn>
-                <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.Product" Property="StockQuantity" Title="Stock Quantity">
+                <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.Product" Property="StockQuantity" Title="Stan magazynowy">
                 </RadzenDataGridColumn>
-                <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.Product" Property="Category" Title="Category">
-                </RadzenDataGridColumn>
-                <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.Product" Property="ProductCategory.Name" Title="Product Category">
+                <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.Product" Property="ProductCategory.Name" Title="Kategoria">
                 </RadzenDataGridColumn>
                 <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.Product" Filterable="false" Sortable="false" Width="70px" TextAlign="TextAlign.Center">
                     <Template Context="product">

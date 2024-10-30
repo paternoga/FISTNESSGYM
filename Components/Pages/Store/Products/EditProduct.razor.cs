@@ -66,5 +66,17 @@ namespace FISTNESSGYM.Components.Pages.Store.Products
         {
             DialogService.Close(null);
         }
+
+        private void OnCategoryChange(object args)
+        {
+            if (args is int selectedCategoryId)
+            {
+                var selectedCategory = productCategoriesForCategoryId.FirstOrDefault(c => c.Id == selectedCategoryId);
+                if (selectedCategory != null)
+                {
+                    product.Category = selectedCategory.Name; 
+                }
+            }
+        }
     }
 }
