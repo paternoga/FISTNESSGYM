@@ -4,6 +4,7 @@
 @using Radzen.Blazor
 @inject databaseService databaseService
 @inject DialogService DialogService
+@inject SecurityService SecurityService
 
 <RadzenScheduler TItem="SchedulerEvent" Data="@events" StartProperty="Start" EndProperty="End" TextProperty="Title"
                  Style="height: 680px; width: 1400px" SlotSelect="OnSlotSelect" AppointmentSelect="OnEventSelect">
@@ -13,58 +14,86 @@
 
 @code {
     List<SchedulerEvent> events;
+    bool userIsClient;
+    bool userIsWorker;
+    string currentUserId;
 
     protected override async Task OnInitializedAsync()
     {
-        await LoadEventsAsync();
+        // Check if the user is authenticated and fetch their role
+        if (SecurityService.User != null && SecurityService.IsAuthenticated())
+        {
+            // Check if the user is in the "Client" role
+            userIsClient = SecurityService.IsInRole("Klient");
+            userIsWorker = SecurityService.IsInRole("Pracownik");
+            // Retrieve the logged-in user's ID
+            currentUserId = SecurityService.User.Id;
+        }
+
+        await LoadEventsAsync(); // Load events when the component initializes
     }
 
     // Load events from the database
     private async Task LoadEventsAsync()
     {
         events = await databaseService.GetAllEventsAsync();
-        StateHasChanged();  // Refresh UI
+        StateHasChanged();  // Refresh UI with updated events
     }
 
     async Task OnSlotSelect(SchedulerSlotSelectEventArgs args)
     {
-        // Set the end time to one hour after the start time
-        var newEvent = await DialogService.OpenAsync<EventDialog>("Dodaj wydarzenie", new Dictionary<string, object>
-    {
-        { "Start", args.Start },
-        { "End", args.Start.AddHours(1) } // Add 1 hour to start time
-    });
-
-        if (newEvent != null)
+        if (userIsWorker)
         {
-            // Save new event through the service
-            await databaseService.CreateEventAsync(newEvent);
+            // Open the dialog to add a new event with a default duration of 1 hour
+            var newEvent = await DialogService.OpenAsync<EventDialog>("Add Event", new Dictionary<string, object>
+            {
+            { "Start", args.Start },
+            { "End", args.Start.AddHours(1) }  // Set event end time to 1 hour after the start
+            });
 
-            // Reload events after adding a new one
-            await LoadEventsAsync();
+            if (newEvent != null)
+            {
+                // Save the new event using the database service
+                await databaseService.CreateEventAsync(newEvent);
+                await LoadEventsAsync(); // Refresh events list after adding
+            }
         }
-    }
 
+    }
 
     async Task OnEventSelect(SchedulerAppointmentSelectEventArgs<SchedulerEvent> args)
     {
-        var editedEvent = await DialogService.OpenAsync<EditEventDialog>("Edytuj wydarzenie", new Dictionary<string, object>
+        if (userIsClient)
         {
-            { "EventItem", args.Data }
+            var eventDetails = await DialogService.OpenAsync<EventDetailsDialog>("Szczegó³y wydarzenia", new Dictionary<string, object>
+        {
+            { "EventItem", args.Data },
+            { "CurrentUserId", currentUserId } // Pass the user's ID to the dialog
         });
 
-        if (editedEvent == null)
-        {
-            // Event was deleted, so reload events
-            await LoadEventsAsync();
+            if (eventDetails == true)
+            {
+                await LoadEventsAsync(); // Refresh events after reservation
+            }
         }
-        else
+        else if(userIsWorker)
         {
-            // Update the event through the service
-            await databaseService.UpdateEventAsync(editedEvent);
+            // Show event edit dialog for admin
+            var editedEvent = await DialogService.OpenAsync<EditEventDialog>("Edytuj wydarzenie", new Dictionary<string, object>
+        {
+            { "EventItem", args.Data }
+            });
 
-            // Reload events after editing
-            await LoadEventsAsync();
+            if (editedEvent == null)
+            {
+                await LoadEventsAsync();
+            }
+            else
+            {
+                await databaseService.UpdateEventAsync(editedEvent);
+                await LoadEventsAsync();
+            }
         }
     }
+
 }

@@ -1,0 +1,145 @@
+﻿@page "/event-details-dialog"
+@using FISTNESSGYM.Models
+@using FISTNESSGYM.Components.Pages.Calendar
+@inject DialogService DialogService
+@inject databaseService databaseService
+
+@code {
+    [Parameter]
+    public SchedulerEvent EventItem { get; set; }
+
+    [Parameter]
+    public string CurrentUserId { get; set; }
+
+    private int currentParticipants;
+    private bool alreadyRegistered;
+    private bool isLoading = true;
+    private string infoMessage;
+    private string errorMessage;
+}
+
+<RadzenCard>
+    <RadzenStack>
+        <RadzenLabel Text="Tytuł:" />
+        <RadzenTextBox Value="@EventItem.Title" Disabled="true" />
+
+        <RadzenLabel Text="Instruktor:" />
+        <RadzenTextBox Value="@EventItem.InstructorName" Disabled="true" />
+
+        <RadzenLabel Text="Liczba uczestników:" />
+        <RadzenTextBox Value="@currentParticipants.ToString()" Disabled="true" />
+
+        <RadzenLabel Text="Maksymalna liczba uczestników:" />
+        <RadzenTextBox Value="@EventItem.MaxParticipants.ToString()" Disabled="true" />
+
+        @if (isLoading)
+        {
+            <RadzenProgressBar Mode="ProgressBarMode.Indeterminate" />
+        }
+        else
+        {
+            <!-- Display informational or error message, if any -->
+            @if (!string.IsNullOrEmpty(infoMessage))
+            {
+                <RadzenAlert Text="@infoMessage" Severity="Severity.Info" />
+            }
+            else if (!string.IsNullOrEmpty(errorMessage))
+            {
+                <RadzenAlert Text="@errorMessage" Severity="Severity.Error" />
+            }
+
+            <!-- Display registration or unregistration buttons -->
+            <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" AlignItems="AlignItems.Center">
+                @if (alreadyRegistered)
+                {
+                    <RadzenButton Text="Wypisz się" Click="@OnUnregisterClick" Style="width: 150px;" />
+                }
+                else if (currentParticipants < EventItem.MaxParticipants)
+                {
+                    <RadzenButton Text="Zapisz się" Click="@OnRegisterClick" Style="width: 150px;" />
+                }
+            </RadzenStack>
+        }
+    </RadzenStack>
+</RadzenCard>
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            currentParticipants = await databaseService.GetParticipantCountAsync(EventItem.Id);
+            alreadyRegistered = await databaseService.IsUserRegisteredForEvent(CurrentUserId, EventItem.Id);
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Wystąpił błąd: {ex.Message}";
+        }
+        finally
+        {
+            isLoading = false;
+        }
+
+        if (alreadyRegistered)
+        {
+            infoMessage = "Już jesteś zapisany na to wydarzenie.";
+        }
+        else if (currentParticipants >= EventItem.MaxParticipants)
+        {
+            infoMessage = "Brak dostępnych miejsc na to wydarzenie.";
+        }
+    }
+
+    private async Task OnRegisterClick()
+    {
+        if (string.IsNullOrEmpty(CurrentUserId))
+        {
+            errorMessage = "Błąd: ID użytkownika jest puste. Spróbuj ponownie później.";
+            return;
+        }
+
+        if (alreadyRegistered)
+        {
+            infoMessage = "Już jesteś zapisany na to wydarzenie.";
+            return;
+        }
+
+        if (currentParticipants >= EventItem.MaxParticipants)
+        {
+            infoMessage = "Brak dostępnych miejsc na to wydarzenie.";
+            return;
+        }
+
+        await databaseService.CreateReservationAsync(EventItem.Id, CurrentUserId);
+        currentParticipants += 1;
+        alreadyRegistered = true;
+        infoMessage = "Zostałeś zapisany na wydarzenie!";
+    }
+
+    private async Task OnUnregisterClick()
+    {
+        var confirmed = await DialogService.Confirm(
+            "Czy na pewno chcesz się wypisać z tego wydarzenia?",       
+            "Potwierdzenie wypisu",                                     
+            new ConfirmOptions
+                {
+                    OkButtonText = "Tak, wypisz się",                      
+                    CancelButtonText = "Anuluj"                             
+                }
+        );
+
+        if (confirmed == true)
+        {
+            if (!alreadyRegistered)
+            {
+                infoMessage = "Nie jesteś zapisany na to wydarzenie.";
+                return;
+            }
+
+            await databaseService.DeleteReservationAsync(EventItem.Id, CurrentUserId);
+            currentParticipants -= 1;
+            alreadyRegistered = false;
+            infoMessage = "Zostałeś wypisany z wydarzenia!";
+        }
+    }
+}

@@ -2764,7 +2764,7 @@ namespace FISTNESSGYM
         }
         public async Task RemoveEventAsync(int eventId)
         {
-
+            // Retrieve the event that needs to be deleted
             var eventToDelete = await Context.Events.FindAsync(eventId);
 
             if (eventToDelete == null)
@@ -2772,12 +2772,19 @@ namespace FISTNESSGYM
                 throw new Exception("Event not found");
             }
 
+            // Retrieve all reservations associated with the event
+            var reservationsToDelete = Context.Reservations.Where(r => r.EventId == eventId);
 
+            // Remove the associated reservations
+            Context.Reservations.RemoveRange(reservationsToDelete);
+
+            // Remove the event itself
             Context.Events.Remove(eventToDelete);
 
-
+            // Commit the changes to the database
             await Context.SaveChangesAsync();
         }
+
 
         public async Task ExportSubscriptionStatusesToExcel(Query query = null, string fileName = null)
         {
@@ -3431,5 +3438,89 @@ namespace FISTNESSGYM
 
             return itemToDelete;
         }
+        public async Task<int> GetParticipantCountAsync(int eventId)
+        {
+            return await Context.Reservations.CountAsync(r => r.EventId == eventId);
         }
+
+        public async Task<bool> IsUserRegisteredForEvent(string userId, int eventId)
+        {
+            return await Context.Reservations.AnyAsync(r => r.UserId == userId && r.EventId == eventId);
+        }
+
+        public async Task<bool> CreateReservationAsync(int eventId, string userId)
+        {
+            // Check if the user is already registered for the event
+            if (await IsUserRegisteredForEvent(userId, eventId))
+            {
+                // User is already registered
+                return false;
+            }
+
+            // Retrieve the event from the database
+            var eventItem = await Context.Events.FindAsync(eventId);
+            if (eventItem == null)
+            {
+                throw new Exception("Event not found");
+            }
+
+            // Check if the event is already at max capacity
+            int currentParticipants = await GetParticipantCountAsync(eventId);
+            if (currentParticipants >= eventItem.MaxParticipants)
+            {
+                // Event is at max capacity
+                return false;
+            }
+
+            // Create the reservation since all conditions are met
+            var reservation = new Reservation
+            {
+                EventId = eventId,
+                UserId = userId
+            };
+            Context.Reservations.Add(reservation);
+
+            // Increment the participants count in the event itself
+            eventItem.Participants += 1;
+
+            // Save changes to the database
+            await Context.SaveChangesAsync();
+
+            return true;  // Reservation successfully created
+        }
+
+        public async Task DeleteReservationAsync(int eventId, string userId)
+        {
+            try
+            {
+                // ZnajdŸ rezerwacjê dla danego u¿ytkownika i wydarzenia
+                var reservation = await Context.Reservations
+                    .FirstOrDefaultAsync(r => r.EventId == eventId && r.UserId == userId);
+
+                if (reservation != null)
+                {
+                    // Usuñ rezerwacjê
+                    Context.Reservations.Remove(reservation);
+
+                    // ZnajdŸ wydarzenie i zaktualizuj liczbê uczestników
+                    var eventToUpdate = await Context.Events.FindAsync(eventId);
+                    if (eventToUpdate != null)
+                    {
+                        eventToUpdate.Participants -= 1;
+                        if (eventToUpdate.Participants < 0) eventToUpdate.Participants = 0; // Zapewnia, ¿e liczba uczestników nie spada poni¿ej zera
+                    }
+
+                    await Context.SaveChangesAsync();
+                }
+            }
+            catch (Exception ex)
+            {
+                // Logowanie lub obs³uga b³êdu
+                throw new ApplicationException($"Error removing reservation for user {userId} on event {eventId}: {ex.Message}");
+            }
+        }
+
+
+
+    }
 }
