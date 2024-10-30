@@ -36,8 +36,15 @@
         <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap">
             <RadzenLabel Text="Liczba uczestników" Style="width: 8rem;" />
             <RadzenNumeric @bind-Value="model.MaxParticipants" Name="MaxParticipants" Style="width: 15rem;" />
+
+            <!-- Validator to ensure the field is required -->
             <RadzenRequiredValidator Component="MaxParticipants" Text="Maksymalna liczba uczestników jest wymagana" />
+
+            <!-- Validator to ensure the value is at least 1 -->
+            <RadzenNumericRangeValidator Component="MaxParticipants" Min="1" Text="Liczba uczestników nie może być mniejsza niż 1" />
         </RadzenStack>
+
+
 
         <!-- Save Button -->
         <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End">
@@ -69,7 +76,7 @@
         {
             model.Start = Start;
             model.End = End;
-            model.Participants = 0; // Set participants to 0 by default for new events
+            model.MaxParticipants = 1; 
         }
     }
 
