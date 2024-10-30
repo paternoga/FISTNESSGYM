@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Components.Web;
 using Radzen;
 using Radzen.Blazor;
 
-namespace FISTNESSGYM.Components.Pages.Store
+namespace FISTNESSGYM.Components.Pages.Store.Products
 {
     public partial class EditProduct
     {
@@ -40,7 +40,7 @@ namespace FISTNESSGYM.Components.Pages.Store
             product = await databaseService.GetProductById(Id);
         }
         protected bool errorVisible;
-        protected FISTNESSGYM.Models.database.Product product;
+        protected Models.database.Product product;
 
         [Inject]
         protected SecurityService Security { get; set; }

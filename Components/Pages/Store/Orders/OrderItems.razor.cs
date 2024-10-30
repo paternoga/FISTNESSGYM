@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Components.Web;
 using Radzen;
 using Radzen.Blazor;
 
-namespace FISTNESSGYM.Components.Pages.Store
+namespace FISTNESSGYM.Components.Pages.Store.Orders
 {
     public partial class OrderItems
     {
@@ -33,9 +33,9 @@ namespace FISTNESSGYM.Components.Pages.Store
         [Inject]
         public databaseService databaseService { get; set; }
 
-        protected IEnumerable<FISTNESSGYM.Models.database.OrderItem> orderItems;
+        protected IEnumerable<Models.database.OrderItem> orderItems;
 
-        protected RadzenDataGrid<FISTNESSGYM.Models.database.OrderItem> grid0;
+        protected RadzenDataGrid<Models.database.OrderItem> grid0;
         protected bool isEdit = true;
         protected override async Task OnInitializedAsync()
         {
@@ -49,16 +49,16 @@ namespace FISTNESSGYM.Components.Pages.Store
         protected async Task AddButtonClick(MouseEventArgs args)
         {
             isEdit = false;
-            orderItem = new FISTNESSGYM.Models.database.OrderItem();
+            orderItem = new Models.database.OrderItem();
         }
 
-        protected async Task EditRow(FISTNESSGYM.Models.database.OrderItem args)
+        protected async Task EditRow(Models.database.OrderItem args)
         {
             isEdit = true;
             orderItem = args;
         }
 
-        protected async Task GridDeleteButtonClick(MouseEventArgs args, FISTNESSGYM.Models.database.OrderItem orderItem)
+        protected async Task GridDeleteButtonClick(MouseEventArgs args, Models.database.OrderItem orderItem)
         {
             try
             {
@@ -83,11 +83,11 @@ namespace FISTNESSGYM.Components.Pages.Store
             }
         }
         protected bool errorVisible;
-        protected FISTNESSGYM.Models.database.OrderItem orderItem;
+        protected Models.database.OrderItem orderItem;
 
-        protected IEnumerable<FISTNESSGYM.Models.database.Order> ordersForOrderId;
+        protected IEnumerable<Models.database.Order> ordersForOrderId;
 
-        protected IEnumerable<FISTNESSGYM.Models.database.Product> productsForProductId;
+        protected IEnumerable<Models.database.Product> productsForProductId;
 
         [Inject]
         protected SecurityService Security { get; set; }

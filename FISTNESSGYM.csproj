@@ -16,7 +16,8 @@
     <PackageReference Include="Microsoft.AspNetCore.OData" Version="8.2.3" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Components\Pages\Events\" />
-    <Folder Include="Components\Pages\Analytics\" />
+    <Folder Include="Components\Pages\Training\Events\" />
+    <Folder Include="Components\Pages\Store\Cart\" />
+    <Folder Include="Components\Pages\Training\Training Plans\" />
   </ItemGroup>
 </Project>

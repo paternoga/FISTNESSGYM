@@ -43,13 +43,18 @@
         </RadzenPanelMenu>
 
         <RadzenPanelMenu>
-            <RadzenPanelMenuItem Text="Kalendarz" Icon="calendar_month" Path="/calendar" />
+            <RadzenPanelMenuItem Text="Trening" Icon="calendar_month" Path="" >
+                <RadzenPanelMenuItem Path="training/calendar" Icon="calendar_month" Text="Kalendarz" />
+                <RadzenPanelMenuItem Path="training/classes" Icon="sports_gymnastics" Text="Zajęcia" />
+                <RadzenPanelMenuItem Path="training/training_plans" Icon="exercise" Text="Plany treningowe" />
+            </RadzenPanelMenuItem>
         </RadzenPanelMenu>
 
         <RadzenPanelMenu>
-            <RadzenPanelMenuItem Text="Sklep" Icon="store">     
-                <RadzenPanelMenuItem Text="Produkty" Icon="shopping_cart" Path="/store/products" />
-                <RadzenPanelMenuItem Text="Zamówienia" Icon="category" Path="/store/orders" />
+            <RadzenPanelMenuItem Text="Sklep" Icon="store">
+                <RadzenPanelMenuItem Path="store/cart" Icon="shopping_cart" Text="Koszyk" />
+                <RadzenPanelMenuItem Path="store/products" Icon="shopping_cart" Text="Produkty" />
+                <RadzenPanelMenuItem Path="store/orders" Icon="category" Text="Zamówienia" />
             </RadzenPanelMenuItem>
         </RadzenPanelMenu>
         
@@ -58,9 +63,10 @@
         </RadzenPanelMenu>
 
         <RadzenPanelMenu>
-            <RadzenPanelMenuItem Text="Ustawienia" Icon="settings">
-                <RadzenPanelMenuItem Path="settings/application-users" Icon="person" Text="Użytkownicy" />
-                <RadzenPanelMenuItem Path="settings/application-roles" Icon="security" Text="Role" />
+            <RadzenPanelMenuItem Text="Ustawienia" Icon="settings" >
+                <RadzenPanelMenuItem Path="settings/profile" Icon="person" Text="Profil" />
+                <RadzenPanelMenuItem Path="settings/application-users" Icon="group" Text="Użytkownicy" />
+                <RadzenPanelMenuItem Path="settings/application-roles" Icon="badge" Text="Role" />
             </RadzenPanelMenuItem>
         </RadzenPanelMenu>
     </RadzenSidebar>
