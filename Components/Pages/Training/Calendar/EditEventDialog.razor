@@ -6,31 +6,31 @@
     <RadzenStack Gap="1rem">
         <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap">
             <RadzenLabel Text="Tytuł" Style="width: 8rem;" />
-            <RadzenTextBox @bind-Value="model.Title" Name="Title" Style="width: 15rem;" />
+            <RadzenTextBox @bind-Value="model.Title" Name="Title" Style="width: 25rem" />
             <RadzenRequiredValidator Component="Title" Text="Tytuł jest wymagany" />
         </RadzenStack>
 
         <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap">
             <RadzenLabel Text="Instruktor" Style="width: 8rem;" />
-            <RadzenTextBox @bind-Value="model.InstructorName" Name="InstructorName" Style="width: 15rem;" />
+            <RadzenTextBox @bind-Value="model.InstructorName" Name="InstructorName" Style="width: 25rem" />
             <RadzenRequiredValidator Component="InstructorName" Text="Imię instruktora jest wymagane" />
         </RadzenStack>
 
         <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap">
             <RadzenLabel Text="Początek" Style="width: 8rem;" />
-            <RadzenDatePicker @bind-Value="model.Start" Name="Start" ShowTime="true" Style="width: 15rem;" />
+            <RadzenDatePicker @bind-Value="model.Start" Name="Start" ShowTime="true" Style="width: 25rem" />
             <RadzenRequiredValidator Component="Start" Text="Czas rozpoczęcia jest wymagany" />
         </RadzenStack>
 
         <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap">
             <RadzenLabel Text="Koniec" Style="width: 8rem;" />
-            <RadzenDatePicker Name="End" @bind-Value="model.End" ShowTime="true" Style="width: 15rem;" />
+            <RadzenDatePicker Name="End" @bind-Value="model.End" ShowTime="true" Style="width: 25rem" />
             <RadzenRequiredValidator Component="End" Text="Czas zakończenia jest wymagany" />
         </RadzenStack>
 
         <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap">
             <RadzenLabel Text="Liczba uczestników" Style="width: 8rem;" />
-            <RadzenNumeric @bind-Value="model.MaxParticipants" Name="MaxParticipants" Style="width: 15rem;" />
+            <RadzenNumeric @bind-Value="model.MaxParticipants" Name="MaxParticipants" Style="width: 25rem" />
             <RadzenRequiredValidator Component="MaxParticipants" Text="Maksymalna liczba uczestników jest wymagana" />
         </RadzenStack>
 
