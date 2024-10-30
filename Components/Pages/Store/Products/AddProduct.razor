@@ -48,6 +48,16 @@
                     <RadzenTextBox style="display: block; width: 100%" @bind-Value="@product.Category" Name="Category" />
                 </RadzenColumn>
             </RadzenRow>
+            <RadzenRow style="margin-bottom: 1rem">
+                <RadzenColumn SizeMD="3">
+                    <RadzenLabel Text="Product Category" Component="ProductCategory" style="width: 100%" />
+                </RadzenColumn>
+                <RadzenColumn SizeMD="9">
+                    <RadzenDropDown Data="@productCategoriesForCategoryId" TextProperty="Name" ValueProperty="Id" AllowClear=true
+                         Placeholder="Choose ProductCategory" style="display: block; width: 100%" @bind-Value="@product.CategoryId" Name="CategoryId"
+                           />
+                </RadzenColumn>
+            </RadzenRow>
           <RadzenStack  Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.End" Gap="0.5rem">
                     <RadzenButton ButtonStyle="ButtonStyle.Primary" ButtonType="ButtonType.Submit" Icon="save" Text="Save" Variant="Variant.Flat" />
                     <RadzenButton ButtonStyle="ButtonStyle.Light" Text="Cancel" Variant="Variant.Flat" Click="@CancelButtonClick"  />

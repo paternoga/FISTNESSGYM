@@ -26,6 +26,12 @@ namespace FISTNESSGYM.Services
             return await _context.Products.FindAsync(id);
         }
 
+        public async Task<List<string>> GetAllCategoriesAsync()
+        {
+            return await _context.ProductCategories
+                .Select(c => c.Name)  // Assuming "Name" is the property storing category names
+                .ToListAsync();
+        }
         public async Task<List<Product>> GetFilteredProductsAsync(string searchTerm, string category, bool sortAscending)
         {
             var query = _context.Products.AsQueryable();

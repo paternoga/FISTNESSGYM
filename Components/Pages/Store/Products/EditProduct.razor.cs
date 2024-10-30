@@ -38,9 +38,13 @@ namespace FISTNESSGYM.Components.Pages.Store.Products
         protected override async Task OnInitializedAsync()
         {
             product = await databaseService.GetProductById(Id);
+
+            productCategoriesForCategoryId = await databaseService.GetProductCategories();
         }
         protected bool errorVisible;
-        protected Models.database.Product product;
+        protected FISTNESSGYM.Models.database.Product product;
+
+        protected IEnumerable<FISTNESSGYM.Models.database.ProductCategory> productCategoriesForCategoryId;
 
         [Inject]
         protected SecurityService Security { get; set; }

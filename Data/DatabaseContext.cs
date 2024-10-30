@@ -34,54 +34,6 @@ namespace FISTNESSGYM.Data
                 table.UserId, table.LoginProvider, table.Name
             });
 
-            builder.Entity<FISTNESSGYM.Models.database.Order>()
-              .HasOne(i => i.OrderStatus)
-              .WithMany(i => i.Orders)
-              .HasForeignKey(i => i.OrderStatusId)
-              .HasPrincipalKey(i => i.Id);
-
-            builder.Entity<FISTNESSGYM.Models.database.Order>()
-              .HasOne(i => i.AspNetUser)
-              .WithMany(i => i.Orders)
-              .HasForeignKey(i => i.UserId)
-              .HasPrincipalKey(i => i.Id);
-
-            builder.Entity<FISTNESSGYM.Models.database.OrderItem>()
-              .HasOne(i => i.Order)
-              .WithMany(i => i.OrderItems)
-              .HasForeignKey(i => i.OrderId)
-              .HasPrincipalKey(i => i.Id);
-
-            builder.Entity<FISTNESSGYM.Models.database.OrderItem>()
-              .HasOne(i => i.Product)
-              .WithMany(i => i.OrderItems)
-              .HasForeignKey(i => i.ProductId)
-              .HasPrincipalKey(i => i.Id);
-
-            builder.Entity<FISTNESSGYM.Models.database.Reservation>()
-              .HasOne(i => i.Event)
-              .WithMany(i => i.Reservations)
-              .HasForeignKey(i => i.EventId)
-              .HasPrincipalKey(i => i.Id);
-
-            builder.Entity<FISTNESSGYM.Models.database.Reservation>()
-              .HasOne(i => i.AspNetUser)
-              .WithMany(i => i.Reservations)
-              .HasForeignKey(i => i.UserId)
-              .HasPrincipalKey(i => i.Id);
-
-            builder.Entity<FISTNESSGYM.Models.database.Subscription>()
-              .HasOne(i => i.SubscriptionStatus)
-              .WithMany(i => i.Subscriptions)
-              .HasForeignKey(i => i.SubscriptionStatusId)
-              .HasPrincipalKey(i => i.Id);
-
-            builder.Entity<FISTNESSGYM.Models.database.Subscription>()
-              .HasOne(i => i.AspNetUser)
-              .WithMany(i => i.Subscriptions)
-              .HasForeignKey(i => i.UserId)
-              .HasPrincipalKey(i => i.Id);
-
             builder.Entity<FISTNESSGYM.Models.database.AspNetRoleClaim>()
               .HasOne(i => i.AspNetRole)
               .WithMany(i => i.AspNetRoleClaims)
@@ -118,6 +70,80 @@ namespace FISTNESSGYM.Data
               .HasForeignKey(i => i.UserId)
               .HasPrincipalKey(i => i.Id);
 
+            builder.Entity<FISTNESSGYM.Models.database.Order>()
+              .HasOne(i => i.OrderStatus)
+              .WithMany(i => i.Orders)
+              .HasForeignKey(i => i.OrderStatusId)
+              .HasPrincipalKey(i => i.Id);
+
+            builder.Entity<FISTNESSGYM.Models.database.Order>()
+              .HasOne(i => i.AspNetUser)
+              .WithMany(i => i.Orders)
+              .HasForeignKey(i => i.UserId)
+              .HasPrincipalKey(i => i.Id);
+
+            builder.Entity<FISTNESSGYM.Models.database.OrderItem>()
+              .HasOne(i => i.Order)
+              .WithMany(i => i.OrderItems)
+              .HasForeignKey(i => i.OrderId)
+              .HasPrincipalKey(i => i.Id);
+
+            builder.Entity<FISTNESSGYM.Models.database.OrderItem>()
+              .HasOne(i => i.Product)
+              .WithMany(i => i.OrderItems)
+              .HasForeignKey(i => i.ProductId)
+              .HasPrincipalKey(i => i.Id);
+
+            builder.Entity<FISTNESSGYM.Models.database.Product>()
+              .HasOne(i => i.ProductCategory)
+              .WithMany(i => i.Products)
+              .HasForeignKey(i => i.CategoryId)
+              .HasPrincipalKey(i => i.Id);
+
+            builder.Entity<FISTNESSGYM.Models.database.Reservation>()
+              .HasOne(i => i.Event)
+              .WithMany(i => i.Reservations)
+              .HasForeignKey(i => i.EventId)
+              .HasPrincipalKey(i => i.Id);
+
+            builder.Entity<FISTNESSGYM.Models.database.Reservation>()
+              .HasOne(i => i.AspNetUser)
+              .WithMany(i => i.Reservations)
+              .HasForeignKey(i => i.UserId)
+              .HasPrincipalKey(i => i.Id);
+
+            builder.Entity<FISTNESSGYM.Models.database.Subscription>()
+              .HasOne(i => i.SubscriptionStatus)
+              .WithMany(i => i.Subscriptions)
+              .HasForeignKey(i => i.SubscriptionStatusId)
+              .HasPrincipalKey(i => i.Id);
+
+            builder.Entity<FISTNESSGYM.Models.database.Subscription>()
+              .HasOne(i => i.AspNetUser)
+              .WithMany(i => i.Subscriptions)
+              .HasForeignKey(i => i.UserId)
+              .HasPrincipalKey(i => i.Id);
+
+            builder.Entity<FISTNESSGYM.Models.database.CartItem>()
+              .HasOne(i => i.Product)
+              .WithMany(i => i.CartItems)
+              .HasForeignKey(i => i.ProductId)
+              .HasPrincipalKey(i => i.Id);
+
+            builder.Entity<FISTNESSGYM.Models.database.CartItem>()
+              .HasOne(i => i.AspNetUser)
+              .WithMany(i => i.CartItems)
+              .HasForeignKey(i => i.UserId)
+              .HasPrincipalKey(i => i.Id);
+
+            builder.Entity<FISTNESSGYM.Models.database.CartItem>()
+              .Property(p => p.Quantity)
+              .HasDefaultValueSql(@"((1))");
+
+            builder.Entity<FISTNESSGYM.Models.database.AspNetUser>()
+              .Property(p => p.LockoutEnd)
+              .HasColumnType("datetimeoffset");
+
             builder.Entity<FISTNESSGYM.Models.database.Event>()
               .Property(p => p.EventStartDate)
               .HasColumnType("datetime");
@@ -137,12 +163,22 @@ namespace FISTNESSGYM.Data
             builder.Entity<FISTNESSGYM.Models.database.Subscription>()
               .Property(p => p.EndDate)
               .HasColumnType("datetime");
-
-            builder.Entity<FISTNESSGYM.Models.database.AspNetUser>()
-              .Property(p => p.LockoutEnd)
-              .HasColumnType("datetimeoffset");
             this.OnModelBuilding(builder);
         }
+
+        public DbSet<FISTNESSGYM.Models.database.AspNetRoleClaim> AspNetRoleClaims { get; set; }
+
+        public DbSet<FISTNESSGYM.Models.database.AspNetRole> AspNetRoles { get; set; }
+
+        public DbSet<FISTNESSGYM.Models.database.AspNetUserClaim> AspNetUserClaims { get; set; }
+
+        public DbSet<FISTNESSGYM.Models.database.AspNetUserLogin> AspNetUserLogins { get; set; }
+
+        public DbSet<FISTNESSGYM.Models.database.AspNetUserRole> AspNetUserRoles { get; set; }
+
+        public DbSet<FISTNESSGYM.Models.database.AspNetUser> AspNetUsers { get; set; }
+
+        public DbSet<FISTNESSGYM.Models.database.AspNetUserToken> AspNetUserTokens { get; set; }
 
         public DbSet<FISTNESSGYM.Models.database.Event> Events { get; set; }
 
@@ -160,19 +196,10 @@ namespace FISTNESSGYM.Data
 
         public DbSet<FISTNESSGYM.Models.database.SubscriptionStatus> SubscriptionStatuses { get; set; }
 
-        public DbSet<FISTNESSGYM.Models.database.AspNetRoleClaim> AspNetRoleClaims { get; set; }
+        public DbSet<FISTNESSGYM.Models.database.ProductCategory> ProductCategories { get; set; }
 
-        public DbSet<FISTNESSGYM.Models.database.AspNetRole> AspNetRoles { get; set; }
-
-        public DbSet<FISTNESSGYM.Models.database.AspNetUserClaim> AspNetUserClaims { get; set; }
-
-        public DbSet<FISTNESSGYM.Models.database.AspNetUserLogin> AspNetUserLogins { get; set; }
-
-        public DbSet<FISTNESSGYM.Models.database.AspNetUserRole> AspNetUserRoles { get; set; }
-
-        public DbSet<FISTNESSGYM.Models.database.AspNetUser> AspNetUsers { get; set; }
-
-        public DbSet<FISTNESSGYM.Models.database.AspNetUserToken> AspNetUserTokens { get; set; }
+        public DbSet<FISTNESSGYM.Models.database.CartItem> CartItems { get; set; }
+        public IEnumerable<object> ProductCategory { get; internal set; }
 
         protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
         {

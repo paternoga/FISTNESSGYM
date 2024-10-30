@@ -41,7 +41,7 @@ namespace FISTNESSGYM.Components.Pages.Store.Products
         protected SecurityService Security { get; set; }
         protected override async Task OnInitializedAsync()
         {
-            products = await databaseService.GetProducts();
+            products = await databaseService.GetProducts(new Query { Expand = "ProductCategory" });
         }
 
         protected async Task AddButtonClick(MouseEventArgs args)

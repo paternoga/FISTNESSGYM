@@ -22,7 +22,7 @@
     // Load events from the database
     private async Task LoadEventsAsync()
     {
-        events = await databaseService.GetAllEventsAsync();
+        //events = await databaseService.GetAllEventsAsync();
         StateHasChanged();  // Refresh UI
     }
 
@@ -38,7 +38,7 @@
         if (newEvent != null)
         {
             // Save new event through the service
-            await databaseService.CreateEventAsync(newEvent);
+            //await databaseService.CreateEventAsync(newEvent);
 
             // Reload events after adding a new one
             await LoadEventsAsync();
@@ -61,7 +61,7 @@
         else
         {
             // Update the event through the service
-            await databaseService.UpdateEventAsync(editedEvent);
+            //await databaseService.UpdateEventAsync(editedEvent);
 
             // Reload events after editing
             await LoadEventsAsync();

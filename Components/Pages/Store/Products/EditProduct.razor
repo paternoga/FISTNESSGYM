@@ -1,4 +1,5 @@
-@page "/edit-product"
+@page "/edit-product"
+
 @attribute [Authorize]
 
 <PageTitle>Edit Product</PageTitle>
@@ -47,6 +48,13 @@
                 </RadzenColumn>
                 <RadzenColumn SizeMD="9">
                     <RadzenTextBox style="display: block; width: 100%" @bind-Value="@product.Category" Name="Category" />
+                </RadzenColumn>
+            </RadzenRow>
+            <RadzenRow style="margin-bottom: 1rem">
+                <RadzenColumn SizeMD="9">
+                    <RadzenDropDown Data="@productCategoriesForCategoryId" TextProperty="Name" ValueProperty="Id" AllowClear=true
+                         Placeholder="Choose ProductCategory" style="display: block; width: 100%" @bind-Value="@product.CategoryId" Name="CategoryId"
+                           />
                 </RadzenColumn>
             </RadzenRow>
           <RadzenStack  Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.End" Gap="0.5rem">

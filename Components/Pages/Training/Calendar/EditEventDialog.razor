@@ -74,7 +74,7 @@
         if (confirmed == true && model.Id != 0)
         {
             // Remove event through the service
-            await databaseService.RemoveEventAsync(model.Id);
+            //await databaseService.RemoveEventAsync(model.Id);
 
             // Close the dialog and return null to indicate deletion
             DialogService.Close(null);

@@ -1,4 +1,5 @@
 ﻿@page "/products-catalog"
+@using FISTNESSGYM.Services
 @inject IProductService ProductService
 @inject ICartService CartService
 @inject NavigationManager NavigationManager
@@ -10,6 +11,13 @@
 
 <h3 class="catalog-title">Katalog Produktów</h3>
 <link href="css/store/productcatalog.css" rel="stylesheet" />
+
+<RadzenDropDown TValue="string" 
+                   Data="@categories" 
+                   Placeholder="Wybierz kategorię"
+                   @bind-Value="selectedCategory"
+                   Change="OnCategoryChange"
+                   Style="width: 100%;" />
 
 <div class="filters">
     <input type="text" @oninput="OnSearchInput" placeholder="Wyszukaj produkt..." class="filter-input" />
@@ -74,7 +82,7 @@
     protected override async Task OnInitializedAsync()
     {
         products = await ProductService.GetAllProductsAsync();
-        categories = products.Select(p => p.Category).Distinct().ToList();
+        categories = await ProductService.GetAllCategoriesAsync();
         ApplyFilters();
     }
 
@@ -83,6 +91,13 @@
         searchTerm = e.Value.ToString();
         ApplyFilters();
     }
+
+     private void OnCategoryChange(object value)
+    {
+        selectedCategory = value?.ToString();
+        ApplyFilters();
+    }
+
 
     private void SortByPrice()
     {

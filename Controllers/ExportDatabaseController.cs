@@ -19,6 +19,104 @@ namespace FISTNESSGYM.Controllers
             this.context = context;
         }
 
+        [HttpGet("/export/database/aspnetroleclaims/csv")]
+        [HttpGet("/export/database/aspnetroleclaims/csv(fileName='{fileName}')")]
+        public async Task<FileStreamResult> ExportAspNetRoleClaimsToCSV(string fileName = null)
+        {
+            return ToCSV(ApplyQuery(await service.GetAspNetRoleClaims(), Request.Query, false), fileName);
+        }
+
+        [HttpGet("/export/database/aspnetroleclaims/excel")]
+        [HttpGet("/export/database/aspnetroleclaims/excel(fileName='{fileName}')")]
+        public async Task<FileStreamResult> ExportAspNetRoleClaimsToExcel(string fileName = null)
+        {
+            return ToExcel(ApplyQuery(await service.GetAspNetRoleClaims(), Request.Query, false), fileName);
+        }
+
+        [HttpGet("/export/database/aspnetroles/csv")]
+        [HttpGet("/export/database/aspnetroles/csv(fileName='{fileName}')")]
+        public async Task<FileStreamResult> ExportAspNetRolesToCSV(string fileName = null)
+        {
+            return ToCSV(ApplyQuery(await service.GetAspNetRoles(), Request.Query, false), fileName);
+        }
+
+        [HttpGet("/export/database/aspnetroles/excel")]
+        [HttpGet("/export/database/aspnetroles/excel(fileName='{fileName}')")]
+        public async Task<FileStreamResult> ExportAspNetRolesToExcel(string fileName = null)
+        {
+            return ToExcel(ApplyQuery(await service.GetAspNetRoles(), Request.Query, false), fileName);
+        }
+
+        [HttpGet("/export/database/aspnetuserclaims/csv")]
+        [HttpGet("/export/database/aspnetuserclaims/csv(fileName='{fileName}')")]
+        public async Task<FileStreamResult> ExportAspNetUserClaimsToCSV(string fileName = null)
+        {
+            return ToCSV(ApplyQuery(await service.GetAspNetUserClaims(), Request.Query, false), fileName);
+        }
+
+        [HttpGet("/export/database/aspnetuserclaims/excel")]
+        [HttpGet("/export/database/aspnetuserclaims/excel(fileName='{fileName}')")]
+        public async Task<FileStreamResult> ExportAspNetUserClaimsToExcel(string fileName = null)
+        {
+            return ToExcel(ApplyQuery(await service.GetAspNetUserClaims(), Request.Query, false), fileName);
+        }
+
+        [HttpGet("/export/database/aspnetuserlogins/csv")]
+        [HttpGet("/export/database/aspnetuserlogins/csv(fileName='{fileName}')")]
+        public async Task<FileStreamResult> ExportAspNetUserLoginsToCSV(string fileName = null)
+        {
+            return ToCSV(ApplyQuery(await service.GetAspNetUserLogins(), Request.Query, false), fileName);
+        }
+
+        [HttpGet("/export/database/aspnetuserlogins/excel")]
+        [HttpGet("/export/database/aspnetuserlogins/excel(fileName='{fileName}')")]
+        public async Task<FileStreamResult> ExportAspNetUserLoginsToExcel(string fileName = null)
+        {
+            return ToExcel(ApplyQuery(await service.GetAspNetUserLogins(), Request.Query, false), fileName);
+        }
+
+        [HttpGet("/export/database/aspnetuserroles/csv")]
+        [HttpGet("/export/database/aspnetuserroles/csv(fileName='{fileName}')")]
+        public async Task<FileStreamResult> ExportAspNetUserRolesToCSV(string fileName = null)
+        {
+            return ToCSV(ApplyQuery(await service.GetAspNetUserRoles(), Request.Query, false), fileName);
+        }
+
+        [HttpGet("/export/database/aspnetuserroles/excel")]
+        [HttpGet("/export/database/aspnetuserroles/excel(fileName='{fileName}')")]
+        public async Task<FileStreamResult> ExportAspNetUserRolesToExcel(string fileName = null)
+        {
+            return ToExcel(ApplyQuery(await service.GetAspNetUserRoles(), Request.Query, false), fileName);
+        }
+
+        [HttpGet("/export/database/aspnetusers/csv")]
+        [HttpGet("/export/database/aspnetusers/csv(fileName='{fileName}')")]
+        public async Task<FileStreamResult> ExportAspNetUsersToCSV(string fileName = null)
+        {
+            return ToCSV(ApplyQuery(await service.GetAspNetUsers(), Request.Query, false), fileName);
+        }
+
+        [HttpGet("/export/database/aspnetusers/excel")]
+        [HttpGet("/export/database/aspnetusers/excel(fileName='{fileName}')")]
+        public async Task<FileStreamResult> ExportAspNetUsersToExcel(string fileName = null)
+        {
+            return ToExcel(ApplyQuery(await service.GetAspNetUsers(), Request.Query, false), fileName);
+        }
+
+        [HttpGet("/export/database/aspnetusertokens/csv")]
+        [HttpGet("/export/database/aspnetusertokens/csv(fileName='{fileName}')")]
+        public async Task<FileStreamResult> ExportAspNetUserTokensToCSV(string fileName = null)
+        {
+            return ToCSV(ApplyQuery(await service.GetAspNetUserTokens(), Request.Query, false), fileName);
+        }
+
+        [HttpGet("/export/database/aspnetusertokens/excel")]
+        [HttpGet("/export/database/aspnetusertokens/excel(fileName='{fileName}')")]
+        public async Task<FileStreamResult> ExportAspNetUserTokensToExcel(string fileName = null)
+        {
+            return ToExcel(ApplyQuery(await service.GetAspNetUserTokens(), Request.Query, false), fileName);
+        }
+
         [HttpGet("/export/database/events/csv")]
         [HttpGet("/export/database/events/csv(fileName='{fileName}')")]
         public async Task<FileStreamResult> ExportEventsToCSV(string fileName = null)
@@ -131,102 +229,32 @@ namespace FISTNESSGYM.Controllers
             return ToExcel(ApplyQuery(await service.GetSubscriptionStatuses(), Request.Query, false), fileName);
         }
 
-        [HttpGet("/export/database/aspnetroleclaims/csv")]
-        [HttpGet("/export/database/aspnetroleclaims/csv(fileName='{fileName}')")]
-        public async Task<FileStreamResult> ExportAspNetRoleClaimsToCSV(string fileName = null)
+        [HttpGet("/export/database/productcategories/csv")]
+        [HttpGet("/export/database/productcategories/csv(fileName='{fileName}')")]
+        public async Task<FileStreamResult> ExportProductCategoriesToCSV(string fileName = null)
         {
-            return ToCSV(ApplyQuery(await service.GetAspNetRoleClaims(), Request.Query, false), fileName);
+            return ToCSV(ApplyQuery(await service.GetProductCategories(), Request.Query, false), fileName);
         }
 
-        [HttpGet("/export/database/aspnetroleclaims/excel")]
-        [HttpGet("/export/database/aspnetroleclaims/excel(fileName='{fileName}')")]
-        public async Task<FileStreamResult> ExportAspNetRoleClaimsToExcel(string fileName = null)
+        [HttpGet("/export/database/productcategories/excel")]
+        [HttpGet("/export/database/productcategories/excel(fileName='{fileName}')")]
+        public async Task<FileStreamResult> ExportProductCategoriesToExcel(string fileName = null)
         {
-            return ToExcel(ApplyQuery(await service.GetAspNetRoleClaims(), Request.Query, false), fileName);
+            return ToExcel(ApplyQuery(await service.GetProductCategories(), Request.Query, false), fileName);
         }
 
-        [HttpGet("/export/database/aspnetroles/csv")]
-        [HttpGet("/export/database/aspnetroles/csv(fileName='{fileName}')")]
-        public async Task<FileStreamResult> ExportAspNetRolesToCSV(string fileName = null)
+        [HttpGet("/export/database/cartitems/csv")]
+        [HttpGet("/export/database/cartitems/csv(fileName='{fileName}')")]
+        public async Task<FileStreamResult> ExportCartItemsToCSV(string fileName = null)
         {
-            return ToCSV(ApplyQuery(await service.GetAspNetRoles(), Request.Query, false), fileName);
+            return ToCSV(ApplyQuery(await service.GetCartItems(), Request.Query, false), fileName);
         }
 
-        [HttpGet("/export/database/aspnetroles/excel")]
-        [HttpGet("/export/database/aspnetroles/excel(fileName='{fileName}')")]
-        public async Task<FileStreamResult> ExportAspNetRolesToExcel(string fileName = null)
+        [HttpGet("/export/database/cartitems/excel")]
+        [HttpGet("/export/database/cartitems/excel(fileName='{fileName}')")]
+        public async Task<FileStreamResult> ExportCartItemsToExcel(string fileName = null)
         {
-            return ToExcel(ApplyQuery(await service.GetAspNetRoles(), Request.Query, false), fileName);
-        }
-
-        [HttpGet("/export/database/aspnetuserclaims/csv")]
-        [HttpGet("/export/database/aspnetuserclaims/csv(fileName='{fileName}')")]
-        public async Task<FileStreamResult> ExportAspNetUserClaimsToCSV(string fileName = null)
-        {
-            return ToCSV(ApplyQuery(await service.GetAspNetUserClaims(), Request.Query, false), fileName);
-        }
-
-        [HttpGet("/export/database/aspnetuserclaims/excel")]
-        [HttpGet("/export/database/aspnetuserclaims/excel(fileName='{fileName}')")]
-        public async Task<FileStreamResult> ExportAspNetUserClaimsToExcel(string fileName = null)
-        {
-            return ToExcel(ApplyQuery(await service.GetAspNetUserClaims(), Request.Query, false), fileName);
-        }
-
-        [HttpGet("/export/database/aspnetuserlogins/csv")]
-        [HttpGet("/export/database/aspnetuserlogins/csv(fileName='{fileName}')")]
-        public async Task<FileStreamResult> ExportAspNetUserLoginsToCSV(string fileName = null)
-        {
-            return ToCSV(ApplyQuery(await service.GetAspNetUserLogins(), Request.Query, false), fileName);
-        }
-
-        [HttpGet("/export/database/aspnetuserlogins/excel")]
-        [HttpGet("/export/database/aspnetuserlogins/excel(fileName='{fileName}')")]
-        public async Task<FileStreamResult> ExportAspNetUserLoginsToExcel(string fileName = null)
-        {
-            return ToExcel(ApplyQuery(await service.GetAspNetUserLogins(), Request.Query, false), fileName);
-        }
-
-        [HttpGet("/export/database/aspnetuserroles/csv")]
-        [HttpGet("/export/database/aspnetuserroles/csv(fileName='{fileName}')")]
-        public async Task<FileStreamResult> ExportAspNetUserRolesToCSV(string fileName = null)
-        {
-            return ToCSV(ApplyQuery(await service.GetAspNetUserRoles(), Request.Query, false), fileName);
-        }
-
-        [HttpGet("/export/database/aspnetuserroles/excel")]
-        [HttpGet("/export/database/aspnetuserroles/excel(fileName='{fileName}')")]
-        public async Task<FileStreamResult> ExportAspNetUserRolesToExcel(string fileName = null)
-        {
-            return ToExcel(ApplyQuery(await service.GetAspNetUserRoles(), Request.Query, false), fileName);
-        }
-
-        [HttpGet("/export/database/aspnetusers/csv")]
-        [HttpGet("/export/database/aspnetusers/csv(fileName='{fileName}')")]
-        public async Task<FileStreamResult> ExportAspNetUsersToCSV(string fileName = null)
-        {
-            return ToCSV(ApplyQuery(await service.GetAspNetUsers(), Request.Query, false), fileName);
-        }
-
-        [HttpGet("/export/database/aspnetusers/excel")]
-        [HttpGet("/export/database/aspnetusers/excel(fileName='{fileName}')")]
-        public async Task<FileStreamResult> ExportAspNetUsersToExcel(string fileName = null)
-        {
-            return ToExcel(ApplyQuery(await service.GetAspNetUsers(), Request.Query, false), fileName);
-        }
-
-        [HttpGet("/export/database/aspnetusertokens/csv")]
-        [HttpGet("/export/database/aspnetusertokens/csv(fileName='{fileName}')")]
-        public async Task<FileStreamResult> ExportAspNetUserTokensToCSV(string fileName = null)
-        {
-            return ToCSV(ApplyQuery(await service.GetAspNetUserTokens(), Request.Query, false), fileName);
-        }
-
-        [HttpGet("/export/database/aspnetusertokens/excel")]
-        [HttpGet("/export/database/aspnetusertokens/excel(fileName='{fileName}')")]
-        public async Task<FileStreamResult> ExportAspNetUserTokensToExcel(string fileName = null)
-        {
-            return ToExcel(ApplyQuery(await service.GetAspNetUserTokens(), Request.Query, false), fileName);
+            return ToExcel(ApplyQuery(await service.GetCartItems(), Request.Query, false), fileName);
         }
     }
 }

@@ -25,6 +25,12 @@ namespace FISTNESSGYM.Models.database
 
         public string Category { get; set; }
 
+        public int? CategoryId { get; set; }
+
+        public ProductCategory ProductCategory { get; set; }
+
+        public ICollection<CartItem> CartItems { get; set; }
+
         public ICollection<OrderItem> OrderItems { get; set; }
     }
 }

@@ -1,5 +1,4 @@
 ﻿using FISTNESSGYM.Models.database;
-using FISTNESSGYM.Models.Database;
 using Microsoft.Data.SqlClient;
 using System.Collections.Generic;
 using System.Linq;

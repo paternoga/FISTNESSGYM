@@ -1,8 +1,10 @@
 ﻿@page "/product-details/{productId:int}"
+
 @inject IProductService ProductService
 @inject NavigationManager NavigationManager
 @using FISTNESSGYM.Models.database
 @using FISTNESSGYM.Data
+@using FISTNESSGYM.Services
 
 <h3 class="product-title">@product?.Name</h3>
 <link href="css/store/productdetails.css" rel="stylesheet" />

@@ -1,5 +1,4 @@
 ﻿using FISTNESSGYM.Models.database;
-using FISTNESSGYM.Models.Database;
 
 namespace FISTNESSGYM.Services
 {
