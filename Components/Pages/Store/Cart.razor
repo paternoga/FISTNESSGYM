@@ -1,0 +1,106 @@
+﻿@page "/cart"
+@inject ICartService CartService
+@inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@using System.Security.Claims
+@using FISTNESSGYM.Data
+@using FISTNESSGYM.Services
+@using FISTNESSGYM.Models.database
+@using FISTNESSGYM.Models.Database
+
+<h3>Koszyk</h3>
+
+@if (cartItems == null)
+{
+    <p>Ładowanie koszyka...</p>
+}
+else if (!cartItems.Any())
+{
+    <p>Twój koszyk jest pusty.</p>
+}
+else
+{
+    <div>
+        <ul>
+            @foreach (var item in cartItems)
+            {
+                <li>
+                    @item.Product.Name - @item.Quantity sztuk - @item.Product.Price zł
+                    <button @onclick="() => RemoveFromCart(item.Product.Id)">Usuń</button>
+                </li>
+            }
+        </ul>
+        <p>Łączna kwota: @totalAmount zł</p>
+        <button @onclick="ClearCart">Wyczyść koszyk</button>
+    </div>
+}
+
+@code {
+    private List<CartItem> cartItems;
+    private decimal totalAmount;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        if (user.Identity.IsAuthenticated)
+        {
+            // Pobierz userId jako string
+            var userId = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (!string.IsNullOrEmpty(userId))
+            {
+                cartItems = CartService.GetCartItems(userId);  // string zamiast int
+                totalAmount = CartService.GetTotal(userId);
+            }
+            else
+            {
+                cartItems = new List<CartItem>();
+                totalAmount = 0;
+            }
+        }
+        else
+        {
+            cartItems = new List<CartItem>();
+            totalAmount = 0;
+        }
+    }
+
+    private async Task RemoveFromCart(int productId)
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        if (user.Identity.IsAuthenticated)
+        {
+            // Pobierz userId jako string
+            var userId = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (!string.IsNullOrEmpty(userId))
+            {
+                CartService.RemoveFromCart(userId, productId);  // string zamiast int
+                cartItems = CartService.GetCartItems(userId);
+                totalAmount = CartService.GetTotal(userId);
+                StateHasChanged();
+            }
+        }
+    }
+
+    private async Task ClearCart()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        if (user.Identity.IsAuthenticated)
+        {
+            // Pobierz userId jako string
+            var userId = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (!string.IsNullOrEmpty(userId))
+            {
+                CartService.ClearCart(userId);  // string zamiast int
+                cartItems.Clear();
+                totalAmount = 0;
+                StateHasChanged();
+            }
+        }
+    }
+}
