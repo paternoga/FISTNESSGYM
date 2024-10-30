@@ -8,9 +8,9 @@ using Microsoft.AspNetCore.Components.Web;
 using Radzen;
 using Radzen.Blazor;
 
-namespace FISTNESSGYM.Components.Pages.Store.Products
+namespace FISTNESSGYM.Components.Pages.Training.Events
 {
-    public partial class EditProduct
+    public partial class AddEvent
     {
         [Inject]
         protected IJSRuntime JSRuntime { get; set; }
@@ -32,19 +32,12 @@ namespace FISTNESSGYM.Components.Pages.Store.Products
         [Inject]
         public databaseService databaseService { get; set; }
 
-        [Parameter]
-        public int Id { get; set; }
-
         protected override async Task OnInitializedAsync()
         {
-            product = await databaseService.GetProductById(Id);
-
-            productCategoriesForCategoryId = await databaseService.GetProductCategories();
+            _event = new FISTNESSGYM.Models.database.Event();
         }
         protected bool errorVisible;
-        protected FISTNESSGYM.Models.database.Product product;
-
-        protected IEnumerable<FISTNESSGYM.Models.database.ProductCategory> productCategoriesForCategoryId;
+        protected FISTNESSGYM.Models.database.Event _event;
 
         [Inject]
         protected SecurityService Security { get; set; }
@@ -53,8 +46,8 @@ namespace FISTNESSGYM.Components.Pages.Store.Products
         {
             try
             {
-                await databaseService.UpdateProduct(Id, product);
-                DialogService.Close(product);
+                await databaseService.CreateEvent(_event);
+                DialogService.Close(_event);
             }
             catch (Exception ex)
             {
@@ -65,18 +58,6 @@ namespace FISTNESSGYM.Components.Pages.Store.Products
         protected async Task CancelButtonClick(MouseEventArgs args)
         {
             DialogService.Close(null);
-        }
-
-        private void OnCategoryChange(object args)
-        {
-            if (args is int selectedCategoryId)
-            {
-                var selectedCategory = productCategoriesForCategoryId.FirstOrDefault(c => c.Id == selectedCategoryId);
-                if (selectedCategory != null)
-                {
-                    product.Category = selectedCategory.Name; 
-                }
-            }
         }
     }
 }

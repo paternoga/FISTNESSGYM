@@ -1,22 +1,23 @@
-@page "/add-product"
+@page "/add-product"
+
 @attribute [Authorize]
 
-<PageTitle>Add Product</PageTitle>
+<PageTitle>Dodaj Produkt</PageTitle>
 <RadzenColumn SizeMD=12>
-    <RadzenAlert Shade="Shade.Lighter" Variant="Variant.Flat" Size="AlertSize.Small" AlertStyle="AlertStyle.Danger" Visible="@errorVisible">Cannot save Product</RadzenAlert>
+    <RadzenAlert Shade="Shade.Lighter" Variant="Variant.Flat" Size="AlertSize.Small" AlertStyle="AlertStyle.Danger" Visible="@errorVisible">Nie mo�na doda� produktu.</RadzenAlert>
     <RadzenTemplateForm TItem="FISTNESSGYM.Models.database.Product" Data="@product" Visible="@(product != null)" Submit="@FormSubmit">
         <RadzenRow style="margin-bottom: 1rem">
             <RadzenColumn SizeMD="3">
-                <RadzenLabel Text="Name" Component="Name" style="width: 100%" />
+                <RadzenLabel Text="Nazwa" Component="Name" style="width: 100%" />
             </RadzenColumn>
             <RadzenColumn SizeMD="9">
                 <RadzenTextBox style="display: block; width: 100%" @bind-Value="@product.Name" Name="Name" />
-                <RadzenRequiredValidator Component="Name" Text="Name is required" />
+                <RadzenRequiredValidator Component="Name" Text="Nazwa jest wymagana" />
             </RadzenColumn>
         </RadzenRow>
         <RadzenRow style="margin-bottom: 1rem">
             <RadzenColumn SizeMD="3">
-                <RadzenLabel Text="Description" Component="Description" style="width: 100%" />
+                <RadzenLabel Text="Opis" Component="Description" style="width: 100%" />
             </RadzenColumn>
             <RadzenColumn SizeMD="9">
                 <RadzenTextBox style="display: block; width: 100%" @bind-Value="@product.Description" Name="Description" />
@@ -24,36 +25,37 @@
         </RadzenRow>
         <RadzenRow style="margin-bottom: 1rem">
             <RadzenColumn SizeMD="3">
-                <RadzenLabel Text="Price" Component="Price" style="width: 100%" />
+                <RadzenLabel Text="Cena" Component="Price" style="width: 100%" />
             </RadzenColumn>
             <RadzenColumn SizeMD="9">
                 <RadzenNumeric style="display: block; width: 100%" @bind-Value="@product.Price" Name="Price" />
-                <RadzenRequiredValidator Component="Price" Text="Price is required" />
+                <RadzenRequiredValidator Component="Price" Text="Cena jest wymagana" />
             </RadzenColumn>
         </RadzenRow>
         <RadzenRow style="margin-bottom: 1rem">
             <RadzenColumn SizeMD="3">
-                <RadzenLabel Text="Stock Quantity" Component="StockQuantity" style="width: 100%" />
+                <RadzenLabel Text="Stan magazynowy" Component="StockQuantity" style="width: 100%" />
             </RadzenColumn>
             <RadzenColumn SizeMD="9">
                 <RadzenNumeric style="display: block; width: 100%" @bind-Value="@product.StockQuantity" Name="StockQuantity" />
-                <RadzenRequiredValidator Component="StockQuantity" Text="StockQuantity is required" />
+                <RadzenRequiredValidator Component="StockQuantity" Text="Stan magazywnowy jest wymagnany" />
             </RadzenColumn>
         </RadzenRow>
         
         <RadzenRow style="margin-bottom: 1rem">
             <RadzenColumn SizeMD="3">
-                <RadzenLabel Text="Product Category" Component="ProductCategory" style="width: 100%" ReadOnly="true" />
+                <RadzenLabel Text="Kategoria" Component="ProductCategory" style="width: 100%" ReadOnly="true" />
             </RadzenColumn>
             <RadzenColumn SizeMD="9">
                 <RadzenDropDown Data="@productCategoriesForCategoryId" TextProperty="Name" ValueProperty="Id" AllowClear=true
-                                Placeholder="Choose ProductCategory" style="display: block; width: 100%" @bind-Value="@product.CategoryId" Name="CategoryId"
-                                Change="@OnProductCategoryChange" /> <!-- Zdarzenie zmiany -->
+                                Placeholder="Wybierz kategorie" style="display: block; width: 100%" @bind-Value="@product.CategoryId" Name="CategoryId"
+                                Change="@OnProductCategoryChange" />
+                <RadzenRequiredValidator Component="CategoryId" Text="Wybór kategorii jest wymagany" />
             </RadzenColumn>
         </RadzenRow>
         <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.End" Gap="0.5rem">
-            <RadzenButton ButtonStyle="ButtonStyle.Primary" ButtonType="ButtonType.Submit" Icon="save" Text="Save" Variant="Variant.Flat" />
-            <RadzenButton ButtonStyle="ButtonStyle.Light" Text="Cancel" Variant="Variant.Flat" Click="@CancelButtonClick" />
+            <RadzenButton ButtonStyle="ButtonStyle.Primary" ButtonType="ButtonType.Submit" Icon="save" Text="Zapisz" Variant="Variant.Flat" />
+            <RadzenButton ButtonStyle="ButtonStyle.Light" Text="Anuluj" Variant="Variant.Flat" Click="@CancelButtonClick" />
         </RadzenStack>
     </RadzenTemplateForm>
 </RadzenColumn>
