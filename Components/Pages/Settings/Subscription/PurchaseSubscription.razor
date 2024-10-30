@@ -1,0 +1,68 @@
+﻿@page "/settings/subscription/purchase-subscription"
+@using System.Security.Claims
+@using FISTNESSGYM.Models.database
+@using FISTNESSGYM.Services
+@inject SubscriptionService SubscriptionService
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+<h3>Zakup Subskrypcji</h3>
+
+@if (hasActiveSubscription)
+{
+    <p>Nie możesz zakupić nowej subskrypcji, ponieważ masz już aktywną subskrypcję.</p>
+}
+else
+{
+    <select @bind="selectedSubscriptionTypeId">
+        <option value="">Wybierz typ subskrypcji</option>
+        <option value="1">Miesięczna - 99 zł</option>
+        <option value="2">Roczna - 950 zł</option>
+        <option value="3">Próbna - 1 zł</option>
+    </select>
+
+    <button @onclick="Purchase">Kup</button>
+}
+
+@code {
+    private int selectedSubscriptionTypeId;
+    private string userId;
+    private bool hasActiveSubscription;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        // Upewnij się, że użytkownik jest zalogowany
+        if (user.Identity.IsAuthenticated)
+        {
+            userId = user.FindFirst(ClaimTypes.NameIdentifier)?.Value; // Pobierz UserId
+            hasActiveSubscription = await SubscriptionService.GetCurrentSubscriptionAsync(userId) != null; // Sprawdź aktywną subskrypcję
+        }
+        else
+        {
+            throw new Exception("Użytkownik nie jest zalogowany.");
+        }
+    }
+
+    private async Task Purchase()
+    {
+        if (hasActiveSubscription)
+        {
+            Console.WriteLine("Nie możesz kupić nowej subskrypcji, ponieważ masz już aktywną subskrypcję.");
+            return; // Zakończ, jeśli użytkownik ma już subskrypcję
+        }
+
+        try
+        {
+            await SubscriptionService.PurchaseSubscriptionAsync(userId, selectedSubscriptionTypeId);
+            // Obsłuż sukces (np. pokaż komunikat o sukcesie lub przekieruj)
+            Console.WriteLine("Zakup subskrypcji zakończony sukcesem.");
+        }
+        catch (Exception ex)
+        {
+            // Obsłuż wyjątek (np. pokaż komunikat o błędzie)
+            Console.WriteLine($"Błąd podczas zakupu subskrypcji: {ex.Message}");
+        }
+    }
+}

@@ -9,6 +9,7 @@ using Microsoft.OData.ModelBuilder;
 using Microsoft.AspNetCore.Components.Authorization;
 using FISTNESSGYM.Services;
 using DocumentFormat.OpenXml.Office2016.Drawing.ChartDrawing;
+using FISTNESSGYM;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,8 +22,8 @@ builder.Services.AddRadzenCookieThemeService(options =>
     options.Duration = TimeSpan.FromDays(365);
 });
 builder.Services.AddHttpClient();
-builder.Services.AddScoped<FISTNESSGYM.databaseService>();
-builder.Services.AddDbContext<FISTNESSGYM.Data.databaseContext>(options =>
+builder.Services.AddScoped<databaseService>();
+builder.Services.AddDbContext<databaseContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("databaseConnection"));
 });
@@ -30,9 +31,11 @@ builder.Services.AddHttpClient("FISTNESSGYM").ConfigurePrimaryHttpMessageHandler
 builder.Services.AddHeaderPropagation(o => o.Headers.Add("Cookie"));
 builder.Services.AddAuthentication();
 builder.Services.AddAuthorization();
-builder.Services.AddScoped<FISTNESSGYM.SecurityService>();
 
+builder.Services.AddScoped<SecurityService>();
 builder.Services.AddScoped<IProductService, ProductService>();
+builder.Services.AddScoped<SubscriptionService>();
+
 builder.Services.AddScoped<ICartService>(provider =>
 {
     var connectionString = builder.Configuration.GetConnectionString("databaseConnection");
@@ -60,6 +63,7 @@ builder.Services.AddControllers().AddOData(o =>
     o.AddRouteComponents("odata/Identity", oDataBuilder.GetEdmModel()).Count().Filter().OrderBy().Expand().Select().SetMaxTop(null).TimeZone = TimeZoneInfo.Utc;
 });
 builder.Services.AddScoped<AuthenticationStateProvider, FISTNESSGYM.ApplicationAuthenticationStateProvider>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

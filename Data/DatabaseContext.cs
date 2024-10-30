@@ -186,6 +186,21 @@ namespace FISTNESSGYM.Data
               .Property(p => p.EndDate)
               .HasColumnType("datetime");
 
+            builder.Entity<FISTNESSGYM.Models.database.Subscription>()
+                .Property(p => p.Price)
+                .HasColumnType("decimal(18, 2)") 
+                .IsRequired(); 
+
+            builder.Entity<FISTNESSGYM.Models.database.Subscription>()
+                .Property(p => p.SubscriptionStatusId)
+                .HasColumnType("int") 
+                .IsRequired(); 
+
+            builder.Entity<FISTNESSGYM.Models.database.Subscription>()
+                .Property(p => p.SubscriptionTypeId)
+                .HasColumnType("int") 
+                .IsRequired(); 
+
             builder.Entity<FISTNESSGYM.Models.database.WorkoutPlan>()
               .Property(p => p.CreatedDate)
               .HasColumnType("datetime");
@@ -223,6 +238,7 @@ namespace FISTNESSGYM.Data
         public DbSet<FISTNESSGYM.Models.database.Reservation> Reservations { get; set; }
 
         public DbSet<FISTNESSGYM.Models.database.Subscription> Subscriptions { get; set; }
+        public DbSet<FISTNESSGYM.Models.database.SubscriptionType> SubscriptionTypes { get; set; }
 
         public DbSet<FISTNESSGYM.Models.database.SubscriptionStatus> SubscriptionStatuses { get; set; }
 
