@@ -1,0 +1,158 @@
+﻿@page "/products-catalog"
+@inject IProductService ProductService
+@inject ICartService CartService
+@inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@using FISTNESSGYM.Models.database
+@using FISTNESSGYM.Data
+@using FISTNESSGYM.Services
+@using System.Security.Claims
+
+<h3 class="catalog-title">Katalog Produktów</h3>
+<link href="css/store/productcatalog.css" rel="stylesheet" />
+
+<div class="filters">
+    <input type="text" @oninput="OnSearchInput" placeholder="Wyszukaj produkt..." class="filter-input" />
+    <select @bind="selectedCategory" class="filter-select">
+        <option value="">Wszystkie kategorie</option>
+        @foreach (var category in categories)
+        {
+            <option value="@category">@category</option>
+        }
+    </select>
+    <button @onclick="SortByPrice" class="filter-button">Sortuj według ceny</button>
+</div>
+
+<div>
+    @if (!string.IsNullOrEmpty(successMessage))
+    {
+        <div class="alert alert-success">@successMessage</div>
+    }
+</div>
+
+<div class="product-list">
+    @if (!products.Any())
+    {
+        <p>Brak produktów do wyświetlenia.</p>
+    }
+    else
+    {
+        @foreach (var product in PaginatedProducts)
+        {
+            <div class="product-item">
+                <h4 class="product-name">@product.Name</h4>
+                <p class="product-description">@product.Description</p>
+                <p class="product-price">@product.Price zł</p>
+                <button class="details-button" @onclick="() => NavigateToDetails(product.Id)">Szczegóły</button>
+                <button class="add-to-cart-button" @onclick="() => AddToCart(product)">Dodaj do koszyka</button>
+            </div>
+        }
+    }
+</div>
+
+<div class="pagination">
+    <button @onclick="PreviousPage" disabled="@(!CanGoToPreviousPage)" class="pagination-button">Poprzednia</button>
+    <span class="pagination-info">Strona @currentPage z @totalPages</span>
+    <button @onclick="NextPage" disabled="@(!CanGoToNextPage)" class="pagination-button">Następna</button>
+</div>
+
+@code {
+    private List<Product> products = new();
+    private List<Product> filteredProducts = new();
+    private List<string> categories = new();
+    private string searchTerm = "";
+    private string selectedCategory = "";
+    private bool sortAscending = true;
+
+    private int currentPage = 1;
+    private int itemsPerPage = 5;
+    private string successMessage = "";
+
+    private int totalPages => (int)Math.Ceiling((double)filteredProducts.Count / itemsPerPage);
+    private IEnumerable<Product> PaginatedProducts => filteredProducts.Skip((currentPage - 1) * itemsPerPage).Take(itemsPerPage);
+
+    protected override async Task OnInitializedAsync()
+    {
+        products = await ProductService.GetAllProductsAsync();
+        categories = products.Select(p => p.Category).Distinct().ToList();
+        ApplyFilters();
+    }
+
+    private void OnSearchInput(ChangeEventArgs e)
+    {
+        searchTerm = e.Value.ToString();
+        ApplyFilters();
+    }
+
+    private void SortByPrice()
+    {
+        filteredProducts = sortAscending
+            ? filteredProducts.OrderBy(p => p.Price).ToList()
+            : filteredProducts.OrderByDescending(p => p.Price).ToList();
+        sortAscending = !sortAscending;
+    }
+
+    private void ApplyFilters()
+    {
+        filteredProducts = products
+            .Where(p => string.IsNullOrEmpty(searchTerm) || p.Name.Contains(searchTerm, StringComparison.OrdinalIgnoreCase))
+            .Where(p => string.IsNullOrEmpty(selectedCategory) || p.Category == selectedCategory)
+            .ToList();
+
+        currentPage = 1; // Resetuj do pierwszej strony po filtrowaniu
+    }
+
+    private void NavigateToDetails(int productId)
+    {
+        NavigationManager.NavigateTo($"/product-details/{productId}");
+    }
+
+    private async void AddToCart(Product product)
+    {
+        // Uzyskaj stan uwierzytelnienia użytkownika
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        if (user.Identity.IsAuthenticated)
+        {
+            // Wyciągnij userId z Claims jako string
+            var userId = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (!string.IsNullOrEmpty(userId))
+            {
+                // Przekazanie userId jako string i product
+                CartService.AddToCart(userId, product);
+                successMessage = $"{product.Name} został dodany do koszyka!";
+                StateHasChanged();
+
+                // Zniknij komunikat po 3 sekundach
+                await Task.Delay(3000);
+                successMessage = string.Empty;
+                StateHasChanged();
+            }
+        }
+        else
+        {
+            // Obsługa sytuacji, gdy użytkownik nie jest zalogowany
+            successMessage = "Musisz być zalogowany, aby dodać produkty do koszyka.";
+            StateHasChanged();
+        }
+    }
+
+
+
+    private void NextPage()
+    {
+        if (CanGoToNextPage)
+            currentPage++;
+    }
+
+    private void PreviousPage()
+    {
+        if (CanGoToPreviousPage)
+            currentPage--;
+    }
+
+    private bool CanGoToNextPage => currentPage < totalPages;
+    private bool CanGoToPreviousPage => currentPage > 1;
+}

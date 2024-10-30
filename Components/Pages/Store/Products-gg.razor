@@ -1,0 +1,88 @@
+﻿@page "/products-gg"
+@inject IProductService ProductService
+@inject NavigationManager NavigationManager
+@using FISTNESSGYM.Models.database
+@using FISTNESSGYM.Data
+
+<h3 class="catalog-title">Katalog Produktów w Kategorii GG</h3>
+<link href="css/store/productcatalog.css" rel="stylesheet" />
+<div class="filters">
+    <input type="text" @oninput="OnSearchInput" placeholder="Wyszukaj produkt..." class="filter-input" />
+</div>
+
+<div class="product-list">
+    @if (!filteredProducts.Any())
+    {
+        <p>Brak produktów do wyświetlenia w tej kategorii.</p>
+    }
+    else
+    {
+        @foreach (var product in PaginatedProducts)
+        {
+            <div class="product-item">
+                <h4 class="product-name">@product.Name</h4>
+                <p class="product-description">@product.Description</p>
+                <p class="product-price">@product.Price zł</p>
+                <button class="details-button" @onclick="() => NavigateToDetails(product.Id)">Szczegóły</button>
+            </div>
+        }
+    }
+</div>
+
+<div class="pagination">
+    <button @onclick="PreviousPage" disabled="@(!CanGoToPreviousPage)" class="pagination-button">Poprzednia</button>
+    <span class="pagination-info">Strona @currentPage z @totalPages</span>
+    <button @onclick="NextPage" disabled="@(!CanGoToNextPage)" class="pagination-button">Następna</button>
+</div>
+
+@code {
+    private List<Product> products = new();
+    private List<Product> filteredProducts = new();
+    private string searchTerm = "";
+
+    private int currentPage = 1;
+    private int itemsPerPage = 5;
+    private int totalPages => (int)Math.Ceiling((double)filteredProducts.Count / itemsPerPage);
+    private IEnumerable<Product> PaginatedProducts => filteredProducts.Skip((currentPage - 1) * itemsPerPage).Take(itemsPerPage);
+
+    protected override async Task OnInitializedAsync()
+    {
+        products = await ProductService.GetAllProductsAsync();
+        filteredProducts = products.Where(p => p.Category == "gg").ToList(); // Filtrowanie produktów według kategorii
+    }
+
+    private void OnSearchInput(ChangeEventArgs e)
+    {
+        searchTerm = e.Value.ToString();
+        ApplyFilters(); // Filtrowanie wyników na podstawie wprowadzonego tekstu
+    }
+
+    private void ApplyFilters()
+    {
+        filteredProducts = products
+            .Where(p => p.Category == "gg" && (string.IsNullOrEmpty(searchTerm) || p.Name.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)))
+            .ToList();
+
+        currentPage = 1; // Resetujemy do pierwszej strony po każdym filtrowaniu
+    }
+
+    private void NavigateToDetails(int productId)
+    {
+        NavigationManager.NavigateTo($"/product-details/{productId}");
+    }
+
+    private void NextPage()
+    {
+        if (CanGoToNextPage)
+            currentPage++;
+    }
+
+    private void PreviousPage()
+    {
+        if (CanGoToPreviousPage)
+            currentPage--;
+    }
+
+    private bool CanGoToNextPage => currentPage < totalPages;
+    private bool CanGoToPreviousPage => currentPage > 1;
+}
