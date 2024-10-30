@@ -117,6 +117,20 @@ namespace FISTNESSGYM.Controllers
             return ToExcel(ApplyQuery(await service.GetAspNetUserTokens(), Request.Query, false), fileName);
         }
 
+        [HttpGet("/export/database/cartitems/csv")]
+        [HttpGet("/export/database/cartitems/csv(fileName='{fileName}')")]
+        public async Task<FileStreamResult> ExportCartItemsToCSV(string fileName = null)
+        {
+            return ToCSV(ApplyQuery(await service.GetCartItems(), Request.Query, false), fileName);
+        }
+
+        [HttpGet("/export/database/cartitems/excel")]
+        [HttpGet("/export/database/cartitems/excel(fileName='{fileName}')")]
+        public async Task<FileStreamResult> ExportCartItemsToExcel(string fileName = null)
+        {
+            return ToExcel(ApplyQuery(await service.GetCartItems(), Request.Query, false), fileName);
+        }
+
         [HttpGet("/export/database/events/csv")]
         [HttpGet("/export/database/events/csv(fileName='{fileName}')")]
         public async Task<FileStreamResult> ExportEventsToCSV(string fileName = null)
@@ -187,6 +201,20 @@ namespace FISTNESSGYM.Controllers
             return ToExcel(ApplyQuery(await service.GetProducts(), Request.Query, false), fileName);
         }
 
+        [HttpGet("/export/database/productcategories/csv")]
+        [HttpGet("/export/database/productcategories/csv(fileName='{fileName}')")]
+        public async Task<FileStreamResult> ExportProductCategoriesToCSV(string fileName = null)
+        {
+            return ToCSV(ApplyQuery(await service.GetProductCategories(), Request.Query, false), fileName);
+        }
+
+        [HttpGet("/export/database/productcategories/excel")]
+        [HttpGet("/export/database/productcategories/excel(fileName='{fileName}')")]
+        public async Task<FileStreamResult> ExportProductCategoriesToExcel(string fileName = null)
+        {
+            return ToExcel(ApplyQuery(await service.GetProductCategories(), Request.Query, false), fileName);
+        }
+
         [HttpGet("/export/database/reservations/csv")]
         [HttpGet("/export/database/reservations/csv(fileName='{fileName}')")]
         public async Task<FileStreamResult> ExportReservationsToCSV(string fileName = null)
@@ -229,32 +257,46 @@ namespace FISTNESSGYM.Controllers
             return ToExcel(ApplyQuery(await service.GetSubscriptionStatuses(), Request.Query, false), fileName);
         }
 
-        [HttpGet("/export/database/productcategories/csv")]
-        [HttpGet("/export/database/productcategories/csv(fileName='{fileName}')")]
-        public async Task<FileStreamResult> ExportProductCategoriesToCSV(string fileName = null)
+        [HttpGet("/export/database/workoutexercises/csv")]
+        [HttpGet("/export/database/workoutexercises/csv(fileName='{fileName}')")]
+        public async Task<FileStreamResult> ExportWorkoutExercisesToCSV(string fileName = null)
         {
-            return ToCSV(ApplyQuery(await service.GetProductCategories(), Request.Query, false), fileName);
+            return ToCSV(ApplyQuery(await service.GetWorkoutExercises(), Request.Query, false), fileName);
         }
 
-        [HttpGet("/export/database/productcategories/excel")]
-        [HttpGet("/export/database/productcategories/excel(fileName='{fileName}')")]
-        public async Task<FileStreamResult> ExportProductCategoriesToExcel(string fileName = null)
+        [HttpGet("/export/database/workoutexercises/excel")]
+        [HttpGet("/export/database/workoutexercises/excel(fileName='{fileName}')")]
+        public async Task<FileStreamResult> ExportWorkoutExercisesToExcel(string fileName = null)
         {
-            return ToExcel(ApplyQuery(await service.GetProductCategories(), Request.Query, false), fileName);
+            return ToExcel(ApplyQuery(await service.GetWorkoutExercises(), Request.Query, false), fileName);
         }
 
-        [HttpGet("/export/database/cartitems/csv")]
-        [HttpGet("/export/database/cartitems/csv(fileName='{fileName}')")]
-        public async Task<FileStreamResult> ExportCartItemsToCSV(string fileName = null)
+        [HttpGet("/export/database/exercises/csv")]
+        [HttpGet("/export/database/exercises/csv(fileName='{fileName}')")]
+        public async Task<FileStreamResult> ExportExercisesToCSV(string fileName = null)
         {
-            return ToCSV(ApplyQuery(await service.GetCartItems(), Request.Query, false), fileName);
+            return ToCSV(ApplyQuery(await service.GetExercises(), Request.Query, false), fileName);
         }
 
-        [HttpGet("/export/database/cartitems/excel")]
-        [HttpGet("/export/database/cartitems/excel(fileName='{fileName}')")]
-        public async Task<FileStreamResult> ExportCartItemsToExcel(string fileName = null)
+        [HttpGet("/export/database/exercises/excel")]
+        [HttpGet("/export/database/exercises/excel(fileName='{fileName}')")]
+        public async Task<FileStreamResult> ExportExercisesToExcel(string fileName = null)
         {
-            return ToExcel(ApplyQuery(await service.GetCartItems(), Request.Query, false), fileName);
+            return ToExcel(ApplyQuery(await service.GetExercises(), Request.Query, false), fileName);
+        }
+
+        [HttpGet("/export/database/workoutplans/csv")]
+        [HttpGet("/export/database/workoutplans/csv(fileName='{fileName}')")]
+        public async Task<FileStreamResult> ExportWorkoutPlansToCSV(string fileName = null)
+        {
+            return ToCSV(ApplyQuery(await service.GetWorkoutPlans(), Request.Query, false), fileName);
+        }
+
+        [HttpGet("/export/database/workoutplans/excel")]
+        [HttpGet("/export/database/workoutplans/excel(fileName='{fileName}')")]
+        public async Task<FileStreamResult> ExportWorkoutPlansToExcel(string fileName = null)
+        {
+            return ToExcel(ApplyQuery(await service.GetWorkoutPlans(), Request.Query, false), fileName);
         }
     }
 }

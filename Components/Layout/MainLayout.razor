@@ -46,7 +46,12 @@
             <RadzenPanelMenuItem Text="Trening" Icon="calendar_month" >
                 <RadzenPanelMenuItem Path="training/calendar" Icon="calendar_month" Text="Kalendarz" />
                 <RadzenPanelMenuItem Path="training/classes" Icon="sports_gymnastics" Text="Zajęcia" />
-                <RadzenPanelMenuItem Path="training/training_plans" Icon="exercise" Text="Plany treningowe" />
+                <RadzenPanelMenuItem Icon="exercise" Text="Plany treningowe">
+                    <RadzenPanelMenuItem Text="Moje ćwiczenia" Path="training/workout-exercises" Icon="sports_gymnastics" />
+                    <RadzenPanelMenuItem Text="Ćwiczenia" Path="training/exercises" Icon="fitness_center" />
+                    <RadzenPanelMenuItem Text="Plany treningowe" Path="training/workout-plans" Icon="exercise" />
+                </RadzenPanelMenuItem>
+                
             </RadzenPanelMenuItem>
         </RadzenPanelMenu>
 

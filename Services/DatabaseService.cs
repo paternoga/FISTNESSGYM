@@ -1030,6 +1030,7 @@ namespace FISTNESSGYM
                               .Include(i => i.Orders)
                               .Include(i => i.Reservations)
                               .Include(i => i.Subscriptions)
+                              .Include(i => i.WorkoutPlans)
                               .FirstOrDefault();
 
             if (itemToDelete == null)
@@ -1216,6 +1217,171 @@ namespace FISTNESSGYM
             }
 
             OnAfterAspNetUserTokenDeleted(itemToDelete);
+
+            return itemToDelete;
+        }
+    
+        public async Task ExportCartItemsToExcel(Query query = null, string fileName = null)
+        {
+            navigationManager.NavigateTo(query != null ? query.ToUrl($"export/database/cartitems/excel(fileName='{(!string.IsNullOrEmpty(fileName) ? UrlEncoder.Default.Encode(fileName) : "Export")}')") : $"export/database/cartitems/excel(fileName='{(!string.IsNullOrEmpty(fileName) ? UrlEncoder.Default.Encode(fileName) : "Export")}')", true);
+        }
+
+        public async Task ExportCartItemsToCSV(Query query = null, string fileName = null)
+        {
+            navigationManager.NavigateTo(query != null ? query.ToUrl($"export/database/cartitems/csv(fileName='{(!string.IsNullOrEmpty(fileName) ? UrlEncoder.Default.Encode(fileName) : "Export")}')") : $"export/database/cartitems/csv(fileName='{(!string.IsNullOrEmpty(fileName) ? UrlEncoder.Default.Encode(fileName) : "Export")}')", true);
+        }
+
+        partial void OnCartItemsRead(ref IQueryable<FISTNESSGYM.Models.database.CartItem> items);
+
+        public async Task<IQueryable<FISTNESSGYM.Models.database.CartItem>> GetCartItems(Query query = null)
+        {
+            var items = Context.CartItems.AsQueryable();
+
+            items = items.Include(i => i.Product);
+            items = items.Include(i => i.AspNetUser);
+
+            if (query != null)
+            {
+                if (!string.IsNullOrEmpty(query.Expand))
+                {
+                    var propertiesToExpand = query.Expand.Split(',');
+                    foreach(var p in propertiesToExpand)
+                    {
+                        items = items.Include(p.Trim());
+                    }
+                }
+
+                ApplyQuery(ref items, query);
+            }
+
+            OnCartItemsRead(ref items);
+
+            return await Task.FromResult(items);
+        }
+
+        partial void OnCartItemGet(FISTNESSGYM.Models.database.CartItem item);
+        partial void OnGetCartItemById(ref IQueryable<FISTNESSGYM.Models.database.CartItem> items);
+
+
+        public async Task<FISTNESSGYM.Models.database.CartItem> GetCartItemById(int id)
+        {
+            var items = Context.CartItems
+                              .AsNoTracking()
+                              .Where(i => i.Id == id);
+
+            items = items.Include(i => i.Product);
+            items = items.Include(i => i.AspNetUser);
+ 
+            OnGetCartItemById(ref items);
+
+            var itemToReturn = items.FirstOrDefault();
+
+            OnCartItemGet(itemToReturn);
+
+            return await Task.FromResult(itemToReturn);
+        }
+
+        partial void OnCartItemCreated(FISTNESSGYM.Models.database.CartItem item);
+        partial void OnAfterCartItemCreated(FISTNESSGYM.Models.database.CartItem item);
+
+        public async Task<FISTNESSGYM.Models.database.CartItem> CreateCartItem(FISTNESSGYM.Models.database.CartItem cartitem)
+        {
+            OnCartItemCreated(cartitem);
+
+            var existingItem = Context.CartItems
+                              .Where(i => i.Id == cartitem.Id)
+                              .FirstOrDefault();
+
+            if (existingItem != null)
+            {
+               throw new Exception("Item already available");
+            }            
+
+            try
+            {
+                Context.CartItems.Add(cartitem);
+                Context.SaveChanges();
+            }
+            catch
+            {
+                Context.Entry(cartitem).State = EntityState.Detached;
+                throw;
+            }
+
+            OnAfterCartItemCreated(cartitem);
+
+            return cartitem;
+        }
+
+        public async Task<FISTNESSGYM.Models.database.CartItem> CancelCartItemChanges(FISTNESSGYM.Models.database.CartItem item)
+        {
+            var entityToCancel = Context.Entry(item);
+            if (entityToCancel.State == EntityState.Modified)
+            {
+              entityToCancel.CurrentValues.SetValues(entityToCancel.OriginalValues);
+              entityToCancel.State = EntityState.Unchanged;
+            }
+
+            return item;
+        }
+
+        partial void OnCartItemUpdated(FISTNESSGYM.Models.database.CartItem item);
+        partial void OnAfterCartItemUpdated(FISTNESSGYM.Models.database.CartItem item);
+
+        public async Task<FISTNESSGYM.Models.database.CartItem> UpdateCartItem(int id, FISTNESSGYM.Models.database.CartItem cartitem)
+        {
+            OnCartItemUpdated(cartitem);
+
+            var itemToUpdate = Context.CartItems
+                              .Where(i => i.Id == cartitem.Id)
+                              .FirstOrDefault();
+
+            if (itemToUpdate == null)
+            {
+               throw new Exception("Item no longer available");
+            }
+                
+            var entryToUpdate = Context.Entry(itemToUpdate);
+            entryToUpdate.CurrentValues.SetValues(cartitem);
+            entryToUpdate.State = EntityState.Modified;
+
+            Context.SaveChanges();
+
+            OnAfterCartItemUpdated(cartitem);
+
+            return cartitem;
+        }
+
+        partial void OnCartItemDeleted(FISTNESSGYM.Models.database.CartItem item);
+        partial void OnAfterCartItemDeleted(FISTNESSGYM.Models.database.CartItem item);
+
+        public async Task<FISTNESSGYM.Models.database.CartItem> DeleteCartItem(int id)
+        {
+            var itemToDelete = Context.CartItems
+                              .Where(i => i.Id == id)
+                              .FirstOrDefault();
+
+            if (itemToDelete == null)
+            {
+               throw new Exception("Item no longer available");
+            }
+
+            OnCartItemDeleted(itemToDelete);
+
+
+            Context.CartItems.Remove(itemToDelete);
+
+            try
+            {
+                Context.SaveChanges();
+            }
+            catch
+            {
+                Context.Entry(itemToDelete).State = EntityState.Unchanged;
+                throw;
+            }
+
+            OnAfterCartItemDeleted(itemToDelete);
 
             return itemToDelete;
         }
@@ -2040,6 +2206,168 @@ namespace FISTNESSGYM
             return itemToDelete;
         }
     
+        public async Task ExportProductCategoriesToExcel(Query query = null, string fileName = null)
+        {
+            navigationManager.NavigateTo(query != null ? query.ToUrl($"export/database/productcategories/excel(fileName='{(!string.IsNullOrEmpty(fileName) ? UrlEncoder.Default.Encode(fileName) : "Export")}')") : $"export/database/productcategories/excel(fileName='{(!string.IsNullOrEmpty(fileName) ? UrlEncoder.Default.Encode(fileName) : "Export")}')", true);
+        }
+
+        public async Task ExportProductCategoriesToCSV(Query query = null, string fileName = null)
+        {
+            navigationManager.NavigateTo(query != null ? query.ToUrl($"export/database/productcategories/csv(fileName='{(!string.IsNullOrEmpty(fileName) ? UrlEncoder.Default.Encode(fileName) : "Export")}')") : $"export/database/productcategories/csv(fileName='{(!string.IsNullOrEmpty(fileName) ? UrlEncoder.Default.Encode(fileName) : "Export")}')", true);
+        }
+
+        partial void OnProductCategoriesRead(ref IQueryable<FISTNESSGYM.Models.database.ProductCategory> items);
+
+        public async Task<IQueryable<FISTNESSGYM.Models.database.ProductCategory>> GetProductCategories(Query query = null)
+        {
+            var items = Context.ProductCategories.AsQueryable();
+
+
+            if (query != null)
+            {
+                if (!string.IsNullOrEmpty(query.Expand))
+                {
+                    var propertiesToExpand = query.Expand.Split(',');
+                    foreach(var p in propertiesToExpand)
+                    {
+                        items = items.Include(p.Trim());
+                    }
+                }
+
+                ApplyQuery(ref items, query);
+            }
+
+            OnProductCategoriesRead(ref items);
+
+            return await Task.FromResult(items);
+        }
+
+        partial void OnProductCategoryGet(FISTNESSGYM.Models.database.ProductCategory item);
+        partial void OnGetProductCategoryById(ref IQueryable<FISTNESSGYM.Models.database.ProductCategory> items);
+
+
+        public async Task<FISTNESSGYM.Models.database.ProductCategory> GetProductCategoryById(int id)
+        {
+            var items = Context.ProductCategories
+                              .AsNoTracking()
+                              .Where(i => i.Id == id);
+
+ 
+            OnGetProductCategoryById(ref items);
+
+            var itemToReturn = items.FirstOrDefault();
+
+            OnProductCategoryGet(itemToReturn);
+
+            return await Task.FromResult(itemToReturn);
+        }
+
+        partial void OnProductCategoryCreated(FISTNESSGYM.Models.database.ProductCategory item);
+        partial void OnAfterProductCategoryCreated(FISTNESSGYM.Models.database.ProductCategory item);
+
+        public async Task<FISTNESSGYM.Models.database.ProductCategory> CreateProductCategory(FISTNESSGYM.Models.database.ProductCategory productcategory)
+        {
+            OnProductCategoryCreated(productcategory);
+
+            var existingItem = Context.ProductCategories
+                              .Where(i => i.Id == productcategory.Id)
+                              .FirstOrDefault();
+
+            if (existingItem != null)
+            {
+               throw new Exception("Item already available");
+            }            
+
+            try
+            {
+                Context.ProductCategories.Add(productcategory);
+                Context.SaveChanges();
+            }
+            catch
+            {
+                Context.Entry(productcategory).State = EntityState.Detached;
+                throw;
+            }
+
+            OnAfterProductCategoryCreated(productcategory);
+
+            return productcategory;
+        }
+
+        public async Task<FISTNESSGYM.Models.database.ProductCategory> CancelProductCategoryChanges(FISTNESSGYM.Models.database.ProductCategory item)
+        {
+            var entityToCancel = Context.Entry(item);
+            if (entityToCancel.State == EntityState.Modified)
+            {
+              entityToCancel.CurrentValues.SetValues(entityToCancel.OriginalValues);
+              entityToCancel.State = EntityState.Unchanged;
+            }
+
+            return item;
+        }
+
+        partial void OnProductCategoryUpdated(FISTNESSGYM.Models.database.ProductCategory item);
+        partial void OnAfterProductCategoryUpdated(FISTNESSGYM.Models.database.ProductCategory item);
+
+        public async Task<FISTNESSGYM.Models.database.ProductCategory> UpdateProductCategory(int id, FISTNESSGYM.Models.database.ProductCategory productcategory)
+        {
+            OnProductCategoryUpdated(productcategory);
+
+            var itemToUpdate = Context.ProductCategories
+                              .Where(i => i.Id == productcategory.Id)
+                              .FirstOrDefault();
+
+            if (itemToUpdate == null)
+            {
+               throw new Exception("Item no longer available");
+            }
+                
+            var entryToUpdate = Context.Entry(itemToUpdate);
+            entryToUpdate.CurrentValues.SetValues(productcategory);
+            entryToUpdate.State = EntityState.Modified;
+
+            Context.SaveChanges();
+
+            OnAfterProductCategoryUpdated(productcategory);
+
+            return productcategory;
+        }
+
+        partial void OnProductCategoryDeleted(FISTNESSGYM.Models.database.ProductCategory item);
+        partial void OnAfterProductCategoryDeleted(FISTNESSGYM.Models.database.ProductCategory item);
+
+        public async Task<FISTNESSGYM.Models.database.ProductCategory> DeleteProductCategory(int id)
+        {
+            var itemToDelete = Context.ProductCategories
+                              .Where(i => i.Id == id)
+                              .Include(i => i.Products)
+                              .FirstOrDefault();
+
+            if (itemToDelete == null)
+            {
+               throw new Exception("Item no longer available");
+            }
+
+            OnProductCategoryDeleted(itemToDelete);
+
+
+            Context.ProductCategories.Remove(itemToDelete);
+
+            try
+            {
+                Context.SaveChanges();
+            }
+            catch
+            {
+                Context.Entry(itemToDelete).State = EntityState.Unchanged;
+                throw;
+            }
+
+            OnAfterProductCategoryDeleted(itemToDelete);
+
+            return itemToDelete;
+        }
+    
         public async Task ExportReservationsToExcel(Query query = null, string fileName = null)
         {
             navigationManager.NavigateTo(query != null ? query.ToUrl($"export/database/reservations/excel(fileName='{(!string.IsNullOrEmpty(fileName) ? UrlEncoder.Default.Encode(fileName) : "Export")}')") : $"export/database/reservations/excel(fileName='{(!string.IsNullOrEmpty(fileName) ? UrlEncoder.Default.Encode(fileName) : "Export")}')", true);
@@ -2613,22 +2941,24 @@ namespace FISTNESSGYM
             return itemToDelete;
         }
     
-        public async Task ExportProductCategoriesToExcel(Query query = null, string fileName = null)
+        public async Task ExportWorkoutExercisesToExcel(Query query = null, string fileName = null)
         {
-            navigationManager.NavigateTo(query != null ? query.ToUrl($"export/database/productcategories/excel(fileName='{(!string.IsNullOrEmpty(fileName) ? UrlEncoder.Default.Encode(fileName) : "Export")}')") : $"export/database/productcategories/excel(fileName='{(!string.IsNullOrEmpty(fileName) ? UrlEncoder.Default.Encode(fileName) : "Export")}')", true);
+            navigationManager.NavigateTo(query != null ? query.ToUrl($"export/database/workoutexercises/excel(fileName='{(!string.IsNullOrEmpty(fileName) ? UrlEncoder.Default.Encode(fileName) : "Export")}')") : $"export/database/workoutexercises/excel(fileName='{(!string.IsNullOrEmpty(fileName) ? UrlEncoder.Default.Encode(fileName) : "Export")}')", true);
         }
 
-        public async Task ExportProductCategoriesToCSV(Query query = null, string fileName = null)
+        public async Task ExportWorkoutExercisesToCSV(Query query = null, string fileName = null)
         {
-            navigationManager.NavigateTo(query != null ? query.ToUrl($"export/database/productcategories/csv(fileName='{(!string.IsNullOrEmpty(fileName) ? UrlEncoder.Default.Encode(fileName) : "Export")}')") : $"export/database/productcategories/csv(fileName='{(!string.IsNullOrEmpty(fileName) ? UrlEncoder.Default.Encode(fileName) : "Export")}')", true);
+            navigationManager.NavigateTo(query != null ? query.ToUrl($"export/database/workoutexercises/csv(fileName='{(!string.IsNullOrEmpty(fileName) ? UrlEncoder.Default.Encode(fileName) : "Export")}')") : $"export/database/workoutexercises/csv(fileName='{(!string.IsNullOrEmpty(fileName) ? UrlEncoder.Default.Encode(fileName) : "Export")}')", true);
         }
 
-        partial void OnProductCategoriesRead(ref IQueryable<FISTNESSGYM.Models.database.ProductCategory> items);
+        partial void OnWorkoutExercisesRead(ref IQueryable<FISTNESSGYM.Models.database.WorkoutExercise> items);
 
-        public async Task<IQueryable<FISTNESSGYM.Models.database.ProductCategory>> GetProductCategories(Query query = null)
+        public async Task<IQueryable<FISTNESSGYM.Models.database.WorkoutExercise>> GetWorkoutExercises(Query query = null)
         {
-            var items = Context.ProductCategories.AsQueryable();
+            var items = Context.WorkoutExercises.AsQueryable();
 
+            items = items.Include(i => i.Exercise);
+            items = items.Include(i => i.WorkoutPlan);
 
             if (query != null)
             {
@@ -2644,40 +2974,42 @@ namespace FISTNESSGYM
                 ApplyQuery(ref items, query);
             }
 
-            OnProductCategoriesRead(ref items);
+            OnWorkoutExercisesRead(ref items);
 
             return await Task.FromResult(items);
         }
 
-        partial void OnProductCategoryGet(FISTNESSGYM.Models.database.ProductCategory item);
-        partial void OnGetProductCategoryById(ref IQueryable<FISTNESSGYM.Models.database.ProductCategory> items);
+        partial void OnWorkoutExerciseGet(FISTNESSGYM.Models.database.WorkoutExercise item);
+        partial void OnGetWorkoutExerciseById(ref IQueryable<FISTNESSGYM.Models.database.WorkoutExercise> items);
 
 
-        public async Task<FISTNESSGYM.Models.database.ProductCategory> GetProductCategoryById(int id)
+        public async Task<FISTNESSGYM.Models.database.WorkoutExercise> GetWorkoutExerciseById(int id)
         {
-            var items = Context.ProductCategories
+            var items = Context.WorkoutExercises
                               .AsNoTracking()
                               .Where(i => i.Id == id);
 
+            items = items.Include(i => i.Exercise);
+            items = items.Include(i => i.WorkoutPlan);
  
-            OnGetProductCategoryById(ref items);
+            OnGetWorkoutExerciseById(ref items);
 
             var itemToReturn = items.FirstOrDefault();
 
-            OnProductCategoryGet(itemToReturn);
+            OnWorkoutExerciseGet(itemToReturn);
 
             return await Task.FromResult(itemToReturn);
         }
 
-        partial void OnProductCategoryCreated(FISTNESSGYM.Models.database.ProductCategory item);
-        partial void OnAfterProductCategoryCreated(FISTNESSGYM.Models.database.ProductCategory item);
+        partial void OnWorkoutExerciseCreated(FISTNESSGYM.Models.database.WorkoutExercise item);
+        partial void OnAfterWorkoutExerciseCreated(FISTNESSGYM.Models.database.WorkoutExercise item);
 
-        public async Task<FISTNESSGYM.Models.database.ProductCategory> CreateProductCategory(FISTNESSGYM.Models.database.ProductCategory productcategory)
+        public async Task<FISTNESSGYM.Models.database.WorkoutExercise> CreateWorkoutExercise(FISTNESSGYM.Models.database.WorkoutExercise workoutexercise)
         {
-            OnProductCategoryCreated(productcategory);
+            OnWorkoutExerciseCreated(workoutexercise);
 
-            var existingItem = Context.ProductCategories
-                              .Where(i => i.Id == productcategory.Id)
+            var existingItem = Context.WorkoutExercises
+                              .Where(i => i.Id == workoutexercise.Id)
                               .FirstOrDefault();
 
             if (existingItem != null)
@@ -2687,21 +3019,21 @@ namespace FISTNESSGYM
 
             try
             {
-                Context.ProductCategories.Add(productcategory);
+                Context.WorkoutExercises.Add(workoutexercise);
                 Context.SaveChanges();
             }
             catch
             {
-                Context.Entry(productcategory).State = EntityState.Detached;
+                Context.Entry(workoutexercise).State = EntityState.Detached;
                 throw;
             }
 
-            OnAfterProductCategoryCreated(productcategory);
+            OnAfterWorkoutExerciseCreated(workoutexercise);
 
-            return productcategory;
+            return workoutexercise;
         }
 
-        public async Task<FISTNESSGYM.Models.database.ProductCategory> CancelProductCategoryChanges(FISTNESSGYM.Models.database.ProductCategory item)
+        public async Task<FISTNESSGYM.Models.database.WorkoutExercise> CancelWorkoutExerciseChanges(FISTNESSGYM.Models.database.WorkoutExercise item)
         {
             var entityToCancel = Context.Entry(item);
             if (entityToCancel.State == EntityState.Modified)
@@ -2713,15 +3045,15 @@ namespace FISTNESSGYM
             return item;
         }
 
-        partial void OnProductCategoryUpdated(FISTNESSGYM.Models.database.ProductCategory item);
-        partial void OnAfterProductCategoryUpdated(FISTNESSGYM.Models.database.ProductCategory item);
+        partial void OnWorkoutExerciseUpdated(FISTNESSGYM.Models.database.WorkoutExercise item);
+        partial void OnAfterWorkoutExerciseUpdated(FISTNESSGYM.Models.database.WorkoutExercise item);
 
-        public async Task<FISTNESSGYM.Models.database.ProductCategory> UpdateProductCategory(int id, FISTNESSGYM.Models.database.ProductCategory productcategory)
+        public async Task<FISTNESSGYM.Models.database.WorkoutExercise> UpdateWorkoutExercise(int id, FISTNESSGYM.Models.database.WorkoutExercise workoutexercise)
         {
-            OnProductCategoryUpdated(productcategory);
+            OnWorkoutExerciseUpdated(workoutexercise);
 
-            var itemToUpdate = Context.ProductCategories
-                              .Where(i => i.Id == productcategory.Id)
+            var itemToUpdate = Context.WorkoutExercises
+                              .Where(i => i.Id == workoutexercise.Id)
                               .FirstOrDefault();
 
             if (itemToUpdate == null)
@@ -2730,24 +3062,23 @@ namespace FISTNESSGYM
             }
                 
             var entryToUpdate = Context.Entry(itemToUpdate);
-            entryToUpdate.CurrentValues.SetValues(productcategory);
+            entryToUpdate.CurrentValues.SetValues(workoutexercise);
             entryToUpdate.State = EntityState.Modified;
 
             Context.SaveChanges();
 
-            OnAfterProductCategoryUpdated(productcategory);
+            OnAfterWorkoutExerciseUpdated(workoutexercise);
 
-            return productcategory;
+            return workoutexercise;
         }
 
-        partial void OnProductCategoryDeleted(FISTNESSGYM.Models.database.ProductCategory item);
-        partial void OnAfterProductCategoryDeleted(FISTNESSGYM.Models.database.ProductCategory item);
+        partial void OnWorkoutExerciseDeleted(FISTNESSGYM.Models.database.WorkoutExercise item);
+        partial void OnAfterWorkoutExerciseDeleted(FISTNESSGYM.Models.database.WorkoutExercise item);
 
-        public async Task<FISTNESSGYM.Models.database.ProductCategory> DeleteProductCategory(int id)
+        public async Task<FISTNESSGYM.Models.database.WorkoutExercise> DeleteWorkoutExercise(int id)
         {
-            var itemToDelete = Context.ProductCategories
+            var itemToDelete = Context.WorkoutExercises
                               .Where(i => i.Id == id)
-                              .Include(i => i.Products)
                               .FirstOrDefault();
 
             if (itemToDelete == null)
@@ -2755,10 +3086,10 @@ namespace FISTNESSGYM
                throw new Exception("Item no longer available");
             }
 
-            OnProductCategoryDeleted(itemToDelete);
+            OnWorkoutExerciseDeleted(itemToDelete);
 
 
-            Context.ProductCategories.Remove(itemToDelete);
+            Context.WorkoutExercises.Remove(itemToDelete);
 
             try
             {
@@ -2770,28 +3101,189 @@ namespace FISTNESSGYM
                 throw;
             }
 
-            OnAfterProductCategoryDeleted(itemToDelete);
+            OnAfterWorkoutExerciseDeleted(itemToDelete);
 
             return itemToDelete;
         }
     
-        public async Task ExportCartItemsToExcel(Query query = null, string fileName = null)
+        public async Task ExportExercisesToExcel(Query query = null, string fileName = null)
         {
-            navigationManager.NavigateTo(query != null ? query.ToUrl($"export/database/cartitems/excel(fileName='{(!string.IsNullOrEmpty(fileName) ? UrlEncoder.Default.Encode(fileName) : "Export")}')") : $"export/database/cartitems/excel(fileName='{(!string.IsNullOrEmpty(fileName) ? UrlEncoder.Default.Encode(fileName) : "Export")}')", true);
+            navigationManager.NavigateTo(query != null ? query.ToUrl($"export/database/exercises/excel(fileName='{(!string.IsNullOrEmpty(fileName) ? UrlEncoder.Default.Encode(fileName) : "Export")}')") : $"export/database/exercises/excel(fileName='{(!string.IsNullOrEmpty(fileName) ? UrlEncoder.Default.Encode(fileName) : "Export")}')", true);
         }
 
-        public async Task ExportCartItemsToCSV(Query query = null, string fileName = null)
+        public async Task ExportExercisesToCSV(Query query = null, string fileName = null)
         {
-            navigationManager.NavigateTo(query != null ? query.ToUrl($"export/database/cartitems/csv(fileName='{(!string.IsNullOrEmpty(fileName) ? UrlEncoder.Default.Encode(fileName) : "Export")}')") : $"export/database/cartitems/csv(fileName='{(!string.IsNullOrEmpty(fileName) ? UrlEncoder.Default.Encode(fileName) : "Export")}')", true);
+            navigationManager.NavigateTo(query != null ? query.ToUrl($"export/database/exercises/csv(fileName='{(!string.IsNullOrEmpty(fileName) ? UrlEncoder.Default.Encode(fileName) : "Export")}')") : $"export/database/exercises/csv(fileName='{(!string.IsNullOrEmpty(fileName) ? UrlEncoder.Default.Encode(fileName) : "Export")}')", true);
         }
 
-        partial void OnCartItemsRead(ref IQueryable<FISTNESSGYM.Models.database.CartItem> items);
+        partial void OnExercisesRead(ref IQueryable<FISTNESSGYM.Models.database.Exercise> items);
 
-        public async Task<IQueryable<FISTNESSGYM.Models.database.CartItem>> GetCartItems(Query query = null)
+        public async Task<IQueryable<FISTNESSGYM.Models.database.Exercise>> GetExercises(Query query = null)
         {
-            var items = Context.CartItems.AsQueryable();
+            var items = Context.Exercises.AsQueryable();
 
-            items = items.Include(i => i.Product);
+
+            if (query != null)
+            {
+                if (!string.IsNullOrEmpty(query.Expand))
+                {
+                    var propertiesToExpand = query.Expand.Split(',');
+                    foreach(var p in propertiesToExpand)
+                    {
+                        items = items.Include(p.Trim());
+                    }
+                }
+
+                ApplyQuery(ref items, query);
+            }
+
+            OnExercisesRead(ref items);
+
+            return await Task.FromResult(items);
+        }
+
+        partial void OnExerciseGet(FISTNESSGYM.Models.database.Exercise item);
+        partial void OnGetExerciseById(ref IQueryable<FISTNESSGYM.Models.database.Exercise> items);
+
+
+        public async Task<FISTNESSGYM.Models.database.Exercise> GetExerciseById(int id)
+        {
+            var items = Context.Exercises
+                              .AsNoTracking()
+                              .Where(i => i.Id == id);
+
+ 
+            OnGetExerciseById(ref items);
+
+            var itemToReturn = items.FirstOrDefault();
+
+            OnExerciseGet(itemToReturn);
+
+            return await Task.FromResult(itemToReturn);
+        }
+
+        partial void OnExerciseCreated(FISTNESSGYM.Models.database.Exercise item);
+        partial void OnAfterExerciseCreated(FISTNESSGYM.Models.database.Exercise item);
+
+        public async Task<FISTNESSGYM.Models.database.Exercise> CreateExercise(FISTNESSGYM.Models.database.Exercise exercise)
+        {
+            OnExerciseCreated(exercise);
+
+            var existingItem = Context.Exercises
+                              .Where(i => i.Id == exercise.Id)
+                              .FirstOrDefault();
+
+            if (existingItem != null)
+            {
+               throw new Exception("Item already available");
+            }            
+
+            try
+            {
+                Context.Exercises.Add(exercise);
+                Context.SaveChanges();
+            }
+            catch
+            {
+                Context.Entry(exercise).State = EntityState.Detached;
+                throw;
+            }
+
+            OnAfterExerciseCreated(exercise);
+
+            return exercise;
+        }
+
+        public async Task<FISTNESSGYM.Models.database.Exercise> CancelExerciseChanges(FISTNESSGYM.Models.database.Exercise item)
+        {
+            var entityToCancel = Context.Entry(item);
+            if (entityToCancel.State == EntityState.Modified)
+            {
+              entityToCancel.CurrentValues.SetValues(entityToCancel.OriginalValues);
+              entityToCancel.State = EntityState.Unchanged;
+            }
+
+            return item;
+        }
+
+        partial void OnExerciseUpdated(FISTNESSGYM.Models.database.Exercise item);
+        partial void OnAfterExerciseUpdated(FISTNESSGYM.Models.database.Exercise item);
+
+        public async Task<FISTNESSGYM.Models.database.Exercise> UpdateExercise(int id, FISTNESSGYM.Models.database.Exercise exercise)
+        {
+            OnExerciseUpdated(exercise);
+
+            var itemToUpdate = Context.Exercises
+                              .Where(i => i.Id == exercise.Id)
+                              .FirstOrDefault();
+
+            if (itemToUpdate == null)
+            {
+               throw new Exception("Item no longer available");
+            }
+                
+            var entryToUpdate = Context.Entry(itemToUpdate);
+            entryToUpdate.CurrentValues.SetValues(exercise);
+            entryToUpdate.State = EntityState.Modified;
+
+            Context.SaveChanges();
+
+            OnAfterExerciseUpdated(exercise);
+
+            return exercise;
+        }
+
+        partial void OnExerciseDeleted(FISTNESSGYM.Models.database.Exercise item);
+        partial void OnAfterExerciseDeleted(FISTNESSGYM.Models.database.Exercise item);
+
+        public async Task<FISTNESSGYM.Models.database.Exercise> DeleteExercise(int id)
+        {
+            var itemToDelete = Context.Exercises
+                              .Where(i => i.Id == id)
+                              .Include(i => i.WorkoutExercises)
+                              .FirstOrDefault();
+
+            if (itemToDelete == null)
+            {
+               throw new Exception("Item no longer available");
+            }
+
+            OnExerciseDeleted(itemToDelete);
+
+
+            Context.Exercises.Remove(itemToDelete);
+
+            try
+            {
+                Context.SaveChanges();
+            }
+            catch
+            {
+                Context.Entry(itemToDelete).State = EntityState.Unchanged;
+                throw;
+            }
+
+            OnAfterExerciseDeleted(itemToDelete);
+
+            return itemToDelete;
+        }
+    
+        public async Task ExportWorkoutPlansToExcel(Query query = null, string fileName = null)
+        {
+            navigationManager.NavigateTo(query != null ? query.ToUrl($"export/database/workoutplans/excel(fileName='{(!string.IsNullOrEmpty(fileName) ? UrlEncoder.Default.Encode(fileName) : "Export")}')") : $"export/database/workoutplans/excel(fileName='{(!string.IsNullOrEmpty(fileName) ? UrlEncoder.Default.Encode(fileName) : "Export")}')", true);
+        }
+
+        public async Task ExportWorkoutPlansToCSV(Query query = null, string fileName = null)
+        {
+            navigationManager.NavigateTo(query != null ? query.ToUrl($"export/database/workoutplans/csv(fileName='{(!string.IsNullOrEmpty(fileName) ? UrlEncoder.Default.Encode(fileName) : "Export")}')") : $"export/database/workoutplans/csv(fileName='{(!string.IsNullOrEmpty(fileName) ? UrlEncoder.Default.Encode(fileName) : "Export")}')", true);
+        }
+
+        partial void OnWorkoutPlansRead(ref IQueryable<FISTNESSGYM.Models.database.WorkoutPlan> items);
+
+        public async Task<IQueryable<FISTNESSGYM.Models.database.WorkoutPlan>> GetWorkoutPlans(Query query = null)
+        {
+            var items = Context.WorkoutPlans.AsQueryable();
+
             items = items.Include(i => i.AspNetUser);
 
             if (query != null)
@@ -2808,42 +3300,41 @@ namespace FISTNESSGYM
                 ApplyQuery(ref items, query);
             }
 
-            OnCartItemsRead(ref items);
+            OnWorkoutPlansRead(ref items);
 
             return await Task.FromResult(items);
         }
 
-        partial void OnCartItemGet(FISTNESSGYM.Models.database.CartItem item);
-        partial void OnGetCartItemById(ref IQueryable<FISTNESSGYM.Models.database.CartItem> items);
+        partial void OnWorkoutPlanGet(FISTNESSGYM.Models.database.WorkoutPlan item);
+        partial void OnGetWorkoutPlanById(ref IQueryable<FISTNESSGYM.Models.database.WorkoutPlan> items);
 
 
-        public async Task<FISTNESSGYM.Models.database.CartItem> GetCartItemById(int id)
+        public async Task<FISTNESSGYM.Models.database.WorkoutPlan> GetWorkoutPlanById(int id)
         {
-            var items = Context.CartItems
+            var items = Context.WorkoutPlans
                               .AsNoTracking()
                               .Where(i => i.Id == id);
 
-            items = items.Include(i => i.Product);
             items = items.Include(i => i.AspNetUser);
  
-            OnGetCartItemById(ref items);
+            OnGetWorkoutPlanById(ref items);
 
             var itemToReturn = items.FirstOrDefault();
 
-            OnCartItemGet(itemToReturn);
+            OnWorkoutPlanGet(itemToReturn);
 
             return await Task.FromResult(itemToReturn);
         }
 
-        partial void OnCartItemCreated(FISTNESSGYM.Models.database.CartItem item);
-        partial void OnAfterCartItemCreated(FISTNESSGYM.Models.database.CartItem item);
+        partial void OnWorkoutPlanCreated(FISTNESSGYM.Models.database.WorkoutPlan item);
+        partial void OnAfterWorkoutPlanCreated(FISTNESSGYM.Models.database.WorkoutPlan item);
 
-        public async Task<FISTNESSGYM.Models.database.CartItem> CreateCartItem(FISTNESSGYM.Models.database.CartItem cartitem)
+        public async Task<FISTNESSGYM.Models.database.WorkoutPlan> CreateWorkoutPlan(FISTNESSGYM.Models.database.WorkoutPlan workoutplan)
         {
-            OnCartItemCreated(cartitem);
+            OnWorkoutPlanCreated(workoutplan);
 
-            var existingItem = Context.CartItems
-                              .Where(i => i.Id == cartitem.Id)
+            var existingItem = Context.WorkoutPlans
+                              .Where(i => i.Id == workoutplan.Id)
                               .FirstOrDefault();
 
             if (existingItem != null)
@@ -2853,21 +3344,21 @@ namespace FISTNESSGYM
 
             try
             {
-                Context.CartItems.Add(cartitem);
+                Context.WorkoutPlans.Add(workoutplan);
                 Context.SaveChanges();
             }
             catch
             {
-                Context.Entry(cartitem).State = EntityState.Detached;
+                Context.Entry(workoutplan).State = EntityState.Detached;
                 throw;
             }
 
-            OnAfterCartItemCreated(cartitem);
+            OnAfterWorkoutPlanCreated(workoutplan);
 
-            return cartitem;
+            return workoutplan;
         }
 
-        public async Task<FISTNESSGYM.Models.database.CartItem> CancelCartItemChanges(FISTNESSGYM.Models.database.CartItem item)
+        public async Task<FISTNESSGYM.Models.database.WorkoutPlan> CancelWorkoutPlanChanges(FISTNESSGYM.Models.database.WorkoutPlan item)
         {
             var entityToCancel = Context.Entry(item);
             if (entityToCancel.State == EntityState.Modified)
@@ -2879,15 +3370,15 @@ namespace FISTNESSGYM
             return item;
         }
 
-        partial void OnCartItemUpdated(FISTNESSGYM.Models.database.CartItem item);
-        partial void OnAfterCartItemUpdated(FISTNESSGYM.Models.database.CartItem item);
+        partial void OnWorkoutPlanUpdated(FISTNESSGYM.Models.database.WorkoutPlan item);
+        partial void OnAfterWorkoutPlanUpdated(FISTNESSGYM.Models.database.WorkoutPlan item);
 
-        public async Task<FISTNESSGYM.Models.database.CartItem> UpdateCartItem(int id, FISTNESSGYM.Models.database.CartItem cartitem)
+        public async Task<FISTNESSGYM.Models.database.WorkoutPlan> UpdateWorkoutPlan(int id, FISTNESSGYM.Models.database.WorkoutPlan workoutplan)
         {
-            OnCartItemUpdated(cartitem);
+            OnWorkoutPlanUpdated(workoutplan);
 
-            var itemToUpdate = Context.CartItems
-                              .Where(i => i.Id == cartitem.Id)
+            var itemToUpdate = Context.WorkoutPlans
+                              .Where(i => i.Id == workoutplan.Id)
                               .FirstOrDefault();
 
             if (itemToUpdate == null)
@@ -2896,23 +3387,24 @@ namespace FISTNESSGYM
             }
                 
             var entryToUpdate = Context.Entry(itemToUpdate);
-            entryToUpdate.CurrentValues.SetValues(cartitem);
+            entryToUpdate.CurrentValues.SetValues(workoutplan);
             entryToUpdate.State = EntityState.Modified;
 
             Context.SaveChanges();
 
-            OnAfterCartItemUpdated(cartitem);
+            OnAfterWorkoutPlanUpdated(workoutplan);
 
-            return cartitem;
+            return workoutplan;
         }
 
-        partial void OnCartItemDeleted(FISTNESSGYM.Models.database.CartItem item);
-        partial void OnAfterCartItemDeleted(FISTNESSGYM.Models.database.CartItem item);
+        partial void OnWorkoutPlanDeleted(FISTNESSGYM.Models.database.WorkoutPlan item);
+        partial void OnAfterWorkoutPlanDeleted(FISTNESSGYM.Models.database.WorkoutPlan item);
 
-        public async Task<FISTNESSGYM.Models.database.CartItem> DeleteCartItem(int id)
+        public async Task<FISTNESSGYM.Models.database.WorkoutPlan> DeleteWorkoutPlan(int id)
         {
-            var itemToDelete = Context.CartItems
+            var itemToDelete = Context.WorkoutPlans
                               .Where(i => i.Id == id)
+                              .Include(i => i.WorkoutExercises)
                               .FirstOrDefault();
 
             if (itemToDelete == null)
@@ -2920,10 +3412,10 @@ namespace FISTNESSGYM
                throw new Exception("Item no longer available");
             }
 
-            OnCartItemDeleted(itemToDelete);
+            OnWorkoutPlanDeleted(itemToDelete);
 
 
-            Context.CartItems.Remove(itemToDelete);
+            Context.WorkoutPlans.Remove(itemToDelete);
 
             try
             {
@@ -2935,11 +3427,9 @@ namespace FISTNESSGYM
                 throw;
             }
 
-            OnAfterCartItemDeleted(itemToDelete);
+            OnAfterWorkoutPlanDeleted(itemToDelete);
 
             return itemToDelete;
         }
         }
-
-
 }
