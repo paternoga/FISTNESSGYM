@@ -9,7 +9,7 @@ using Radzen;
 using Radzen.Blazor;
 using FISTNESSGYM.Components.Pages.Account;
 
-namespace FISTNESSGYM.Components.Pages.Login
+namespace FISTNESSGYM.Components.Pages.Account.Login
 {
     public partial class Login
     {

@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Components.Web;
 using Radzen;
 using Radzen.Blazor;
 
-namespace FISTNESSGYM.Components.Pages.Store
+namespace FISTNESSGYM.Components.Pages.Store.Products
 {
     public partial class Products
     {

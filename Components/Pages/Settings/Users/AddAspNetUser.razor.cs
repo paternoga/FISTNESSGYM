@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Components.Web;
 using Radzen;
 using Radzen.Blazor;
 
-namespace FISTNESSGYM.Components.Pages.Settings
+namespace FISTNESSGYM.Components.Pages.Settings.Users
 {
     public partial class AddAspNetUser
     {

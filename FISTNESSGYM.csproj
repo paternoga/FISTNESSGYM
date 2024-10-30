@@ -17,7 +17,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Components\Pages\Training\Events\" />
-    <Folder Include="Components\Pages\Store\Cart\" />
     <Folder Include="Components\Pages\Training\Training Plans\" />
   </ItemGroup>
 </Project>

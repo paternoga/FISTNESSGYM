@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Components.Web;
 using Radzen;
 using Radzen.Blazor;
 
-namespace FISTNESSGYM.Components.Pages.Profile
+namespace FISTNESSGYM.Components.Pages.Settings.Profile
 {
     public partial class Profile
     {
