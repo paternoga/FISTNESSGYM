@@ -1,0 +1,164 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using FISTNESSGYM.Data;
+using FISTNESSGYM.Models.database;
+using FISTNESSGYM.Services;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+
+namespace FISTNESSGYM.Services
+{
+    public class SubscriptionService : ISubscriptionService
+    {
+        private readonly databaseContext _context;
+        private readonly ILogger<SubscriptionService> _logger;
+
+        public SubscriptionService(databaseContext context, ILogger<SubscriptionService> logger)
+        {
+            _context = context;
+            _logger = logger;
+        }
+
+        public async Task<List<SubscriptionType>> GetSubscriptionTypesAsync()
+        {
+            try
+            {
+                return await _context.SubscriptionTypes.ToListAsync();
+            }
+            catch (DbUpdateException dbEx)
+            {
+                throw new Exception("There was a problem retrieving subscription types from the database.", dbEx);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("An error occurred while retrieving subscription types.", ex);
+            }
+        }
+
+        public async Task<decimal> GetPriceForSubscriptionType(int subscriptionTypeId)
+        {
+            try
+            {
+                return subscriptionTypeId switch
+                {
+                    1 => 99.00m, // miesieczna
+                    2 => 950.00m, // roczna
+                    3 => 1.00m, // probna
+                    _ => throw new ArgumentException("Invalid subscription type.")
+                };
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("An error occurred while retrieving the price for the subscription type.", ex);
+            }
+        }
+
+        public async Task<Subscription> GetCurrentSubscriptionAsync(string userId)
+        {
+            try
+            {
+                var subscription = await _context.Subscriptions
+                    .Include(s => s.SubscriptionType) 
+                    .FirstOrDefaultAsync(s => s.UserId == userId && s.SubscriptionStatusId == 1);
+
+                if (subscription == null)
+                {
+                    _logger.LogWarning("Brak subskrypcji dla użytkownika: {UserId}", userId);
+                }
+
+                return subscription;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Wystąpił błąd podczas pobierania subskrypcji dla użytkownika: {UserId}", userId);
+                throw; 
+            }
+        }
+
+        public async Task PurchaseSubscriptionAsync(string userId, int subscriptionTypeId)
+        {
+            if (string.IsNullOrEmpty(userId))
+            {
+                throw new ArgumentException("User ID cannot be null or empty.");
+            }
+
+            var userExists = await _context.AspNetUsers.AnyAsync(u => u.Id == userId);
+            if (!userExists)
+            {
+                throw new Exception("The specified user does not exist.");
+            }
+
+            try
+            {
+                var subscriptionType = await _context.SubscriptionTypes.FindAsync(subscriptionTypeId);
+                if (subscriptionType == null)
+                {
+                    throw new Exception("Invalid subscription type.");
+                }
+
+                decimal price = await GetPriceForSubscriptionType(subscriptionTypeId);
+
+                var subscription = new Subscription
+                {
+                    UserId = userId,
+                    SubscriptionTypeId = subscriptionTypeId,
+                    StartDate = DateTime.UtcNow,
+                    EndDate = subscriptionTypeId == 1
+                        ? DateTime.UtcNow.AddMonths(1)
+                        : DateTime.UtcNow.AddYears(1),
+                    SubscriptionStatusId = 1, 
+                    Price = price
+                };
+
+                _context.Subscriptions.Add(subscription);
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException dbEx)
+            {
+                // Log or handle database update exceptions
+                throw new Exception("There was a problem saving the subscription to the database.", dbEx);
+            }
+            catch (Exception ex)
+            {
+                // Log or handle general exceptions
+                throw new Exception("An error occurred while purchasing the subscription.", ex);
+            }
+        }
+
+        public async Task CancelSubscriptionAsync(int subscriptionId)
+        {
+            var subscription = await _context.Subscriptions.FindAsync(subscriptionId);
+
+            if (subscription == null)
+            {
+                throw new Exception("Subskrypcja nie została znaleziona.");
+            }
+
+            subscription.SubscriptionStatusId = 2; 
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException dbEx)
+            {
+                // Logowanie lub obsługa wyjątku
+                throw new Exception("Wystąpił problem podczas anulowania subskrypcji.", dbEx);
+            }
+            catch (Exception ex)
+            {
+                // Logowanie lub obsługa ogólnych wyjątków
+                throw new Exception("Wystąpił błąd podczas anulowania subskrypcji.", ex);
+            }
+        }
+
+        public async Task<List<Subscription>> GetSubscriptionsByUserIdAsync(string userId)
+        {
+            return await _context.Subscriptions
+                .Include(s => s.SubscriptionType) 
+                .Where(s => s.UserId == userId)
+                .ToListAsync();
+        }
+    }
+}

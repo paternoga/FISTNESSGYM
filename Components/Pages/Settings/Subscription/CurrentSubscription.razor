@@ -1,0 +1,127 @@
+﻿@page "/settings/subscription"
+@using System.Security.Claims
+@using FISTNESSGYM.Models.database
+@using FISTNESSGYM.Services
+@inject SubscriptionService SubscriptionService
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+<h3>Subskrypcja</h3>
+
+@if (currentSubscription != null)
+{
+    <h4>Aktualna Subskrypcja</h4>
+    <p>Typ subskrypcji: @currentSubscription.SubscriptionType?.TypeName</p>
+    <p>Opis: @currentSubscription.SubscriptionType?.Description</p>
+    <p>Data rozpoczęcia: @currentSubscription.StartDate.ToString("dd/MM/yyyy")</p>
+    <p>Data zakończenia: @currentSubscription.EndDate.ToString("dd/MM/yyyy")</p>
+
+    <button @onclick="CancelSubscription">Zrezygnuj z subskrypcji</button>
+}
+else
+{
+    <h4>Zakup Subskrypcji</h4>
+
+    <select @bind="selectedSubscriptionTypeId">
+        <option value="">Wybierz typ subskrypcji</option>
+        <option value="1">Miesięczna - 99 zł</option>
+        <option value="2">Roczna - 950 zł</option>
+        <option value="3">Próbna - 1 zł</option>
+    </select>
+
+    <button @onclick="Purchase">Kup</button>
+}
+
+<h4>Historia Subskrypcji</h4>
+@if (subscriptions != null && subscriptions.Count > 0)
+{
+    <table>
+        <thead>
+            <tr>
+                <th>Typ subskrypcji</th>
+                <th>Data rozpoczęcia</th>
+                <th>Data zakończenia</th>
+                <th>Cena</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var subscription in subscriptions)
+            {
+                <tr>
+                    <td>@subscription.SubscriptionType?.TypeName</td>
+                    <td>@subscription.StartDate.ToString("dd/MM/yyyy")</td>
+                    <td>@subscription.EndDate.ToString("dd/MM/yyyy")</td>
+                    <td>@subscription.Price.ToString("C")</td>
+                    <td>@subscription.SubscriptionStatus?.Status</td> 
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>Brak historii subskrypcji.</p>
+}
+
+@code {
+    private Subscription currentSubscription;
+    private List<Subscription> subscriptions = new List<Subscription>();
+    private int selectedSubscriptionTypeId;
+    private string userId;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        if (user.Identity.IsAuthenticated)
+        {
+            userId = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            currentSubscription = await SubscriptionService.GetCurrentSubscriptionAsync(userId);
+            subscriptions = await SubscriptionService.GetSubscriptionsByUserIdAsync(userId); 
+        }
+        else
+        {
+            throw new Exception("Użytkownik nie jest zalogowany.");
+        }
+    }
+
+    private async Task Purchase()
+    {
+        if (currentSubscription != null)
+        {
+            Console.WriteLine("Nie możesz kupić nowej subskrypcji, ponieważ masz już aktywną subskrypcję.");
+            return;
+        }
+
+        try
+        {
+            await SubscriptionService.PurchaseSubscriptionAsync(userId, selectedSubscriptionTypeId);
+            Console.WriteLine("Zakup subskrypcji zakończony sukcesem.");
+            currentSubscription = await SubscriptionService.GetCurrentSubscriptionAsync(userId);
+            subscriptions = await SubscriptionService.GetSubscriptionsByUserIdAsync(userId);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Błąd podczas zakupu subskrypcji: {ex.Message}");
+        }
+    }
+
+    private async Task CancelSubscription()
+    {
+        if (currentSubscription != null)
+        {
+            try
+            {
+                await SubscriptionService.CancelSubscriptionAsync(currentSubscription.Id);
+                currentSubscription = null;
+                Console.WriteLine("Subskrypcja została anulowana.");
+                subscriptions = await SubscriptionService.GetSubscriptionsByUserIdAsync(userId); 
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Błąd podczas anulowania subskrypcji: " + ex.Message);
+            }
+        }
+    }
+}

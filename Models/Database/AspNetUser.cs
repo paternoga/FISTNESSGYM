@@ -56,5 +56,7 @@ namespace FISTNESSGYM.Models.database
         public ICollection<Reservation> Reservations { get; set; }
 
         public ICollection<Subscription> Subscriptions { get; set; }
+
+        public ICollection<WorkoutPlan> WorkoutPlans { get; set; }
     }
 }

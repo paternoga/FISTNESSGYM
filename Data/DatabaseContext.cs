@@ -70,6 +70,18 @@ namespace FISTNESSGYM.Data
               .HasForeignKey(i => i.UserId)
               .HasPrincipalKey(i => i.Id);
 
+            builder.Entity<FISTNESSGYM.Models.database.CartItem>()
+              .HasOne(i => i.Product)
+              .WithMany(i => i.CartItems)
+              .HasForeignKey(i => i.ProductId)
+              .HasPrincipalKey(i => i.Id);
+
+            builder.Entity<FISTNESSGYM.Models.database.CartItem>()
+              .HasOne(i => i.AspNetUser)
+              .WithMany(i => i.CartItems)
+              .HasForeignKey(i => i.UserId)
+              .HasPrincipalKey(i => i.Id);
+
             builder.Entity<FISTNESSGYM.Models.database.Order>()
               .HasOne(i => i.OrderStatus)
               .WithMany(i => i.Orders)
@@ -124,21 +136,31 @@ namespace FISTNESSGYM.Data
               .HasForeignKey(i => i.UserId)
               .HasPrincipalKey(i => i.Id);
 
-            builder.Entity<FISTNESSGYM.Models.database.CartItem>()
-              .HasOne(i => i.Product)
-              .WithMany(i => i.CartItems)
-              .HasForeignKey(i => i.ProductId)
+            builder.Entity<FISTNESSGYM.Models.database.WorkoutExercise>()
+              .HasOne(i => i.Exercise)
+              .WithMany(i => i.WorkoutExercises)
+              .HasForeignKey(i => i.ExerciseId)
               .HasPrincipalKey(i => i.Id);
 
-            builder.Entity<FISTNESSGYM.Models.database.CartItem>()
+            builder.Entity<FISTNESSGYM.Models.database.WorkoutExercise>()
+              .HasOne(i => i.WorkoutPlan)
+              .WithMany(i => i.WorkoutExercises)
+              .HasForeignKey(i => i.WorkoutPlanId)
+              .HasPrincipalKey(i => i.Id);
+
+            builder.Entity<FISTNESSGYM.Models.database.WorkoutPlan>()
               .HasOne(i => i.AspNetUser)
-              .WithMany(i => i.CartItems)
+              .WithMany(i => i.WorkoutPlans)
               .HasForeignKey(i => i.UserId)
               .HasPrincipalKey(i => i.Id);
 
             builder.Entity<FISTNESSGYM.Models.database.CartItem>()
               .Property(p => p.Quantity)
               .HasDefaultValueSql(@"((1))");
+
+            builder.Entity<FISTNESSGYM.Models.database.WorkoutPlan>()
+              .Property(p => p.CreatedDate)
+              .HasDefaultValueSql(@"(getdate())");
 
             builder.Entity<FISTNESSGYM.Models.database.AspNetUser>()
               .Property(p => p.LockoutEnd)
@@ -163,6 +185,25 @@ namespace FISTNESSGYM.Data
             builder.Entity<FISTNESSGYM.Models.database.Subscription>()
               .Property(p => p.EndDate)
               .HasColumnType("datetime");
+
+            builder.Entity<FISTNESSGYM.Models.database.Subscription>()
+                .Property(p => p.Price)
+                .HasColumnType("decimal(18, 2)") 
+                .IsRequired(); 
+
+            builder.Entity<FISTNESSGYM.Models.database.Subscription>()
+                .Property(p => p.SubscriptionStatusId)
+                .HasColumnType("int") 
+                .IsRequired(); 
+
+            builder.Entity<FISTNESSGYM.Models.database.Subscription>()
+                .Property(p => p.SubscriptionTypeId)
+                .HasColumnType("int") 
+                .IsRequired(); 
+
+            builder.Entity<FISTNESSGYM.Models.database.WorkoutPlan>()
+              .Property(p => p.CreatedDate)
+              .HasColumnType("datetime");
             this.OnModelBuilding(builder);
         }
 
@@ -180,6 +221,8 @@ namespace FISTNESSGYM.Data
 
         public DbSet<FISTNESSGYM.Models.database.AspNetUserToken> AspNetUserTokens { get; set; }
 
+        public DbSet<FISTNESSGYM.Models.database.CartItem> CartItems { get; set; }
+
         public DbSet<FISTNESSGYM.Models.database.Event> Events { get; set; }
 
         public DbSet<FISTNESSGYM.Models.database.Order> Orders { get; set; }
@@ -190,16 +233,20 @@ namespace FISTNESSGYM.Data
 
         public DbSet<FISTNESSGYM.Models.database.Product> Products { get; set; }
 
+        public DbSet<FISTNESSGYM.Models.database.ProductCategory> ProductCategories { get; set; }
+
         public DbSet<FISTNESSGYM.Models.database.Reservation> Reservations { get; set; }
 
         public DbSet<FISTNESSGYM.Models.database.Subscription> Subscriptions { get; set; }
+        public DbSet<FISTNESSGYM.Models.database.SubscriptionType> SubscriptionTypes { get; set; }
 
         public DbSet<FISTNESSGYM.Models.database.SubscriptionStatus> SubscriptionStatuses { get; set; }
 
-        public DbSet<FISTNESSGYM.Models.database.ProductCategory> ProductCategories { get; set; }
+        public DbSet<FISTNESSGYM.Models.database.WorkoutExercise> WorkoutExercises { get; set; }
 
-        public DbSet<FISTNESSGYM.Models.database.CartItem> CartItems { get; set; }
-        public IEnumerable<object> ProductCategory { get; internal set; }
+        public DbSet<FISTNESSGYM.Models.database.Exercise> Exercises { get; set; }
+
+        public DbSet<FISTNESSGYM.Models.database.WorkoutPlan> WorkoutPlans { get; set; }
 
         protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
         {

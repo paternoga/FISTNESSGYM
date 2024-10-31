@@ -18,19 +18,20 @@ namespace FISTNESSGYM.Models.database
         public AspNetUser AspNetUser { get; set; }
 
         [Required]
-        public string SubscriptionType { get; set; }
+        public int SubscriptionTypeId { get; set; }
 
         [Required]
         public DateTime StartDate { get; set; }
 
-        public DateTime? EndDate { get; set; }
+        public DateTime EndDate { get; set; }
 
         [Required]
         public int SubscriptionStatusId { get; set; }
 
         public SubscriptionStatus SubscriptionStatus { get; set; }
-
         [Required]
         public decimal Price { get; set; }
-    }
+
+        public virtual SubscriptionType SubscriptionType { get; set; }
+    }   
 }

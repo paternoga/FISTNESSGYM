@@ -46,7 +46,12 @@
             <RadzenPanelMenuItem Text="Trening" Icon="calendar_month" >
                 <RadzenPanelMenuItem Path="training/calendar" Icon="calendar_month" Text="Kalendarz" />
                 <RadzenPanelMenuItem Path="training/classes" Icon="sports_gymnastics" Text="Zajęcia" />
-                <RadzenPanelMenuItem Path="training/training_plans" Icon="exercise" Text="Plany treningowe" />
+                <RadzenPanelMenuItem Icon="exercise" Text="Plany treningowe">
+                    <RadzenPanelMenuItem Text="Moje ćwiczenia" Path="training/workout-exercises" Icon="sports_gymnastics" />
+                    <RadzenPanelMenuItem Text="Ćwiczenia" Path="training/exercises" Icon="fitness_center" />
+                    <RadzenPanelMenuItem Text="Plany treningowe" Path="training/workout-plans" Icon="exercise" />
+                </RadzenPanelMenuItem>
+                
             </RadzenPanelMenuItem>
         </RadzenPanelMenu>
 
@@ -66,6 +71,10 @@
         <RadzenPanelMenu>
             <RadzenPanelMenuItem Text="Ustawienia" Icon="settings" >
                 <RadzenPanelMenuItem Path="settings/profile" Icon="person" Text="Profil" />
+                <RadzenPanelMenuItem Icon="universal_currency" Text="Subskrypcja">
+                    <RadzenPanelMenuItem Path="settings/subscription" Icon="universal_currency" Text="Status"/>
+                    <RadzenPanelMenuItem Path="settings/subscription/purchase-subscription" Icon="universal_currency" Text="Zakup"/>
+                </RadzenPanelMenuItem>
                 <RadzenPanelMenuItem Path="settings/application-users" Icon="group" Text="Użytkownicy" />
                 <RadzenPanelMenuItem Path="settings/application-roles" Icon="badge" Text="Role" />
             </RadzenPanelMenuItem>

@@ -10,9 +10,7 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
-
 using Radzen;
-
 using FISTNESSGYM.Models;
 
 namespace FISTNESSGYM
