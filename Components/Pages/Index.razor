@@ -1,7 +1,18 @@
 @page "/"
+@using FISTNESSGYM.Components.Widgets
+@using FISTNESSGYM.Models.database
+@using FISTNESSGYM.Services
+@using System.Security.Claims
+@inject SubscriptionService SubscriptionService
+@inject AuthenticationStateProvider AuthenticationStateProvider
 
 @attribute [Authorize]
 <PageTitle>Index</PageTitle>
+@if (currentSubscription != null)
+{
+    <SubscriptionStatus />
+}
+
 <RadzenRow Gap="5" RowGap="5">
     <RadzenColumn Size="12">
         <RadzenText Text="Welcome to your new app" TextStyle="Radzen.Blazor.TextStyle.DisplayH2" TagName="Radzen.Blazor.TagName.Auto"></RadzenText>
@@ -26,8 +37,25 @@
                     <RadzenText Text="Radzen Community" TextStyle="Radzen.Blazor.TextStyle.DisplayH6" TagName="Radzen.Blazor.TagName.H3"></RadzenText>
                     <RadzenLink Text="Radzen Blazor Studio Forums" Path="https://forum.radzen.com/c/radzen-blazor-studio/12" Icon="east" Target="_blank" Style="font-size: 18px"></RadzenLink>
                 </RadzenColumn>
+                
+
             </RadzenRow>
         </RadzenCard>
     </RadzenColumn>
 </RadzenRow>
 
+
+@code {
+    private Subscription currentSubscription;
+    private string userId;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        userId = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        currentSubscription = await SubscriptionService.GetCurrentSubscriptionAsync(userId);
+    }
+
+}
