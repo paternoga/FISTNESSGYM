@@ -6,6 +6,8 @@
 @inject DialogService DialogService
 @inject SecurityService SecurityService
 
+<PageTitle>KALENDARZ</PageTitle>
+
 <RadzenScheduler TItem="SchedulerEvent" Data="@events" StartProperty="Start" EndProperty="End" TextProperty="Title"
                  Style="height: 680px; width: 1400px" SlotSelect="OnSlotSelect" AppointmentSelect="OnEventSelect">
     <RadzenDayView TimeFormat="HH:mm"></RadzenDayView>

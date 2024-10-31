@@ -2,7 +2,7 @@
 
 @attribute [Authorize]
 
-<PageTitle>Add Exercise</PageTitle>
+<PageTitle>DODAJ ÆWICZENIE</PageTitle>
     <RadzenColumn SizeMD=12>
         <RadzenAlert Shade="Shade.Lighter" Variant="Variant.Flat" Size="AlertSize.Small" AlertStyle="AlertStyle.Danger" Visible="@errorVisible">Cannot save Exercise</RadzenAlert>
         <RadzenTemplateForm TItem="FISTNESSGYM.Models.database.Exercise" Data="@exercise" Visible="@(exercise != null)" Submit="@FormSubmit">

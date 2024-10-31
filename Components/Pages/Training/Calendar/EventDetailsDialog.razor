@@ -4,19 +4,7 @@
 @inject DialogService DialogService
 @inject databaseService databaseService
 
-@code {
-    [Parameter]
-    public SchedulerEvent EventItem { get; set; }
-
-    [Parameter]
-    public string CurrentUserId { get; set; }
-
-    private int currentParticipants;
-    private bool alreadyRegistered;
-    private bool isLoading = true;
-    private string infoMessage;
-    private string errorMessage;
-}
+<PageTitle>SZCZEGÓŁY ZAJĘĆ</PageTitle>
 
 <RadzenCard>
     <RadzenStack>
@@ -64,6 +52,18 @@
 </RadzenCard>
 
 @code {
+    [Parameter]
+    public SchedulerEvent EventItem { get; set; }
+
+    [Parameter]
+    public string CurrentUserId { get; set; }
+
+    private int currentParticipants;
+    private bool alreadyRegistered;
+    private bool isLoading = true;
+    private string infoMessage;
+    private string errorMessage;
+
     protected override async Task OnInitializedAsync()
     {
         try

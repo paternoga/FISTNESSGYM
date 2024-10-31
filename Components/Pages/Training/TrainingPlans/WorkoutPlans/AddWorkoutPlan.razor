@@ -1,7 +1,8 @@
-@page "/add-workout-plan"
+@page "/add-workout-plan"
+
 @attribute [Authorize]
 
-<PageTitle>Add WorkoutPlan</PageTitle>
+<PageTitle>DODAJ PLAN</PageTitle>
     <RadzenColumn SizeMD=12>
         <RadzenAlert Shade="Shade.Lighter" Variant="Variant.Flat" Size="AlertSize.Small" AlertStyle="AlertStyle.Danger" Visible="@errorVisible">Cannot save WorkoutPlan</RadzenAlert>
         <RadzenTemplateForm TItem="FISTNESSGYM.Models.database.WorkoutPlan" Data="@workoutPlan" Visible="@(workoutPlan != null)" Submit="@FormSubmit">

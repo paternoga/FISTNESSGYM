@@ -3,7 +3,7 @@
 @attribute [Authorize]
 
 
-<PageTitle>Dodaj Produkt</PageTitle>
+<PageTitle>DODAJ PRODUKT</PageTitle>
 <RadzenColumn SizeMD=12>
     <RadzenAlert Shade="Shade.Lighter" Variant="Variant.Flat" Size="AlertSize.Small" AlertStyle="AlertStyle.Danger" Visible="@errorVisible">Nie mo�na doda� produktu.</RadzenAlert>
     <RadzenTemplateForm TItem="FISTNESSGYM.Models.database.Product" Data="@product" Visible="@(product != null)" Submit="@FormSubmit">

@@ -1,7 +1,8 @@
-@page "/add-asp-net-user"
+@page "/add-asp-net-user"
+
 @attribute [Authorize]
 
-<PageTitle>Add AspNetUser</PageTitle>
+<PageTitle>DODAJ U¯YTKOWNIKA</PageTitle>
     <RadzenColumn SizeMD=12>
         <RadzenAlert Shade="Shade.Lighter" Variant="Variant.Flat" Size="AlertSize.Small" AlertStyle="AlertStyle.Danger" Visible="@errorVisible">Cannot save AspNetUser</RadzenAlert>
         <RadzenTemplateForm TItem="FISTNESSGYM.Models.database.AspNetUser" Data="@aspNetUser" Visible="@(aspNetUser != null)" Submit="@FormSubmit">

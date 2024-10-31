@@ -2,7 +2,7 @@
 
 @attribute [Authorize]
 
-<PageTitle>Add Event</PageTitle>
+<PageTitle>DODAJ ZAJÊCIA</PageTitle>
     <RadzenColumn SizeMD=12>
         <RadzenAlert Shade="Shade.Lighter" Variant="Variant.Flat" Size="AlertSize.Small" AlertStyle="AlertStyle.Danger" Visible="@errorVisible">Cannot save Event</RadzenAlert>
         <RadzenTemplateForm TItem="FISTNESSGYM.Models.database.Event" Data="@_event" Visible="@(_event != null)" Submit="@FormSubmit">

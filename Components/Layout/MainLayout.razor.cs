@@ -36,7 +36,7 @@ namespace FISTNESSGYM.Components.Layout
         protected SecurityService Security { get; set; }
 
         private bool sidebarExpanded = true;
-        private bool isDarkMode;
+        private bool isDarkMode = true;
 
         private string GetLogoPath()
         {

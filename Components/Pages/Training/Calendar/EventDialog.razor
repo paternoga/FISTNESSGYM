@@ -2,6 +2,8 @@
 @using FISTNESSGYM.Components.Pages.Calendar
 @inject DialogService DialogService
 
+<PageTitle>KALENDARZ</PageTitle>
+
 <RadzenTemplateForm TItem="SchedulerEvent" Data="@model" Submit="@OnSubmit">
     <RadzenStack Gap="1rem">
         <!-- Field for Event Title -->
