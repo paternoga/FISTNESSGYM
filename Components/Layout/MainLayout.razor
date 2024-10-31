@@ -10,7 +10,7 @@
             </RadzenColumn>
             <RadzenColumn Size="7">
                 <RadzenStack AlignItems="AlignItems.Center" Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End" Gap="0.5rem" class="">
-                    <RadzenAppearanceToggle />
+                    <RadzenAppearanceToggle @bind-Value="@isDarkMode" />
                     <RadzenProfileMenu Visible="@Security.IsAuthenticated()" Click="@ProfileMenuClick" Style="background-color: #000000" >
                         <ChildContent>
                             <RadzenProfileMenuItem Path="profile" Icon="settings" Text="Profile" />
@@ -36,7 +36,7 @@
     </RadzenBody>
     <RadzenSidebar Expanded="@sidebarExpanded" style="z-index: 2; width: 258px">
         <RadzenStack AlignItems="Radzen.AlignItems.Center" Style="padding: var(--rz-panel-menu-item-padding); border-bottom: var(--rz-panel-menu-item-border); height: 81px">
-            <RadzenImage Path="images\logo.png"  style="width: 251px; height: 83px; float: none; visibility: visible" AlternateText=""></RadzenImage>
+            <RadzenImage Path="@GetLogoPath()" style="width: 251px; height: 83px; float: none; visibility: visible" AlternateText="" />
         </RadzenStack>
         <RadzenPanelMenu>
             <RadzenPanelMenuItem Text="Strona główna" Icon="home" Path="" />

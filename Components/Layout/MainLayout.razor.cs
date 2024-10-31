@@ -32,10 +32,16 @@ namespace FISTNESSGYM.Components.Layout
         [Inject]
         protected NotificationService NotificationService { get; set; }
 
-        private bool sidebarExpanded = true;
-
         [Inject]
         protected SecurityService Security { get; set; }
+
+        private bool sidebarExpanded = true;
+        private bool isDarkMode;
+
+        private string GetLogoPath()
+        {
+            return isDarkMode ? "images/logo.png" : "images/logo2.png";
+        }
 
         void SidebarToggleClick()
         {
