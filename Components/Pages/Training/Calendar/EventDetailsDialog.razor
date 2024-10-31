@@ -104,6 +104,13 @@
             return;
         }
 
+        // Sprawdzenie, czy wydarzenie już wygasło
+        if (EventItem.End < DateTime.Now)
+        {
+            infoMessage = "To wydarzenie już wygasło i nie można się na nie zapisać.";
+            return;
+        }
+
         if (currentParticipants >= EventItem.MaxParticipants)
         {
             infoMessage = "Brak dostępnych miejsc na to wydarzenie.";
@@ -115,6 +122,7 @@
         alreadyRegistered = true;
         infoMessage = "Zostałeś zapisany na wydarzenie!";
     }
+
 
     private async Task OnUnregisterClick()
     {

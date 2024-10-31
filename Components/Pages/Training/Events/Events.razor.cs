@@ -63,7 +63,13 @@ namespace FISTNESSGYM.Components.Pages.Training.Events
         {
             try
             {
-                if (await DialogService.Confirm("Are you sure you want to delete this record?", "Confirmation", new ConfirmOptions()) == true)
+                var confirmOptions = new ConfirmOptions
+                {
+                    OkButtonText = "Tak",
+                    CancelButtonText = "Nie"
+                };
+
+                if (await DialogService.Confirm("Czy na pewno chcesz usun¹æ ten rekord?", "Potwierdzenie", confirmOptions) == true)
                 {
                     var deleteResult = await databaseService.DeleteEvent(_event.Id);
                     if (deleteResult != null)
@@ -77,10 +83,48 @@ namespace FISTNESSGYM.Components.Pages.Training.Events
                 NotificationService.Notify(new NotificationMessage
                 {
                     Severity = NotificationSeverity.Error,
-                    Summary = "Error",
-                    Detail = "Unable to delete Event"
+                    Summary = "B³¹d",
+                    Detail = "Nie uda³o siê usun¹æ wydarzenia"
                 });
             }
         }
+        private async Task OnUnregisterClick(MouseEventArgs args, Event _event)
+        {
+            var confirmed = await DialogService.Confirm("Czy na pewno chcesz siê wypisaæ z tego wydarzenia?", "Potwierdzenie wypisu",
+                new ConfirmOptions { OkButtonText = "Tak", CancelButtonText = "Nie" });
+
+            if (confirmed == true)
+            {
+                try
+                {
+                    await databaseService.DeleteReservationAsync(_event.Id, currentUserId);
+
+                    NotificationService.Notify(new NotificationMessage
+                    {
+                        Severity = NotificationSeverity.Success,
+                        Summary = "Wypisano",
+                        Detail = "Zosta³eœ wypisany z wydarzenia."
+                    });
+
+
+                   if (isClient)
+                    {
+                        events = await databaseService.GetUserRegisteredEventsAsync(currentUserId);
+                    }
+                    await grid0.Reload();
+                }
+                catch (Exception ex)
+                {
+                    NotificationService.Notify(new NotificationMessage
+                    {
+                        Severity = NotificationSeverity.Error,
+                        Summary = "B³¹d",
+                        Detail = "Nie uda³o siê wypisaæ z wydarzenia."
+                    });
+                }
+            }
+        }
+
+
     }
 }

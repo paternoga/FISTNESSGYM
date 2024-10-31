@@ -29,12 +29,12 @@ else
 
     <RadzenRow>
         <RadzenColumn SizeMD=12>
-            <RadzenDataGrid @ref="grid0" ColumnWidth="200px" AllowFiltering="true" FilterMode="FilterMode.Advanced" AllowPaging="true" AllowSorting="true" ShowPagingSummary="true" PageSizeOptions=@(new int[]{5, 10, 20, 30})
+            <RadzenDataGrid @ref="grid0" ColumnWidth="150px" AllowFiltering="true" FilterMode="FilterMode.Advanced" AllowPaging="true" AllowSorting="true" ShowPagingSummary="true" PageSizeOptions="@(new int[]{5, 10, 20, 30})"
                             Data="@events" EmptyText="Nie jesteœ zapisany na ¿adne zajêcia" TItem="FISTNESSGYM.Models.database.Event" RowSelect="@(isEmployee ? EditRow : null)">
                 <Columns>
                     @if (isEmployee)
                     {
-                        <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.Event" Property="Id" Title="Id" />
+                        <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.Event" Property="Id" Title="Id"/>
                     }
                     <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.Event" Property="EventName" Title="Event Name" />
                     <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.Event" Property="InstructorName" Title="Instructor Name" />
@@ -43,16 +43,23 @@ else
                     <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.Event" Property="MaxParticipants" Title="Max Participants" />
                     <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.Event" Property="Participants" Title="Participants" />
 
-                    @if (isEmployee)
-                    {
-                        <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.Event" Filterable="false" Sortable="false" Width="70px" TextAlign="TextAlign.Center">
-                            <Template Context="_event">
+                    
+                    <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.Event" Filterable="false" Sortable="false" Width="150px" TextAlign="TextAlign.Center">
+                        <Template Context="_event">
+                            @if (isEmployee)
+                            {
                                 <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="delete" Size="ButtonSize.Medium"
                                               Shade="Shade.Lighter" Variant="Variant.Flat"
                                               Click="@((args) => GridDeleteButtonClick(args, _event))" @onclick:stopPropagation="true" />
-                            </Template>
-                        </RadzenDataGridColumn>
-                    }
+                            }
+                            else if (isClient)
+                            {
+                                <RadzenButton ButtonStyle="ButtonStyle.Warning" Icon="exit_to_app" Size="ButtonSize.Medium"
+                                              Shade="Shade.Lighter" Variant="Variant.Flat"
+                                              Text="Wypisz siê" Click="@((args) => OnUnregisterClick(args, _event))" @onclick:stopPropagation="true" />
+                            }
+                        </Template>
+                    </RadzenDataGridColumn>
                 </Columns>
             </RadzenDataGrid>
         </RadzenColumn>
