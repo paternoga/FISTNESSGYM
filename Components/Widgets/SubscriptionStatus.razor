@@ -1,0 +1,73 @@
+﻿@page "/subscription-status"  
+@using FISTNESSGYM.Models.database
+@using FISTNESSGYM.Services
+@using System.Security.Claims
+@using System.Globalization
+@inject SubscriptionService SubscriptionService
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+<div class="subscription-status">
+    @if (currentSubscription != null)
+    {
+        <h4>Status Subskrypcji</h4>
+        var daysLeft = GetDaysLeft();
+        var totalDays = GetTotalDays();
+        var progressPercentage = totalDays > 0 ? (daysLeft * 100.0 / totalDays) : 0;
+
+        <p>Typ subskrypcji: @currentSubscription.SubscriptionType?.TypeName</p>
+        <p>Pozostałe dni do wygaśnięcia: @daysLeft</p>
+
+        <div class="progress">
+            <div class="progress-bar"
+                 role="progressbar"
+                 style="width: @(progressPercentage.ToString("F2", CultureInfo.InvariantCulture))%;"
+                 aria-valuenow="@daysLeft"
+                 aria-valuemin="0"
+                 aria-valuemax="100">
+            </div>
+        </div>
+    }
+    else
+    {
+        <p>Brak aktywnej subskrypcji.</p>
+    }
+</div>
+
+
+
+@code {
+    private Subscription currentSubscription;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        if (user.Identity.IsAuthenticated)
+        {
+            var userId = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            currentSubscription = await SubscriptionService.GetCurrentSubscriptionAsync(userId);
+        }
+    }
+
+    public int GetDaysLeft()
+    {
+        if (currentSubscription == null)
+        {
+            return 0;
+        }
+
+        return currentSubscription.GetDaysUntilExpiration(); // Pozostałe dni do wygaśnięcia
+    }
+
+    public int GetTotalDays()
+    {
+        if (currentSubscription == null)
+        {
+            return 1; // Zwróć 1, aby uniknąć dzielenia przez 0
+        }
+
+        return (currentSubscription.EndDate - currentSubscription.StartDate).Days; // Całkowite dni subskrypcji
+    }
+}
+

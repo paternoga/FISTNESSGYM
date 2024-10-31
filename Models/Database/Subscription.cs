@@ -33,5 +33,12 @@ namespace FISTNESSGYM.Models.database
         public decimal Price { get; set; }
 
         public virtual SubscriptionType SubscriptionType { get; set; }
+        
+        public int GetDaysUntilExpiration()
+        {
+            if (EndDate < DateTime.Now) return 0; 
+
+            return (EndDate - DateTime.Now).Days; 
+        }
     }   
 }

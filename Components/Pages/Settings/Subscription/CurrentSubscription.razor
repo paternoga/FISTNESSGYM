@@ -1,5 +1,6 @@
 ﻿@page "/settings/subscription"
 @using System.Security.Claims
+@using FISTNESSGYM.Components.Widgets
 @using FISTNESSGYM.Models.database
 @using FISTNESSGYM.Services
 @inject SubscriptionService SubscriptionService
@@ -9,6 +10,7 @@
 
 @if (currentSubscription != null)
 {
+    <SubscriptionStatus />
     <h4>Aktualna Subskrypcja</h4>
     <p>Typ subskrypcji: @currentSubscription.SubscriptionType?.TypeName</p>
     <p>Opis: @currentSubscription.SubscriptionType?.Description</p>
