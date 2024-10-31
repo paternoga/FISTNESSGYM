@@ -1,68 +1,71 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.JSInterop;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Radzen;
+using FISTNESSGYM.Models.database;
 using Radzen.Blazor;
 
 namespace FISTNESSGYM.Components.Pages.Training.Events
 {
     public partial class Events
     {
-        [Inject]
-        protected IJSRuntime JSRuntime { get; set; }
+        [Inject] public NavigationManager NavigationManager { get; set; }
+        [Inject] public DialogService DialogService { get; set; }
+        [Inject] public NotificationService NotificationService { get; set; }
+        [Inject] public databaseService databaseService { get; set; }
+        [Inject] public SecurityService Security { get; set; }
 
-        [Inject]
-        protected NavigationManager NavigationManager { get; set; }
+        protected IEnumerable<Event> events;
+        protected RadzenDataGrid<Event> grid0;
+        private bool isEmployee;
+        private bool isClient;
+        private string currentUserId;
 
-        [Inject]
-        protected DialogService DialogService { get; set; }
-
-        [Inject]
-        protected TooltipService TooltipService { get; set; }
-
-        [Inject]
-        protected ContextMenuService ContextMenuService { get; set; }
-
-        [Inject]
-        protected NotificationService NotificationService { get; set; }
-
-        [Inject]
-        public databaseService databaseService { get; set; }
-
-        protected IEnumerable<FISTNESSGYM.Models.database.Event> events;
-
-        protected RadzenDataGrid<FISTNESSGYM.Models.database.Event> grid0;
-
-        [Inject]
-        protected SecurityService Security { get; set; }
         protected override async Task OnInitializedAsync()
         {
-            events = await databaseService.GetEvents();
+            // Determine user role
+            isEmployee = Security.IsInRole("Pracownik");
+            isClient = Security.IsInRole("Klient");
+            currentUserId = Security.User?.Id;
+
+            // Load appropriate events based on role
+            if (isEmployee)
+            {
+                events = await databaseService.GetEvents(); // All events for employee
+            }
+            else if (isClient)
+            {
+                events = await databaseService.GetUserRegisteredEventsAsync(currentUserId); // Registered events for client
+            }
         }
 
         protected async Task AddButtonClick(MouseEventArgs args)
         {
-            await DialogService.OpenAsync<AddEvent>("Add Event", null);
-            await grid0.Reload();
+            if (isEmployee) 
+            {
+                await DialogService.OpenAsync<AddEvent>("Add Event", null);
+                await grid0.Reload();
+            }
+
         }
 
-        protected async Task EditRow(FISTNESSGYM.Models.database.Event args)
+        protected async Task EditRow(Event args)
         {
-            await DialogService.OpenAsync<EditEvent>("Edit Event", new Dictionary<string, object> { {"Id", args.Id} });
+            if (isEmployee)
+            {
+                await DialogService.OpenAsync<EditEvent>("Edit Event", new Dictionary<string, object> { { "Id", args.Id } });
+            }
         }
 
-        protected async Task GridDeleteButtonClick(MouseEventArgs args, FISTNESSGYM.Models.database.Event _event)
+        protected async Task GridDeleteButtonClick(MouseEventArgs args, Event _event)
         {
             try
             {
-                if (await DialogService.Confirm("Are you sure you want to delete this record?") == true)
+                if (await DialogService.Confirm("Are you sure you want to delete this record?", "Confirmation", new ConfirmOptions()) == true)
                 {
                     var deleteResult = await databaseService.DeleteEvent(_event.Id);
-
                     if (deleteResult != null)
                     {
                         await grid0.Reload();
@@ -74,8 +77,8 @@ namespace FISTNESSGYM.Components.Pages.Training.Events
                 NotificationService.Notify(new NotificationMessage
                 {
                     Severity = NotificationSeverity.Error,
-                    Summary = $"Error",
-                    Detail = $"Unable to delete Event"
+                    Summary = "Error",
+                    Detail = "Unable to delete Event"
                 });
             }
         }

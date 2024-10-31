@@ -3493,21 +3493,21 @@ namespace FISTNESSGYM
         {
             try
             {
-                // ZnajdŸ rezerwacjê dla danego u¿ytkownika i wydarzenia
+                
                 var reservation = await Context.Reservations
                     .FirstOrDefaultAsync(r => r.EventId == eventId && r.UserId == userId);
 
                 if (reservation != null)
                 {
-                    // Usuñ rezerwacjê
+                    
                     Context.Reservations.Remove(reservation);
 
-                    // ZnajdŸ wydarzenie i zaktualizuj liczbê uczestników
+                    
                     var eventToUpdate = await Context.Events.FindAsync(eventId);
                     if (eventToUpdate != null)
                     {
                         eventToUpdate.Participants -= 1;
-                        if (eventToUpdate.Participants < 0) eventToUpdate.Participants = 0; // Zapewnia, ¿e liczba uczestników nie spada poni¿ej zera
+                        if (eventToUpdate.Participants < 0) eventToUpdate.Participants = 0; 
                     }
 
                     await Context.SaveChangesAsync();
@@ -3519,7 +3519,14 @@ namespace FISTNESSGYM
                 throw new ApplicationException($"Error removing reservation for user {userId} on event {eventId}: {ex.Message}");
             }
         }
-
+        public async Task<List<Event>> GetUserRegisteredEventsAsync(string userId)
+        {
+            
+            return await Context.Reservations
+                .Where(r => r.UserId == userId && r.Event.EventStartDate >= DateTime.Today)
+                .Select(r => r.Event)
+                .ToListAsync();
+        }
 
 
     }
