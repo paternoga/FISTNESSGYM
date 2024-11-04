@@ -29,7 +29,7 @@ namespace FISTNESSGYM.Models.database
 
         public ProductCategory ProductCategory { get; set; }
 
-        public string ImageUrl { get; set; }
+        public byte[]? ImageUrl { get; set; }
 
         public ICollection<CartItem> CartItems { get; set; }
 

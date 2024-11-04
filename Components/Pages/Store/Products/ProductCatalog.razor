@@ -1,4 +1,4 @@
-﻿@page "/store/products-catalog"
+@page "/store/products-catalog"
 @using FISTNESSGYM.Services
 @inject IProductService ProductService
 @inject ICartService CartService
@@ -13,23 +13,31 @@
 <h3 class="catalog-title">Katalog Produktów</h3>
 <link href="css/store/productcatalog.css" rel="stylesheet" />
 
-<RadzenDropDown TValue="string" 
-                   Data="@categories" 
-                   Placeholder="Wybierz kategorię"
-                   @bind-Value="selectedCategory"
-                   Change="OnCategoryChange"
-                   Style="width: 100%;" />
 
 <div class="filters">
-    <input type="text" @oninput="OnSearchInput" placeholder="Wyszukaj produkt..." class="filter-input" />
-    <select @bind="selectedCategory" class="filter-select">
-        <option value="">Wszystkie kategorie</option>
-        @foreach (var category in categories)
-        {
-            <option value="@category">@category</option>
-        }
-    </select>
-    <button @onclick="SortByPrice" class="filter-button">Sortuj według ceny</button>
+    <RadzenTextBox 
+        Placeholder="Wyszukaj produkt..." 
+        Style="width: 100%; margin-bottom: 10px; height: 43px" 
+        @oninput="OnSearchInput"
+        class="filter-input"
+    />
+    
+    <RadzenDropDown 
+        Placeholder="Wszystkie kategorie"
+        Data="@categories"  
+        @bind-Value="selectedCategory" 
+        Change="OnCategoryChange"
+        Style="width: 100%; margin-bottom: 10px; height: 43px"
+        AllowClear="true" 
+        class="filter-select" 
+    />
+
+    <RadzenButton 
+        Text="Sortuj według ceny" 
+        Click="SortByPrice" 
+        Style="width: 100%; height: 43px" 
+        class="filter-button" 
+    />
 </div>
 
 <div>
@@ -47,15 +55,30 @@
     else
     {
         @foreach (var product in PaginatedProducts)
-        {
-            <div class="product-item">
-                <h4 class="product-name">@product.Name</h4>
-                <p class="product-description">@product.Description</p>
-                <p class="product-price">@product.Price zł</p>
-                <button class="details-button" @onclick="() => NavigateToDetails(product.Id)">Szczegóły</button>
-                <button class="add-to-cart-button" @onclick="() => AddToCart(product)">Dodaj do koszyka</button>
-            </div>
-        }
+{
+    <div class="product-item">
+        <h4 class="product-name">@product.Name</h4>
+        <p class="product-description">@product.Description</p>
+        <p class="product-price">@product.Price zł</p>
+
+        <div class="button-group">
+            <RadzenButton 
+                Text="Szczegóły" 
+                Click="() => NavigateToDetails(product.Id)" 
+                ButtonStyle="ButtonStyle.Primary"
+                Style="width: 60%; height: 36px;"
+                class="rz-button rz-button-md rz-variant-filled rz-primary rz-shade-default filter-button" />
+
+            <RadzenButton 
+                Icon="shopping_cart" 
+                Click="() => AddToCart(product)" 
+                ButtonStyle="ButtonStyle.Warning"
+                Style="width: 25%; height: 36px; background-color: #ffc107;"
+                class="add-to-cart-button" 
+            />
+        </div>
+    </div>
+}
     }
 </div>
 
@@ -79,6 +102,7 @@
 
     private int totalPages => (int)Math.Ceiling((double)filteredProducts.Count / itemsPerPage);
     private IEnumerable<Product> PaginatedProducts => filteredProducts.Skip((currentPage - 1) * itemsPerPage).Take(itemsPerPage);
+    
 
     protected override async Task OnInitializedAsync()
     {
@@ -93,7 +117,7 @@
         ApplyFilters();
     }
 
-     private void OnCategoryChange(object value)
+    private void OnCategoryChange(object value)
     {
         selectedCategory = value?.ToString();
         ApplyFilters();
@@ -139,11 +163,6 @@
                 // Przekazanie userId jako string i product
                 CartService.AddToCart(userId, product);
                 successMessage = $"{product.Name} został dodany do koszyka!";
-                StateHasChanged();
-
-                // Zniknij komunikat po 3 sekundach
-                await Task.Delay(3000);
-                successMessage = string.Empty;
                 StateHasChanged();
             }
         }
