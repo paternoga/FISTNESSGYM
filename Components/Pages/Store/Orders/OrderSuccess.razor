@@ -1,0 +1,18 @@
+@page "/store/order-success"
+@inject NotificationService NotificationService
+@inject NavigationManager NavigationManager
+
+<RadzenAlert AllowClose="false" AlertStyle="AlertStyle.Success" Variant="Variant.Flat" Shade="Shade.Lighter">
+    Zamówienie zostało złożone.
+</RadzenAlert>
+<RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem" Wrap="FlexWrap.Wrap">
+    <RadzenButton Click=@(args => OnClick("/store/products-catalog")) Text="Powrót do sklepu" ButtonStyle="ButtonStyle.Primary" Style="margin: 10px; padding: 8px 16px; margin-left: 350px" />
+</RadzenStack>
+
+@code {
+    private void OnClick(string url)
+    {
+        //NotificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Info, Summary = "Button Clicked", Detail = url });
+        NavigationManager.NavigateTo(url);
+    }
+}

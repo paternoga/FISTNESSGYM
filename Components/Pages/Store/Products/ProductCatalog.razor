@@ -72,24 +72,12 @@
 </div>
 
 <div class="pagination">
-    <button @onclick="PreviousPage" disabled="@(!CanGoToPreviousPage)" class="pagination-button">Poprzednia</button>
+    <button @onclick="PreviousPage" disabled="@(!CanGoToPreviousPage)" class="pagination-button" style="background-color: #4340d2">Poprzednia</button>
     <span class="pagination-info">Strona @currentPage z @totalPages</span>
-    <button @onclick="NextPage" disabled="@(!CanGoToNextPage)" class="pagination-button">Następna</button>
+    <button @onclick="NextPage" disabled="@(!CanGoToNextPage)" class="pagination-button" style="background-color: #4340d2">Następna</button>
 </div>
 
-<div>
-    <h4>Twoje przedmioty w koszyku:</h4>
-    <ul>
-        @foreach (var item in cartItems)
-        {
-            var product = products.FirstOrDefault(p => p.Id == item.ProductId);
-            if (product != null)
-            {
-                <li>@product.Name - Ilość: @item.Quantity</li>
-            }
-        }
-    </ul>
-</div>
+
 
 @code {
     private List<Product> products = new();

@@ -247,6 +247,8 @@ namespace FISTNESSGYM.Data
         public DbSet<FISTNESSGYM.Models.database.Exercise> Exercises { get; set; }
 
         public DbSet<FISTNESSGYM.Models.database.WorkoutPlan> WorkoutPlans { get; set; }
+        public DbSet<FISTNESSGYM.Models.database.OrderDetails> OrderDetails { get; set; }
+
 
         protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
         {

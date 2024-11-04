@@ -1,0 +1,17 @@
+@page "/store/order-failed"
+@inject NotificationService NotificationService
+@inject NavigationManager NavigationManager
+
+<RadzenAlert AllowClose="false" AlertStyle="AlertStyle.Danger" Variant="Variant.Flat" Shade="Shade.Lighter">
+    Wystąpił błąd podczas składania zamówienia.
+</RadzenAlert>
+<RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem" Wrap="FlexWrap.Wrap">
+    <RadzenButton Click=@(args => OnClick("/store/products-catalog")) Text="Powrót do sklepu" ButtonStyle="ButtonStyle.Primary" Style="margin: 10px; padding: 8px 16px; margin-left: 350px" />
+</RadzenStack>
+
+@code {
+    private void OnClick(string url)
+    {
+        NavigationManager.NavigateTo(url);
+    }
+}

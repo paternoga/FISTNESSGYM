@@ -84,31 +84,18 @@
         background-color: #0056b3;
     }
 
-.pagination {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-top: 20px;
-}
-
 .pagination-button {
-    padding: 10px 15px;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    margin: 0 5px;
+    background-color: #4340d2; /* Kolor tła */
+    color: white; /* Kolor tekstu */
+    border: none; /* Bez obramowania */
+    border-radius: 4px; /* Zaokrąglenie rogów */
+    padding: 10px; /* Odstępy wewnętrzne */
+    cursor: pointer; /* Kursor wskaźnika */
 }
 
     .pagination-button:hover {
-        background-color: #0056b3;
+        background-color: #3b37b8; /* Ciemniejszy odcień przy najechaniu */
     }
-
-.pagination-info {
-    margin: 0 10px;
-    font-weight: bold;
-}
 
 
 

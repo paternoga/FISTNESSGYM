@@ -1,5 +1,6 @@
 ﻿using FISTNESSGYM.Data;
 using FISTNESSGYM.Models.database;
+using Microsoft.AspNetCore.Components;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
@@ -139,5 +140,46 @@ namespace FISTNESSGYM.Services
 
             await _context.SaveChangesAsync();
         }
+
+        public async Task PlaceOrderAsync(Order order, List<CartItem> cartItems)
+        {
+            // Dodaj zamówienie do bazy danych
+            await _context.Orders.AddAsync(order);
+            await _context.SaveChangesAsync();
+
+            // Dodaj pozycje zamówienia
+            foreach (var cartItem in cartItems)
+            {
+                var orderItem = new OrderItem
+                {
+                    OrderId = order.Id,
+                    ProductId = cartItem.ProductId,
+                    Quantity = cartItem.Quantity,
+                    UnitPrice = cartItem.Product.Price // zakładam, że price jest pobierane z produktu
+                };
+
+                await _context.OrderItems.AddAsync(orderItem);
+                
+                // Aktualizacja stanu magazynowego
+                var product = await _context.Products.FindAsync(cartItem.ProductId);
+                if (product != null)
+                {
+                    // Kontrola stanu magazynowego
+                    if (product.StockQuantity >= cartItem.Quantity)
+                    {
+                        product.StockQuantity -= cartItem.Quantity; // Odejmij ilość zamówioną od stanu magazynowego
+                    }
+                    else
+                    {
+                        //throw new Exception("Niewystarczająca ilość produktu w magazynie."); // Obsłuż sytuację, gdy brak wystarczającej ilości
+                        throw new InvalidOperationException("Niewystarczająca ilość produktu w magazynie.");
+                    }
+                }
+            }
+
+            // Zapisz zmiany w bazie danych
+            await _context.SaveChangesAsync();
+        }
+
     }
 }

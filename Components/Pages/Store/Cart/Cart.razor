@@ -1,4 +1,4 @@
-﻿@page "/store/cart"
+@page "/store/cart"
 @inject ICartService CartService
 @inject NavigationManager NavigationManager
 @inject AuthenticationStateProvider AuthenticationStateProvider
@@ -27,6 +27,7 @@ else
                 <li>
                     @item.Product.Name - @item.Quantity sztuk - @item.Product.Price zł
                     <button @onclick="() => RemoveFromCart(item.Product.Id)">Usuń</button>
+                    <button @onclick="PlaceOrder">Złóż zamówienie</button>
                 </li>
             }
         </ul>
@@ -51,7 +52,6 @@ else
 
         if (user.Identity.IsAuthenticated)
         {
-            // Pobierz userId jako string
             var userId = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (!string.IsNullOrEmpty(userId))
             {
@@ -89,7 +89,7 @@ else
             if (!string.IsNullOrEmpty(userId))
             {
                 await CartService.RemoveFromCartAsync(userId, productId);
-                await LoadCartItems(); // Odśwież koszyk po usunięciu
+                await LoadCartItems(); 
             }
         }
     }
@@ -105,8 +105,47 @@ else
             if (!string.IsNullOrEmpty(userId))
             {
                 await CartService.ClearCartAsync(userId);
-                await LoadCartItems(); // Odśwież koszyk po wyczyszczeniu
+                await LoadCartItems(); 
             }
         }
     }
+    private async Task PlaceOrder()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        if (user.Identity.IsAuthenticated)
+        {
+            var userId = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (!string.IsNullOrEmpty(userId))
+            {
+                decimal totalAmount = CalculateTotalAmount(cartItems);
+                var order = new Order
+                    {
+                        UserId = userId,
+                        OrderDate = DateTime.Now,
+                        TotalAmount = totalAmount,
+                        OrderStatusId = 1,
+                        OrderStatusName = "Złożone"
+                    };
+
+                try
+                {
+                    await CartService.PlaceOrderAsync(order, cartItems);
+
+                    await CartService.ClearCartAsync(userId);
+                    await LoadCartItems();
+                    NavigationManager.NavigateTo("/store/order-success");
+                }
+                catch (InvalidOperationException ex)
+                {
+                    await CartService.ClearCartAsync(userId);
+                    NavigationManager.NavigateTo("/store/order-failed");
+                }
+            }
+        }
+    }
+
+
 }
+
