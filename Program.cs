@@ -32,19 +32,15 @@ builder.Services.AddHeaderPropagation(o => o.Headers.Add("Cookie"));
 builder.Services.AddAuthentication();
 builder.Services.AddAuthorization();
 
+
+
 builder.Services.AddScoped<SecurityService>();
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<SubscriptionService>();
 
-builder.Services.AddScoped<ICartService>(provider =>
-{
-    var connectionString = builder.Configuration.GetConnectionString("databaseConnection");
-    if (string.IsNullOrEmpty(connectionString))
-    {
-        throw new InvalidOperationException("Connection string 'databaseConnection' is not configured.");
-    }
-    return new CartService(connectionString);
-});
+builder.Services.AddScoped<ICartService, CartService>();
+
+
 
 
 builder.Services.AddDbContext<ApplicationIdentityDbContext>(options =>

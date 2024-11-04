@@ -5,7 +5,6 @@
 @inject NavigationManager NavigationManager
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @using FISTNESSGYM.Models.database
-@using FISTNESSGYM.Data
 @using System.Security.Claims
 
 <PageTitle>KATALOG PRODUKTÓW</PageTitle>
@@ -13,31 +12,24 @@
 <h3 class="catalog-title">Katalog Produktów</h3>
 <link href="css/store/productcatalog.css" rel="stylesheet" />
 
-
 <div class="filters">
-    <RadzenTextBox 
-        Placeholder="Wyszukaj produkt..." 
-        Style="width: 100%; margin-bottom: 10px; height: 43px" 
-        @oninput="OnSearchInput"
-        class="filter-input"
-    />
-    
-    <RadzenDropDown 
-        Placeholder="Wszystkie kategorie"
-        Data="@categories"  
-        @bind-Value="selectedCategory" 
-        Change="OnCategoryChange"
-        Style="width: 100%; margin-bottom: 10px; height: 43px"
-        AllowClear="true" 
-        class="filter-select" 
-    />
+    <RadzenTextBox Placeholder="Wyszukaj produkt..."
+                   Style="width: 100%; margin-bottom: 10px; height: 43px"
+                   @oninput="OnSearchInput"
+                   class="filter-input" />
 
-    <RadzenButton 
-        Text="Sortuj według ceny" 
-        Click="SortByPrice" 
-        Style="width: 100%; height: 43px" 
-        class="filter-button" 
-    />
+    <RadzenDropDown Placeholder="Wszystkie kategorie"
+                    Data="@categories"
+                    @bind-Value="selectedCategory"
+                    Change="OnCategoryChange"
+                    Style="width: 100%; margin-bottom: 10px; height: 43px"
+                    AllowClear="true"
+                    class="filter-select" />
+
+    <RadzenButton Text="Sortuj według ceny"
+                  Click="SortByPrice"
+                  Style="width: 100%; height: 43px"
+                  class="filter-button" />
 </div>
 
 <div>
@@ -55,30 +47,27 @@
     else
     {
         @foreach (var product in PaginatedProducts)
-{
-    <div class="product-item">
-        <h4 class="product-name">@product.Name</h4>
-        <p class="product-description">@product.Description</p>
-        <p class="product-price">@product.Price zł</p>
+        {
+            <div class="product-item">
+                <h4 class="product-name">@product.Name</h4>
+                <p class="product-description">@product.Description</p>
+                <p class="product-price">@product.Price zł</p>
 
-        <div class="button-group">
-            <RadzenButton 
-                Text="Szczegóły" 
-                Click="() => NavigateToDetails(product.Id)" 
-                ButtonStyle="ButtonStyle.Primary"
-                Style="width: 60%; height: 36px;"
-                class="rz-button rz-button-md rz-variant-filled rz-primary rz-shade-default filter-button" />
+                <div class="button-group">
+                    <RadzenButton Text="Szczegóły"
+                                  Click="() => NavigateToDetails(product.Id)"
+                                  ButtonStyle="ButtonStyle.Primary"
+                                  Style="width: 60%; height: 36px;"
+                                  class="rz-button rz-button-md rz-variant-filled rz-primary rz-shade-default filter-button" />
 
-            <RadzenButton 
-                Icon="shopping_cart" 
-                Click="() => AddToCart(product)" 
-                ButtonStyle="ButtonStyle.Warning"
-                Style="width: 25%; height: 36px; background-color: #ffc107;"
-                class="add-to-cart-button" 
-            />
-        </div>
-    </div>
-}
+                    <RadzenButton Icon="shopping_cart"
+                                  Click="() => AddToCart(product)"
+                                  ButtonStyle="ButtonStyle.Warning"
+                                  Style="width: 25%; height: 36px; background-color: #ffc107;"
+                                  class="add-to-cart-button" />
+                </div>
+            </div>
+        }
     }
 </div>
 
@@ -86,6 +75,20 @@
     <button @onclick="PreviousPage" disabled="@(!CanGoToPreviousPage)" class="pagination-button">Poprzednia</button>
     <span class="pagination-info">Strona @currentPage z @totalPages</span>
     <button @onclick="NextPage" disabled="@(!CanGoToNextPage)" class="pagination-button">Następna</button>
+</div>
+
+<div>
+    <h4>Twoje przedmioty w koszyku:</h4>
+    <ul>
+        @foreach (var item in cartItems)
+        {
+            var product = products.FirstOrDefault(p => p.Id == item.ProductId);
+            if (product != null)
+            {
+                <li>@product.Name - Ilość: @item.Quantity</li>
+            }
+        }
+    </ul>
 </div>
 
 @code {
@@ -100,9 +103,11 @@
     private int itemsPerPage = 5;
     private string successMessage = "";
 
+    // Lista do śledzenia przedmiotów w koszyku
+    private List<CartItem> cartItems = new();
+
     private int totalPages => (int)Math.Ceiling((double)filteredProducts.Count / itemsPerPage);
     private IEnumerable<Product> PaginatedProducts => filteredProducts.Skip((currentPage - 1) * itemsPerPage).Take(itemsPerPage);
-    
 
     protected override async Task OnInitializedAsync()
     {
@@ -122,7 +127,6 @@
         selectedCategory = value?.ToString();
         ApplyFilters();
     }
-
 
     private void SortByPrice()
     {
@@ -147,7 +151,7 @@
         NavigationManager.NavigateTo($"/product-details/{productId}");
     }
 
-    private async void AddToCart(Product product)
+    private async Task AddToCart(Product product)
     {
         // Uzyskaj stan uwierzytelnienia użytkownika
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
@@ -160,17 +164,47 @@
 
             if (!string.IsNullOrEmpty(userId))
             {
-                // Przekazanie userId jako string i product
-                CartService.AddToCart(userId, product);
-                successMessage = $"{product.Name} został dodany do koszyka!";
-                StateHasChanged();
+                // Sprawdź dostępność produktu w magazynie
+                var stockQuantity = await ProductService.GetProductStockQuantityAsync(product.Id);
+
+                // Sprawdź, czy użytkownik chce dodać więcej przedmiotów niż dostępnych
+                var cartItem = await CartService.GetCartItemAsync(userId, product.Id);
+                if (cartItem != null)
+                {
+                    // Jeżeli przedmiot już jest w koszyku, zwiększamy jego ilość
+                    if (cartItem.Quantity < stockQuantity)
+                    {
+                        cartItem.Quantity++;
+                        await CartService.UpdateCartItemAsync(cartItem);
+                        successMessage = $"{product.Name} został zwiększony w koszyku.";
+                    }
+                    else
+                    {
+                        successMessage = $"{product.Name} nie może być dodany do koszyka, ponieważ dostępna ilość w magazynie to tylko {stockQuantity}.";
+                    }
+                }
+                else
+                {
+                    // Dodaj nowy przedmiot do koszyka tylko jeśli jest dostępny w magazynie
+                    if (stockQuantity > 0)
+                    {
+                        await CartService.AddToCart(userId, product, 1); // Dodaj produkt do koszyka
+                        successMessage = $"{product.Name} został dodany do koszyka!";
+                    }
+                    else
+                    {
+                        successMessage = $"{product.Name} jest obecnie niedostępny w magazynie.";
+                    }
+                }
+
+                StateHasChanged(); // Odśwież komponent po dodaniu do koszyka
             }
         }
         else
         {
             // Obsługa sytuacji, gdy użytkownik nie jest zalogowany
             successMessage = "Musisz być zalogowany, aby dodać produkty do koszyka.";
-            StateHasChanged();
+            StateHasChanged(); // Odśwież komponent po próbie dodania do koszyka
         }
     }
 

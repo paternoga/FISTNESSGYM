@@ -11,6 +11,7 @@ namespace FISTNESSGYM.Services
     {
         private readonly databaseContext _context;
 
+        // Przyjmujemy tylko databaseContext w konstruktorze
         public ProductService(databaseContext context)
         {
             _context = context;
@@ -56,6 +57,13 @@ namespace FISTNESSGYM.Services
             query = sortAscending ? query.OrderBy(p => p.Price) : query.OrderByDescending(p => p.Price);
 
             return await query.AsNoTracking().ToListAsync(); // Use AsNoTracking for read-only scenarios
+        }
+
+        public async Task<int> GetProductStockQuantityAsync(int productId)
+        {
+            // Używamy Entity Framework do uzyskania ilości zapasów
+            var product = await _context.Products.FindAsync(productId);
+            return product?.StockQuantity ?? 0; // Zwróć ilość zapasów lub 0, jeśli produkt nie został znaleziony
         }
     }
 }

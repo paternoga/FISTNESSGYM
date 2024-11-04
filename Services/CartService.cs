@@ -1,142 +1,143 @@
-﻿using FISTNESSGYM.Models.database;
-using Microsoft.Data.SqlClient;
+﻿using FISTNESSGYM.Data;
+using FISTNESSGYM.Models.database;
+using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace FISTNESSGYM.Services
 {
     public class CartService : ICartService
     {
-        private readonly string _connectionString;
+        private readonly databaseContext _context;
 
-        public CartService(string connectionString)
+        public CartService(databaseContext context)
         {
-            _connectionString = connectionString;
+            _context = context;
         }
 
-        public void AddToCart(string userId, Product product)
+        public async Task AddToCart(string userId, Product product, int quantity)
         {
-            using (var connection = new SqlConnection(_connectionString))
-            {
-                connection.Open();
-                var existingItem = GetCartItems(userId).FirstOrDefault(ci => ci.Product.Id == product.Id);
+            // Sprawdź, czy produkt już istnieje w koszyku dla danego użytkownika
+            var existingCartItem = await _context.CartItems
+                .FirstOrDefaultAsync(ci => ci.UserId == userId && ci.ProductId == product.Id);
 
-                if (existingItem != null)
-                {
-                    existingItem.Quantity++;
-                    var sql = "UPDATE CartItems SET Quantity = @Quantity WHERE UserId = @UserId AND ProductId = @ProductId";
-                    using (var command = new SqlCommand(sql, connection))
-                    {
-                        command.Parameters.AddWithValue("@Quantity", existingItem.Quantity);
-                        command.Parameters.AddWithValue("@UserId", userId); // string zamiast Guid lub int
-                        command.Parameters.AddWithValue("@ProductId", product.Id);
-                        command.ExecuteNonQuery();
-                    }
-                }
-                else
-                {
-                    var sql = "INSERT INTO CartItems (UserId, ProductId, Quantity) VALUES (@UserId, @ProductId, @Quantity)";
-                    using (var command = new SqlCommand(sql, connection))
-                    {
-                        command.Parameters.AddWithValue("@UserId", userId); // string zamiast Guid lub int
-                        command.Parameters.AddWithValue("@ProductId", product.Id);
-                        command.Parameters.AddWithValue("@Quantity", 1);
-                        command.ExecuteNonQuery();
-                    }
-                }
+            if (existingCartItem != null)
+            {
+                // Jeśli element już istnieje, zaktualizuj jego ilość
+                existingCartItem.Quantity += quantity;
+                _context.CartItems.Update(existingCartItem); // Oznacz element do aktualizacji
             }
+            else
+            {
+                // Jeśli element nie istnieje, dodaj nowy
+                var newCartItem = new CartItem
+                {
+                    UserId = userId,
+                    ProductId = product.Id,
+                    Quantity = quantity
+                };
+                await _context.CartItems.AddAsync(newCartItem); // Dodaj nowy element do kontekstu
+            }
+
+            // Zapisz zmiany w bazie danych
+            await _context.SaveChangesAsync();
         }
 
         public void RemoveFromCart(string userId, int productId)
         {
-            using (var connection = new SqlConnection(_connectionString))
+            var cartItem = _context.CartItems.FirstOrDefault(ci => ci.UserId == userId && ci.ProductId == productId);
+            if (cartItem != null)
             {
-                connection.Open();
-                var sql = "DELETE FROM CartItems WHERE UserId = @UserId AND ProductId = @ProductId";
-                using (var command = new SqlCommand(sql, connection))
-                {
-                    command.Parameters.AddWithValue("@UserId", userId); // string zamiast Guid lub int
-                    command.Parameters.AddWithValue("@ProductId", productId);
-                    command.ExecuteNonQuery();
-                }
+                _context.CartItems.Remove(cartItem);
+                _context.SaveChanges();
             }
         }
 
         public List<CartItem> GetCartItems(string userId)
         {
-            var cartItems = new List<CartItem>();
-            using (var connection = new SqlConnection(_connectionString))
-            {
-                connection.Open();
-                var sql = @"
-            SELECT ci.Id, ci.Quantity, p.Id AS ProductId, p.Name, p.Description, p.Price 
-            FROM CartItems ci
-            JOIN Product p ON ci.ProductId = p.Id
-            WHERE ci.UserId = @UserId";
-
-                using (var command = new SqlCommand(sql, connection))
-                {
-                    command.Parameters.AddWithValue("@UserId", userId); // string zamiast Guid lub int
-                    using (var reader = command.ExecuteReader())
-                    {
-                        while (reader.Read())
-                        {
-                            var cartItem = new CartItem
-                            {
-                                Id = reader.GetInt32(0),
-                                Quantity = reader.GetInt32(1),
-                                Product = new Product
-                                {
-                                    Id = reader.GetInt32(2),
-                                    Name = reader.GetString(3),
-                                    Description = reader.GetString(4),
-                                    Price = reader.GetDecimal(5)
-                                }
-                            };
-                            cartItems.Add(cartItem);
-                        }
-                    }
-                }
-            }
-            return cartItems;
+            return _context.CartItems
+                .Where(ci => ci.UserId == userId)
+                .Include(ci => ci.Product) // Załaduj powiązane produkty
+                .ToList();
         }
 
         public decimal GetTotal(string userId)
         {
-            decimal totalAmount = 0;
-            using (var connection = new SqlConnection(_connectionString))
-            {
-                connection.Open();
-                var sql = @"
-            SELECT SUM(p.Price * ci.Quantity) AS TotalAmount
-            FROM CartItems ci
-            JOIN Product p ON ci.ProductId = p.Id
-            WHERE ci.UserId = @UserId";
-
-                using (var command = new SqlCommand(sql, connection))
-                {
-                    command.Parameters.AddWithValue("@UserId", userId); // string zamiast Guid lub int
-                    var result = command.ExecuteScalar();
-                    totalAmount = result != DBNull.Value ? (decimal)result : 0;
-                }
-            }
-            return totalAmount;
+            return _context.CartItems
+                .Where(ci => ci.UserId == userId)
+                .Sum(ci => ci.Quantity * ci.Product.Price); // Zakłada, że masz załadowane produkty
         }
 
         public void ClearCart(string userId)
         {
-            using (var connection = new SqlConnection(_connectionString))
+            var cartItems = _context.CartItems.Where(ci => ci.UserId == userId).ToList();
+            _context.CartItems.RemoveRange(cartItems);
+            _context.SaveChanges();
+        }
+
+        public async Task<CartItem> GetCartItemAsync(string userId, int productId)
+        {
+            return await _context.CartItems
+                .FirstOrDefaultAsync(ci => ci.UserId == userId && ci.ProductId == productId);
+        }
+
+        public async Task AddCartItemAsync(CartItem cartItem)
+        {
+            await _context.CartItems.AddAsync(cartItem);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task UpdateCartItemAsync(CartItem cartItem)
+        {
+            _context.CartItems.Update(cartItem);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task<List<CartItem>> GetCartItemsAsync(string userId)
+        {
+            return await _context.CartItems
+                                 .Where(ci => ci.UserId == userId)
+                                 .Include(ci => ci.Product) // dołącz szczegóły produktu
+                                 .ToListAsync();
+        }
+
+        public async Task RemoveFromCartAsync(string userId, int productId)
+        {
+            var cartItem = await _context.CartItems
+                                          .FirstOrDefaultAsync(ci => ci.UserId == userId && ci.ProductId == productId);
+            if (cartItem != null)
             {
-                connection.Open();
-                var sql = "DELETE FROM CartItems WHERE UserId = @UserId";
-                using (var command = new SqlCommand(sql, connection))
-                {
-                    command.Parameters.AddWithValue("@UserId", userId); // string zamiast Guid lub int
-                    command.ExecuteNonQuery();
-                }
+                _context.CartItems.Remove(cartItem);
+                await _context.SaveChangesAsync();
             }
         }
+
+        public async Task ClearCartAsync(string userId)
+        {
+            var cartItems = await _context.CartItems
+                                           .Where(ci => ci.UserId == userId)
+                                           .ToListAsync();
+            _context.CartItems.RemoveRange(cartItems);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task AddToCartAsync(string userId, CartItem item)
+        {
+            // Można dodać logikę do dodawania przedmiotu do koszyka, z aktualizacją ilości
+            var existingItem = await _context.CartItems
+                                              .FirstOrDefaultAsync(ci => ci.UserId == userId && ci.ProductId == item.ProductId);
+            if (existingItem != null)
+            {
+                existingItem.Quantity += item.Quantity; // aktualizacja ilości
+            }
+            else
+            {
+                item.UserId = userId; // ustawienie UserId przed dodaniem
+                await _context.CartItems.AddAsync(item);
+            }
+
+            await _context.SaveChangesAsync();
+        }
     }
-
-
 }

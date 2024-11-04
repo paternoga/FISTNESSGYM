@@ -3,9 +3,8 @@
 @inject NavigationManager NavigationManager
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @using System.Security.Claims
-@using FISTNESSGYM.Data
-@using FISTNESSGYM.Services
 @using FISTNESSGYM.Models.database
+@using FISTNESSGYM.Services
 
 <PageTitle>KOSZYK</PageTitle>
 
@@ -37,10 +36,15 @@ else
 }
 
 @code {
-    private List<CartItem> cartItems;
+    private List<CartItem> cartItems = new();
     private decimal totalAmount;
 
     protected override async Task OnInitializedAsync()
+    {
+        await LoadCartItems();
+    }
+
+    private async Task LoadCartItems()
     {
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         var user = authState.User;
@@ -51,20 +55,27 @@ else
             var userId = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (!string.IsNullOrEmpty(userId))
             {
-                cartItems = CartService.GetCartItems(userId);  // string zamiast int
-                totalAmount = CartService.GetTotal(userId);
-            }
-            else
-            {
-                cartItems = new List<CartItem>();
-                totalAmount = 0;
+                cartItems = await CartService.GetCartItemsAsync(userId);
+                totalAmount = CalculateTotalAmount(cartItems);
             }
         }
         else
         {
-            cartItems = new List<CartItem>();
+            cartItems.Clear();
             totalAmount = 0;
         }
+
+        StateHasChanged();
+    }
+
+    private decimal CalculateTotalAmount(List<CartItem> items)
+    {
+        decimal total = 0;
+        foreach (var item in items)
+        {
+            total += item.Quantity * item.Product.Price;
+        }
+        return total;
     }
 
     private async Task RemoveFromCart(int productId)
@@ -74,14 +85,11 @@ else
 
         if (user.Identity.IsAuthenticated)
         {
-            // Pobierz userId jako string
             var userId = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (!string.IsNullOrEmpty(userId))
             {
-                CartService.RemoveFromCart(userId, productId);  // string zamiast int
-                cartItems = CartService.GetCartItems(userId);
-                totalAmount = CartService.GetTotal(userId);
-                StateHasChanged();
+                await CartService.RemoveFromCartAsync(userId, productId);
+                await LoadCartItems(); // Odśwież koszyk po usunięciu
             }
         }
     }
@@ -93,14 +101,11 @@ else
 
         if (user.Identity.IsAuthenticated)
         {
-            // Pobierz userId jako string
             var userId = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (!string.IsNullOrEmpty(userId))
             {
-                CartService.ClearCart(userId);  // string zamiast int
-                cartItems.Clear();
-                totalAmount = 0;
-                StateHasChanged();
+                await CartService.ClearCartAsync(userId);
+                await LoadCartItems(); // Odśwież koszyk po wyczyszczeniu
             }
         }
     }
