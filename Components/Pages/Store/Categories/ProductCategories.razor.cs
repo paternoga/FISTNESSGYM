@@ -37,22 +37,27 @@ namespace FISTNESSGYM.Components.Pages.Store.Categories
 
         protected RadzenDataGrid<FISTNESSGYM.Models.database.ProductCategory> grid0;
 
+        protected string search = "";
+
         [Inject]
         protected SecurityService Security { get; set; }
+
+        protected async Task Search(ChangeEventArgs args)
+        {
+            search = $"{args.Value}";
+
+            await grid0.GoToPage(0);
+
+            productCategories = await databaseService.GetProductCategories(new Query { Filter = $@"i => i.Name.Contains(@0)", FilterParameters = new object[] { search } });
+        }
         protected override async Task OnInitializedAsync()
         {
-            productCategories = await databaseService.GetProductCategories();
+            productCategories = await databaseService.GetProductCategories(new Query { Filter = $@"i => i.Name.Contains(@0)", FilterParameters = new object[] { search } });
         }
 
         protected async Task AddButtonClick(MouseEventArgs args)
         {
-            await DialogService.OpenAsync<AddProductCategory>("Add ProductCategory", null);
-            await grid0.Reload();
-        }
-
-        protected async Task EditRow(FISTNESSGYM.Models.database.ProductCategory args)
-        {
-            await DialogService.OpenAsync<EditProductCategory>("Edit ProductCategory", new Dictionary<string, object> { {"Id", args.Id} });
+            await grid0.InsertRow(new FISTNESSGYM.Models.database.ProductCategory());
         }
 
         protected async Task GridDeleteButtonClick(MouseEventArgs args, FISTNESSGYM.Models.database.ProductCategory productCategory)
@@ -78,6 +83,82 @@ namespace FISTNESSGYM.Components.Pages.Store.Categories
                     Detail = $"Unable to delete ProductCategory"
                 });
             }
+        }
+
+        protected async Task ExportClick(RadzenSplitButtonItem args)
+        {
+            if (args?.Value == "csv")
+            {
+                await databaseService.ExportProductCategoriesToCSV(new Query
+{
+    Filter = $@"{(string.IsNullOrEmpty(grid0.Query.Filter)? "true" : grid0.Query.Filter)}",
+    OrderBy = $"{grid0.Query.OrderBy}",
+    Expand = "",
+    Select = string.Join(",", grid0.ColumnsCollection.Where(c => c.GetVisible() && !string.IsNullOrEmpty(c.Property)).Select(c => c.Property.Contains(".") ? c.Property + " as " + c.Property.Replace(".", "") : c.Property))
+}, "ProductCategories");
+            }
+
+            if (args == null || args.Value == "xlsx")
+            {
+                await databaseService.ExportProductCategoriesToExcel(new Query
+{
+    Filter = $@"{(string.IsNullOrEmpty(grid0.Query.Filter)? "true" : grid0.Query.Filter)}",
+    OrderBy = $"{grid0.Query.OrderBy}",
+    Expand = "",
+    Select = string.Join(",", grid0.ColumnsCollection.Where(c => c.GetVisible() && !string.IsNullOrEmpty(c.Property)).Select(c => c.Property.Contains(".") ? c.Property + " as " + c.Property.Replace(".", "") : c.Property))
+}, "ProductCategories");
+            }
+        }
+
+        protected async Task GridRowUpdate(FISTNESSGYM.Models.database.ProductCategory args)
+        {
+            try
+            {
+                await databaseService.UpdateProductCategory(args.Id, args);
+            }
+            catch (Exception ex)
+            {
+                NotificationService.Notify(new NotificationMessage
+                {
+                      Severity = NotificationSeverity.Error,
+                      Summary = $"Error",
+                      Detail = $"Unable to update ProductCategory"
+                });
+            }
+        }
+
+        protected async Task GridRowCreate(FISTNESSGYM.Models.database.ProductCategory args)
+        {
+            try
+            {
+                await databaseService.CreateProductCategory(args);
+            }
+            catch (Exception ex)
+            {
+                NotificationService.Notify(new NotificationMessage
+                {
+                      Severity = NotificationSeverity.Error,
+                      Summary = $"Error",
+                      Detail = $"Unable to create ProductCategory"
+                });
+            }
+            await grid0.Reload();
+        }
+
+        protected async Task EditButtonClick(MouseEventArgs args, FISTNESSGYM.Models.database.ProductCategory data)
+        {
+            await grid0.EditRow(data);
+        }
+
+        protected async Task SaveButtonClick(MouseEventArgs args, FISTNESSGYM.Models.database.ProductCategory data)
+        {
+            await grid0.UpdateRow(data);
+        }
+
+        protected async Task CancelButtonClick(MouseEventArgs args, FISTNESSGYM.Models.database.ProductCategory data)
+        {
+            grid0.CancelEditRow(data);
+            await databaseService.CancelProductCategoryChanges(data);
         }
     }
 }

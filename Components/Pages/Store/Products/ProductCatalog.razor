@@ -4,13 +4,19 @@
 @inject ICartService CartService
 @inject NavigationManager NavigationManager
 @inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NotificationService NotificationService
 @using FISTNESSGYM.Models.database
 @using System.Security.Claims
+@using Radzen
+@using Radzen.Blazor
+@inherits LayoutComponentBase
 
 <PageTitle>KATALOG PRODUKTÓW</PageTitle>
 
 <h3 class="catalog-title">Katalog Produktów</h3>
 <link href="css/store/productcatalog.css" rel="stylesheet" />
+
+<RadzenNotification @ref="notification" />
 
 <div class="filters">
     <RadzenTextBox Placeholder="Wyszukaj produkt..."
@@ -77,8 +83,6 @@
     <button @onclick="NextPage" disabled="@(!CanGoToNextPage)" class="pagination-button" style="background-color: #4340d2">Następna</button>
 </div>
 
-
-
 @code {
     private List<Product> products = new();
     private List<Product> filteredProducts = new();
@@ -91,11 +95,10 @@
     private int itemsPerPage = 10;
     private string successMessage = "";
 
-    // Lista do śledzenia przedmiotów w koszyku
-    private List<CartItem> cartItems = new();
-
     private int totalPages => (int)Math.Ceiling((double)filteredProducts.Count / itemsPerPage);
     private IEnumerable<Product> PaginatedProducts => filteredProducts.Skip((currentPage - 1) * itemsPerPage).Take(itemsPerPage);
+
+    private Radzen.Blazor.RadzenNotification notification;
 
     protected override async Task OnInitializedAsync()
     {
@@ -139,60 +142,74 @@
         NavigationManager.NavigateTo($"/product-details/{productId}");
     }
 
+    private void ShowNotification(string message, NotificationSeverity severity)
+    {
+        NotificationService.Notify(new NotificationMessage
+            {
+                Severity = severity,
+                Summary = severity == NotificationSeverity.Success ? "Sukces" : "Błąd",
+                Detail = message,
+                Duration = 4000
+            });
+    }
+
     private async Task AddToCart(Product product)
     {
-        // Uzyskaj stan uwierzytelnienia użytkownika
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         var user = authState.User;
 
         if (user.Identity.IsAuthenticated)
         {
-            // Wyciągnij userId z Claims jako string
             var userId = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
             if (!string.IsNullOrEmpty(userId))
             {
-                // Sprawdź dostępność produktu w magazynie
                 var stockQuantity = await ProductService.GetProductStockQuantityAsync(product.Id);
-
-                // Sprawdź, czy użytkownik chce dodać więcej przedmiotów niż dostępnych
                 var cartItem = await CartService.GetCartItemAsync(userId, product.Id);
+
+                string message;
+                NotificationSeverity severity;
+
                 if (cartItem != null)
                 {
-                    // Jeżeli przedmiot już jest w koszyku, zwiększamy jego ilość
                     if (cartItem.Quantity < stockQuantity)
                     {
                         cartItem.Quantity++;
                         await CartService.UpdateCartItemAsync(cartItem);
-                        successMessage = $"{product.Name} został zwiększony w koszyku.";
+                        message = $"{product.Name} został zwiększony w koszyku.";
+                        severity = NotificationSeverity.Success; // Ustawienie na sukces
                     }
                     else
                     {
-                        successMessage = $"{product.Name} nie może być dodany do koszyka, ponieważ dostępna ilość w magazynie to tylko {stockQuantity}.";
+                        message = $"{product.Name} nie może być dodany do koszyka, ponieważ dostępna ilość w magazynie to tylko {stockQuantity}.";
+                        severity = NotificationSeverity.Error; // Ustawienie na błąd
                     }
                 }
                 else
                 {
-                    // Dodaj nowy przedmiot do koszyka tylko jeśli jest dostępny w magazynie
                     if (stockQuantity > 0)
                     {
-                        await CartService.AddToCart(userId, product, 1); // Dodaj produkt do koszyka
-                        successMessage = $"{product.Name} został dodany do koszyka!";
+                        await CartService.AddToCart(userId, product, 1);
+                        message = $"{product.Name} został dodany do koszyka!";
+                        severity = NotificationSeverity.Success; // Ustawienie na sukces
                     }
                     else
                     {
-                        successMessage = $"{product.Name} jest obecnie niedostępny w magazynie.";
+                        message = $"{product.Name} jest obecnie niedostępny w magazynie.";
+                        severity = NotificationSeverity.Error; // Ustawienie na błąd
                     }
                 }
 
-                StateHasChanged(); // Odśwież komponent po dodaniu do koszyka
+                // Wyświetl powiadomienie tylko raz
+                ShowNotification(message, severity);
+
+                StateHasChanged();
             }
         }
         else
         {
-            // Obsługa sytuacji, gdy użytkownik nie jest zalogowany
-            successMessage = "Musisz być zalogowany, aby dodać produkty do koszyka.";
-            StateHasChanged(); // Odśwież komponent po próbie dodania do koszyka
+            ShowNotification("Musisz być zalogowany, aby dodać produkty do koszyka.", NotificationSeverity.Error);
+            StateHasChanged();
         }
     }
 

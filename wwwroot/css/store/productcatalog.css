@@ -113,5 +113,25 @@
 }
 
 
+/* Ustawienia dla powiadomień */
+.rz-notification {
+    margin: 0 auto; /* Wyśrodkowanie poziome */
+    text-align: center; /* Wyśrodkowanie tekstu */
+    width: auto; /* Automatyczna szerokość */
+}
+
+/* Kolor dla sukcesów */
+.rz-notification-success {
+    background-color: #d4edda; /* Jasnozielone tło */
+    color: #155724; /* Ciemnozielony tekst */
+}
+
+/* Kolor dla błędów */
+.rz-notification-error {
+    background-color: #f8d7da; /* Jasnoczerwone tło */
+    color: #721c24; /* Ciemnoczerwony tekst */
+}
+
+
 
 
