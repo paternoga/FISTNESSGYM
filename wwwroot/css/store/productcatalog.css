@@ -84,19 +84,33 @@
         background-color: #0056b3;
     }
 
+
+
+.pagination {
+    display: flex; /* Użycie flexboxa */
+    justify-content: center; /* Wyśrodkowanie elementów */
+    align-items: center; /* Wyrównanie do środka w pionie */
+    gap: 1rem; /* Przestrzeń między elementami */
+    margin: 20px 0; /* Odstęp od góry i dołu */
+}
+
 .pagination-button {
     background-color: #4340d2; /* Kolor tła */
     color: white; /* Kolor tekstu */
-    border: none; /* Bez obramowania */
-    border-radius: 4px; /* Zaokrąglenie rogów */
-    padding: 10px; /* Odstępy wewnętrzne */
-    cursor: pointer; /* Kursor wskaźnika */
+    border: none; /* Brak ramki */
+    border-radius: 4px; /* Zaokrąglone rogi */
+    padding: 10px 15px; /* Padding wewnętrzny */
+    cursor: pointer; /* Kursor w rękę na hover */
+    transition: background-color 0.3s; /* Płynne przejście */
 }
 
     .pagination-button:hover {
-        background-color: #3b37b8; /* Ciemniejszy odcień przy najechaniu */
+        background-color: #3b38c5; /* Kolor tła przy hover */
     }
 
+.pagination-info {
+    color: #4340d2; /* Kolor tekstu dla informacji */
+}
 
 
 
