@@ -21,19 +21,22 @@ namespace FISTNESSGYM.Components.Pages.Training.Events
         protected RadzenDataGrid<Event> grid0;
         private bool isEmployee;
         private bool isClient;
+        private bool isTrainer;
+        private bool isAdmin;
         private string currentUserId;
 
         protected override async Task OnInitializedAsync()
         {
-            // Determine user role
             isEmployee = Security.IsInRole("Pracownik");
             isClient = Security.IsInRole("Klient");
+            isTrainer = Security.IsInRole("Trener");
+            isAdmin = Security.IsInRole("Administrator");
             currentUserId = Security.User?.Id;
 
-            // Load appropriate events based on role
-            if (isEmployee)
+            // Load events based on role
+            if (isEmployee || isTrainer || isAdmin)
             {
-                events = await databaseService.GetEvents(); // All events for employee
+                events = await databaseService.GetEvents(); // All events for privileged roles
             }
             else if (isClient)
             {
@@ -43,7 +46,7 @@ namespace FISTNESSGYM.Components.Pages.Training.Events
 
         protected async Task AddButtonClick(MouseEventArgs args)
         {
-            if (isEmployee) 
+            if (isEmployee || isTrainer || isAdmin) 
             {
                 await DialogService.OpenAsync<AddEvent>("Add Event", null);
                 await grid0.Reload();
@@ -53,7 +56,7 @@ namespace FISTNESSGYM.Components.Pages.Training.Events
 
         protected async Task EditRow(Event args)
         {
-            if (isEmployee)
+            if (isEmployee || isTrainer || isAdmin)
             {
                 await DialogService.OpenAsync<EditEvent>("Edit Event", new Dictionary<string, object> { { "Id", args.Id } });
             }

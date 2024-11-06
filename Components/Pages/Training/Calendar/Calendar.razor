@@ -18,6 +18,8 @@
     List<SchedulerEvent> events;
     bool userIsClient;
     bool userIsWorker;
+    bool isTrainer;
+    bool isAdmin;
     string currentUserId;
 
     protected override async Task OnInitializedAsync()
@@ -28,6 +30,8 @@
             // Check if the user is in the "Client" role
             userIsClient = SecurityService.IsInRole("Klient");
             userIsWorker = SecurityService.IsInRole("Pracownik");
+            isTrainer = SecurityService.IsInRole("Trener");
+            isAdmin = SecurityService.IsInRole("Administrator");
             // Retrieve the logged-in user's ID
             currentUserId = SecurityService.User.Id;
         }
@@ -44,7 +48,7 @@
 
     async Task OnSlotSelect(SchedulerSlotSelectEventArgs args)
     {
-        if (userIsWorker)
+        if (userIsWorker || isAdmin || isTrainer)
         {
             // Open the dialog to add a new event with a default duration of 1 hour
             var newEvent = await DialogService.OpenAsync<EventDialog>("Add Event", new Dictionary<string, object>
@@ -78,7 +82,7 @@
                 await LoadEventsAsync(); // Refresh events after reservation
             }
         }
-        else if(userIsWorker)
+        else if(userIsWorker || isAdmin || isTrainer)
         {
             // Show event edit dialog for admin
             var editedEvent = await DialogService.OpenAsync<EditEventDialog>("Edytuj wydarzenie", new Dictionary<string, object>

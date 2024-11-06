@@ -2,7 +2,7 @@
 
 @attribute [Authorize]
 
-@if (isEmployee)
+@if (isEmployee || isTrainer || isAdmin)
 {
     <PageTitle>Wszystkie zajêcia</PageTitle>
 }
@@ -18,7 +18,7 @@ else
             <RadzenText Text="Zajêcia" TextStyle="TextStyle.H3" TagName="TagName.H1" style="margin: 0" />
         </RadzenColumn>
         <RadzenColumn Size="12" SizeMD="6">
-            @if (isEmployee)
+            @if (isEmployee || isTrainer || isAdmin)
             {
                 <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.End" Gap="0.5rem">
                     <RadzenButton Icon="add_circle_outline" Text="Add" Click="@AddButtonClick" Variant="Variant.Flat" />
@@ -30,9 +30,9 @@ else
     <RadzenRow>
         <RadzenColumn SizeMD=12>
             <RadzenDataGrid @ref="grid0" ColumnWidth="150px" AllowFiltering="true" FilterMode="FilterMode.Advanced" AllowPaging="true" AllowSorting="true" ShowPagingSummary="true" PageSizeOptions="@(new int[]{5, 10, 20, 30})"
-                            Data="@events" EmptyText="Nie jesteœ zapisany na ¿adne zajêcia" TItem="FISTNESSGYM.Models.database.Event" RowSelect="@(isEmployee ? EditRow : null)">
+                            Data="@events" EmptyText="Nie jesteœ zapisany na ¿adne zajêcia" TItem="FISTNESSGYM.Models.database.Event" RowSelect="@(isEmployee || isTrainer || isAdmin ? EditRow : null)">
                 <Columns>
-                    @if (isEmployee)
+                    @if (isEmployee || isTrainer || isAdmin)
                     {
                         <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.Event" Property="Id" Title="Id"/>
                     }
@@ -46,7 +46,7 @@ else
                     
                     <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.Event" Filterable="false" Sortable="false" Width="150px" TextAlign="TextAlign.Center">
                         <Template Context="_event">
-                            @if (isEmployee)
+                            @if (isEmployee || isTrainer || isAdmin)
                             {
                                 <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="delete" Size="ButtonSize.Medium"
                                               Shade="Shade.Lighter" Variant="Variant.Flat"

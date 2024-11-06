@@ -3528,6 +3528,22 @@ namespace FISTNESSGYM
                 .ToListAsync();
         }
 
+        public async Task<List<AspNetUser>> GetUsersRegisteredForEventAsync(int eventId)
+        {
+            return await Context.Reservations
+                .Where(r => r.EventId == eventId)
+                .Select(r => r.AspNetUser) // Zak³adaj¹c, ¿e AspNetUser jest powi¹zany z Reservation przez UserId
+                .ToListAsync();
+        }
+        public async Task RemoveUserFromEvent(int eventId, string userId)
+        {
+            var reservation = await Context.Reservations.FirstOrDefaultAsync(r => r.EventId == eventId && r.UserId == userId);
+            if (reservation != null)
+            {
+                Context.Reservations.Remove(reservation);
+                await Context.SaveChangesAsync();
+            }
+        }
 
     }
 }
