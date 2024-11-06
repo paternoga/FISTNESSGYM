@@ -29,8 +29,9 @@
                 <RadzenLabel Text="Cena" Component="Price" style="width: 100%" />
             </RadzenColumn>
             <RadzenColumn SizeMD="9">
-                <RadzenNumeric style="display: block; width: 100%" @bind-Value="@product.Price" Name="Price" />
+                <RadzenNumeric style="display: block; width: 100%" @bind-Value="@product.Price" Name="Price" Min="1"/>
                 <RadzenRequiredValidator Component="Price" Text="Cena jest wymagana" />
+                <RadzenNumericRangeValidator Min="1" Component="Price" Text="Cena musi być większa niż 0" />
             </RadzenColumn>
         </RadzenRow>
         <RadzenRow style="margin-bottom: 1rem">
@@ -38,8 +39,9 @@
                 <RadzenLabel Text="Stan magazynowy" Component="StockQuantity" style="width: 100%" />
             </RadzenColumn>
             <RadzenColumn SizeMD="9">
-                <RadzenNumeric style="display: block; width: 100%" @bind-Value="@product.StockQuantity" Name="StockQuantity" />
+                <RadzenNumeric style="display: block; width: 100%" @bind-Value="@product.StockQuantity" Name="StockQuantity" Min="1" AutoCompleteType="Radzen.Blazor.AutoCompleteType.Off" Placeholder="Wprowadź liczbę sztuk"/>
                 <RadzenRequiredValidator Component="StockQuantity" Text="Stan magazywnowy jest wymagnany" />
+                <RadzenNumericRangeValidator Min="1" Component="StockQuantity" Text="Stan magazynowy musi być większy niż 0" />
             </RadzenColumn>
         </RadzenRow>
         
