@@ -7,26 +7,61 @@
 
 <PageTitle>PAKIETY</PageTitle>
 
-<h3>MOŻE JAKAŚ KARUZELA Z RADZORA?</h3>
-
-@if (hasActiveSubscription)
-{
-    <p>Nie możesz zakupić nowej subskrypcji, ponieważ masz już aktywną subskrypcję.</p>
-}
-else
-{
-    <select @bind="selectedSubscriptionTypeId">
-        <option value="">Wybierz typ subskrypcji</option>
-        <option value="1">Miesięczna - 99 zł</option>
-        <option value="2">Roczna - 950 zł</option>
-        <option value="3">Próbna - 1 zł</option>
-    </select>
-
-    <button @onclick="Purchase">Kup</button>
-}
-
+<h3>Trenuj w najlepszej cenie!</h3>
+<h4> Dołącz do społeczności, która wspiera się w budowaniu zdrowych nawyków i trenuj w ponad 60 miastach w całej Polsce.</h4>
+<RadzenCard Style="box-shadow: none;">
+    @if (hasActiveSubscription)
+    {
+        <p>Nie możesz zakupić nowej subskrypcji, ponieważ masz już aktywną subskrypcję.</p>
+    }
+    else
+    {
+            <RadzenCarousel @ref="carousel" @bind-SelectedIndex="@selectedIndex" Auto="@auto" Interval="@interval" PagerOverlay="false" ButtonShade="Shade.Default" Style="height:320px">
+                <Items>
+                    <RadzenCarouselItem>
+                        <RadzenCard style="box-shadow: 0px 1px 0px 0px darkgray;" class="rz-w-75 rz-text-center">
+                            <h4>Karnet miesięczny</h4>
+                            <p>Cena: 99 zł / miesiąc</p>
+                            <p>Doskonała propozycja dla osób, które szukają elastyczności i wolą korzystać z naszych usług bez długoterminowych zobowiązań. <br />
+                                Za jedyne 99 zł miesięcznie otrzymasz pełen dostęp do wszystkich funkcji, co pozwoli Ci cieszyć się wygodą i najwyższą jakością usług na wyciągnięcie ręki. 
+                                Idealne rozwiązanie, jeśli chcesz sprawdzić, czy nasza oferta odpowiada Twoim potrzebom!</p>
+                            <p></p>
+                            <RadzenButton Text="Kup karnet miesięczny" Click="() => Purchase(1)" ButtonStyle="ButtonStyle.Primary" />
+                        </RadzenCard>
+                    </RadzenCarouselItem>
+                    <RadzenCarouselItem>
+                        <RadzenCard style="box-shadow: 0px 1px 0px 0px darkgray;" class="rz-w-75 rz-text-center">
+                            <h4>Karnet roczny</h4>
+                            <p>Cena: 950 zł / rok</p>
+                            <p>Dla regularnych użytkowników, którzy chcą czerpać maksymalne korzyści i oszczędzać! Wybierając „Subskrypcję Roczną” za 950 zł, 
+                                zyskujesz znacznie niższy miesięczny koszt w porównaniu z planem miesięcznym. <br />Dzięki rocznej subskrypcji możesz korzystać z pełnej oferty naszych usług 
+                                bez konieczności odnawiania planu co miesiąc, co daje Ci spokój i wygodę przez cały rok.</p>
+                            <p></p>
+                            <RadzenButton Text="Kup karnet roczny" Click="() => Purchase(2)" ButtonStyle="ButtonStyle.Primary" />
+                        </RadzenCard>
+                    </RadzenCarouselItem>
+                    <RadzenCarouselItem>
+                        <RadzenCard style="box-shadow: 0px 1px 0px 0px darkgray;" class="rz-w-75 rz-text-center">
+                            <h4>Karnet próbny</h4>
+                            <p>Cena: 1 zł</p>
+                            <p>Zastanawiasz się, czy nasze usługi są dla Ciebie? Skorzystaj z „Subskrypcji Próbnej” i wypróbuj naszą ofertę przez jeden dzień za symboliczne 1 zł. <br />
+                                To doskonała okazja, by przetestować nasze funkcje i poznać naszą platformę bez większego zobowiązania. W ten sposób możesz łatwo sprawdzić, 
+                                czy nasze usługi odpowiadają Twoim oczekiwaniom!</p>
+                            <p></p>
+                            <RadzenButton Text="Kup karnet próbny" Click="() => Purchase(3)" ButtonStyle="ButtonStyle.Primary" />
+                        </RadzenCard>
+                    </RadzenCarouselItem>
+                </Items>
+            </RadzenCarousel>
+    }
+</RadzenCard>
 @code {
-    private int selectedSubscriptionTypeId;
+    RadzenCarousel carousel;
+    bool auto = true;
+    double interval = 4000;
+    bool started = true;
+    int selectedIndex;
+
     private string userId;
     private bool hasActiveSubscription;
 
@@ -35,11 +70,10 @@ else
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         var user = authState.User;
 
-        // Upewnij się, że użytkownik jest zalogowany
         if (user.Identity.IsAuthenticated)
         {
-            userId = user.FindFirst(ClaimTypes.NameIdentifier)?.Value; // Pobierz UserId
-            hasActiveSubscription = await SubscriptionService.GetCurrentSubscriptionAsync(userId) != null; // Sprawdź aktywną subskrypcję
+            userId = user.FindFirst(ClaimTypes.NameIdentifier)?.Value; 
+            hasActiveSubscription = await SubscriptionService.GetCurrentSubscriptionAsync(userId) != null; 
         }
         else
         {
@@ -47,24 +81,24 @@ else
         }
     }
 
-    private async Task Purchase()
+    private async Task Purchase(int subscriptionTypeId)
     {
         if (hasActiveSubscription)
         {
             Console.WriteLine("Nie możesz kupić nowej subskrypcji, ponieważ masz już aktywną subskrypcję.");
-            return; // Zakończ, jeśli użytkownik ma już subskrypcję
+            return;
         }
 
         try
         {
-            await SubscriptionService.PurchaseSubscriptionAsync(userId, selectedSubscriptionTypeId);
-            // Obsłuż sukces (np. pokaż komunikat o sukcesie lub przekieruj)
+            await SubscriptionService.PurchaseSubscriptionAsync(userId, subscriptionTypeId);
             Console.WriteLine("Zakup subskrypcji zakończony sukcesem.");
         }
         catch (Exception ex)
         {
-            // Obsłuż wyjątek (np. pokaż komunikat o błędzie)
             Console.WriteLine($"Błąd podczas zakupu subskrypcji: {ex.Message}");
         }
     }
+
+
 }
