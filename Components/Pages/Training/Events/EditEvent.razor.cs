@@ -50,7 +50,6 @@ namespace FISTNESSGYM.Components.Pages.Training.Events
             DialogService.Close(null);
         }
 
-        // Remove user registration from the event
         protected async Task RemoveUserFromEvent()
         {
             if (!string.IsNullOrEmpty(selectedUserId))
@@ -59,16 +58,22 @@ namespace FISTNESSGYM.Components.Pages.Training.Events
 
                 if (confirmed == true)
                 {
-                    await databaseService.RemoveUserFromEvent(Id, selectedUserId);
-                    registeredUsers.RemoveAll(u => u.Id == selectedUserId); // Update list without reloading
-                    selectedUserId = null;
-
-                    NotificationService.Notify(new NotificationMessage
+                    var userToRemove = registeredUsers.Find(u => u.Id == selectedUserId);
+                    if (userToRemove != null)
                     {
-                        Severity = NotificationSeverity.Success,
-                        Summary = "U¿ytkownik wypisany",
-                        Detail = "U¿ytkownik zosta³ pomyœlnie wypisany z wydarzenia."
-                    });
+                        string userEmail = userToRemove.Email; 
+
+                        await databaseService.RemoveUserFromEvent(Id, selectedUserId);
+                        registeredUsers.Remove(userToRemove); 
+                        selectedUserId = null;
+
+                        NotificationService.Notify(new NotificationMessage
+                        {
+                            Severity = NotificationSeverity.Success,
+                            Summary = $"U¿ytkownik {userEmail} wypisany",
+                            Detail = "U¿ytkownik zosta³ pomyœlnie wypisany z wydarzenia."
+                        });
+                    }
                 }
             }
         }
