@@ -2,19 +2,19 @@
 
 @attribute [Authorize]
 
-<PageTitle>PLANY</PageTitle>
+<PageTitle>PLANY TRENINGOWE</PageTitle>
 <RadzenStack>
     <RadzenRow AlignItems="AlignItems.Center">
         <RadzenColumn Size="12" SizeMD="6">
-            <RadzenText Text="WorkoutPlans" TextStyle="TextStyle.H3" TagName="TagName.H1" style="margin: 0" />
+            <RadzenText Text="Plany treningowe" TextStyle="TextStyle.H3" TagName="TagName.H1" style="margin: 0" />
         </RadzenColumn>
         <RadzenColumn Size="12" SizeMD="6">
             <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.End" Gap="0.5rem">
-                <RadzenButton Icon="add_circle_outline" Text="Add" Click="@AddButtonClick" Variant="Variant.Flat" />
+                <RadzenButton Icon="add_circle_outline" Text="Dodaj" Click="@AddButtonClick" Variant="Variant.Flat" />
             </RadzenStack>
         </RadzenColumn>
     </RadzenRow>
-    <RadzenTextBox Placeholder="Search ..." style="display: block; width: 100%" @oninput="@Search" aria-label="Search by all string columns" />
+    <RadzenTextBox Placeholder="Wyszukaj ..." style="display: block; width: 100%" @oninput="@Search" aria-label="Search by all string columns" />
     <RadzenRow>
       <RadzenColumn SizeMD=12>
         <RadzenDataGrid @ref="grid0" ColumnWidth="200px"   AllowFiltering="true" FilterMode="FilterMode.Advanced" AllowPaging="true" AllowSorting="true" ShowPagingSummary="true" PageSizeOptions=@(new int[]{5, 10, 20, 30})
@@ -22,13 +22,13 @@
             <Columns>
                 <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.WorkoutPlan" Property="Id" Title="Id">
                 </RadzenDataGridColumn>
-                <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.WorkoutPlan" Property="Name" Title="Name">
+                <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.WorkoutPlan" Property="Name" Title="Nazwa">
                 </RadzenDataGridColumn>
-                <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.WorkoutPlan" Property="Description" Title="Description">
+                <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.WorkoutPlan" Property="Description" Title="Opis planu">
                 </RadzenDataGridColumn>
-                <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.WorkoutPlan" Property="AspNetUser.UserName" Title="Asp Net User">
+                <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.WorkoutPlan" Property="AspNetUser.UserName" Title="U¿ytkownik">
                 </RadzenDataGridColumn>
-                <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.WorkoutPlan" Property="CreatedDate" Title="Created Date">
+                <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.WorkoutPlan" Property="CreatedDate" Title="Data utworzenia">
                 </RadzenDataGridColumn>
                 <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.WorkoutPlan" Filterable="false" Sortable="false" Width="70px" TextAlign="TextAlign.Center">
                     <Template Context="workoutPlan">

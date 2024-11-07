@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Radzen;
 using Radzen.Blazor;
+using FISTNESSGYM.Components.Pages.Training.TrainingPlans.Exercises;
 
 namespace FISTNESSGYM.Components.Pages.Store.Products
 {
@@ -39,9 +40,18 @@ namespace FISTNESSGYM.Components.Pages.Store.Products
 
         [Inject]
         protected SecurityService Security { get; set; }
+        protected string search = "";
+
         protected override async Task OnInitializedAsync()
         {
             products = await databaseService.GetProducts(new Query { Expand = "ProductCategory" });
+        }
+        protected async Task Search(ChangeEventArgs args)
+        {
+            search = $"{args.Value}";
+            await grid0.GoToPage(0);
+
+            products = await databaseService.GetProducts(new Query { Filter = $@"i => i.Name.Contains(@0) || i.Description.Contains(@0) || i.Category.Contains(@0)", FilterParameters = new object[] { search } });
         }
 
         protected async Task AddButtonClick(MouseEventArgs args)

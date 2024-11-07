@@ -25,6 +25,8 @@ namespace FISTNESSGYM.Components.Pages.Training.Events
         private bool isAdmin;
         private string currentUserId;
 
+        protected string search = "";
+
         protected override async Task OnInitializedAsync()
         {
             isEmployee = Security.IsInRole("Pracownik");
@@ -42,6 +44,15 @@ namespace FISTNESSGYM.Components.Pages.Training.Events
             {
                 events = await databaseService.GetUserRegisteredEventsAsync(currentUserId); // Registered events for client
             }
+        }
+
+        protected async Task Search(ChangeEventArgs args)
+        {
+            search = $"{args.Value}";
+
+            await grid0.GoToPage(0);
+
+            events = await databaseService.GetEvents(new Query { Filter = $@"i => i.EventName.Contains(@0)", FilterParameters = new object[] { search } });
         }
 
         protected async Task AddButtonClick(MouseEventArgs args)

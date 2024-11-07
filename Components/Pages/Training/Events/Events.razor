@@ -21,12 +21,12 @@ else
             @if (isEmployee || isTrainer || isAdmin)
             {
                 <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.End" Gap="0.5rem">
-                    <RadzenButton Icon="add_circle_outline" Text="Add" Click="@AddButtonClick" Variant="Variant.Flat" />
+                    <RadzenButton Icon="add_circle_outline" Text="Dodaj" Click="@AddButtonClick" Variant="Variant.Flat" />
                 </RadzenStack>
             }
         </RadzenColumn>
     </RadzenRow>
-
+    <RadzenTextBox Placeholder="Wyszukaj ..." style="display: block; width: 100%" @oninput="@Search" aria-label="Search by all string columns" />
     <RadzenRow>
         <RadzenColumn SizeMD=12>
             <RadzenDataGrid @ref="grid0" ColumnWidth="150px" AllowFiltering="true" FilterMode="FilterMode.Advanced" AllowPaging="true" AllowSorting="true" ShowPagingSummary="true" PageSizeOptions="@(new int[]{5, 10, 20, 30})"
@@ -36,12 +36,12 @@ else
                     {
                         <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.Event" Property="Id" Title="Id"/>
                     }
-                    <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.Event" Property="EventName" Title="Event Name" />
-                    <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.Event" Property="InstructorName" Title="Instructor Name" />
-                    <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.Event" Property="EventStartDate" Title="Event Start Date" />
-                    <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.Event" Property="EventEndDate" Title="Event End Date" />
-                    <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.Event" Property="MaxParticipants" Title="Max Participants" />
-                    <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.Event" Property="Participants" Title="Participants" />
+                    <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.Event" Property="EventName" Title="Nazwa zajêcia" />
+                    <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.Event" Property="InstructorName" Title="Instruktor" />
+                    <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.Event" Property="EventStartDate" Title="Czas startu" />
+                    <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.Event" Property="EventEndDate" Title="Czas koñca" />
+                    <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.Event" Property="MaxParticipants" Title="Maks. liczba uczestników" />
+                    <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.Event" Property="Participants" Title="Liczba uczestników" />
 
                     
                     <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.Event" Filterable="false" Sortable="false" Width="150px" TextAlign="TextAlign.Center">

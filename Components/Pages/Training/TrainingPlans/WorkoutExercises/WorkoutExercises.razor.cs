@@ -48,7 +48,7 @@ namespace FISTNESSGYM.Components.Pages.Training.TrainingPlans.WorkoutExercises
 
             await grid0.GoToPage(0);
 
-            workoutExercises = await databaseService.GetWorkoutExercises(new Query { Expand = "Exercise,WorkoutPlan" });
+            workoutExercises = await databaseService.GetWorkoutExercises(new Query { Filter = $@"i => i.WorkoutPlan.Name.Contains(@0)", FilterParameters = new object[] { search } });
         }
         protected override async Task OnInitializedAsync()
         {
