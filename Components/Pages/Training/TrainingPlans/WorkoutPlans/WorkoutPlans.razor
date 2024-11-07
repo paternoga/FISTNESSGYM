@@ -28,7 +28,7 @@
                 </RadzenDataGridColumn>
                 <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.WorkoutPlan" Property="AspNetUser.UserName" Title="U¿ytkownik">
                 </RadzenDataGridColumn>
-                <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.WorkoutPlan" Property="CreatedDate" Title="Data utworzenia">
+                    <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.WorkoutPlan" Property="CreatedDate" Title="Data utworzenia" FormatString="{0:yyyy-MM-dd HH:mm}">
                 </RadzenDataGridColumn>
                 <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.WorkoutPlan" Filterable="false" Sortable="false" Width="70px" TextAlign="TextAlign.Center">
                     <Template Context="workoutPlan">
