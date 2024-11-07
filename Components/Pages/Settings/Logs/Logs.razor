@@ -1,14 +1,26 @@
 ﻿@page "/settings/logs"
+@using FISTNESSGYM.Services
+@inject AuthorizationService AuthorizationService
+@inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider AuthenticationStateProvider
 
 <PageTitle>LOGI</PageTitle>
 
-<RadzenStack>
-    <RadzenRow AlignItems="AlignItems.Center">
-        <RadzenColumn Size="12">
-            <RadzenText Text="Logi" TextStyle="TextStyle.H3" TagName="TagName.H1" style="margin: 0" />
-        </RadzenColumn>
-    </RadzenRow>
-</RadzenStack>
+@if (AuthorizationService.IsAdmin) 
+{
+    <RadzenStack>
+        <RadzenRow AlignItems="AlignItems.Center">
+            <RadzenColumn Size="12">
+                <RadzenText Text="Logi" TextStyle="TextStyle.H3" TagName="TagName.H1" style="margin: 0" />
+            </RadzenColumn>
+        </RadzenRow>
+    </RadzenStack>
+}
+else
+{
+    NavigationManager.NavigateTo("/");
+    //<RadzenText Text="Brak dostępu. Tylko administratorzy mogą przeglądać logi." TextStyle="TextStyle.H4" style="color: red;" />
+}
 
 @code {
 

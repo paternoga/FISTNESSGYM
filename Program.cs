@@ -32,16 +32,12 @@ builder.Services.AddHeaderPropagation(o => o.Headers.Add("Cookie"));
 builder.Services.AddAuthentication();
 builder.Services.AddAuthorization();
 
-
-
 builder.Services.AddScoped<SecurityService>();
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<SubscriptionService>();
-
 builder.Services.AddScoped<ICartService, CartService>();
 
-
-
+builder.Services.AddScoped<AuthorizationService>();
 
 builder.Services.AddDbContext<ApplicationIdentityDbContext>(options =>
 {

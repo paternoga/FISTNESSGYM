@@ -1,5 +1,9 @@
 @inherits LayoutComponentBase
+@using FISTNESSGYM.Services
 @inject CookieThemeService CookieThemeService
+@inject AuthorizationService AuthorizationService
+
+
 <RadzenComponents />
 
 <RadzenLayout style="grid-template-areas: 'rz-sidebar rz-header' 'rz-sidebar rz-body';">
@@ -40,47 +44,114 @@
             <RadzenImage Path="@GetLogoPath()" style="width: 251px; height: 83px; float: none; visibility: visible" AlternateText="" />
         </RadzenStack>
         <RadzenPanelMenu>
-            <RadzenPanelMenuItem Text="Strona główna" Icon="home" Path="" />
+            @if (AuthorizationService.IsUser || AuthorizationService.IsClient || AuthorizationService.IsWorker || AuthorizationService.IsTrainer || AuthorizationService.IsAdmin)
+            {
+                <RadzenPanelMenuItem Text="Strona główna" Icon="home" Path="" />
+            }
         </RadzenPanelMenu>
 
         <RadzenPanelMenu>
-            <RadzenPanelMenuItem Text="Trening" Icon="calendar_month" >
-                <RadzenPanelMenuItem Path="training/calendar" Icon="calendar_month" Text="Kalendarz" />
-                <RadzenPanelMenuItem Path="training/classes" Icon="sports_gymnastics" Text="Zajęcia" />
-                <RadzenPanelMenuItem Icon="exercise" Text="Plany treningowe">
-                    <RadzenPanelMenuItem Text="Moje ćwiczenia" Path="training/workout-exercises" Icon="sports_gymnastics" />
-                    <RadzenPanelMenuItem Text="Ćwiczenia" Path="training/exercises" Icon="fitness_center" />
-                    <RadzenPanelMenuItem Text="Plany treningowe" Path="training/workout-plans" Icon="exercise" />
-                </RadzenPanelMenuItem>
-                
+            <RadzenPanelMenuItem Text="Trening" Icon="calendar_month">
+                @if (AuthorizationService.IsUser || AuthorizationService.IsClient || AuthorizationService.IsWorker || AuthorizationService.IsTrainer || AuthorizationService.IsAdmin)
+                {
+                    <RadzenPanelMenuItem Path="training/calendar" Icon="calendar_month" Text="Kalendarz" />
+                }
+                @if (AuthorizationService.IsUser || AuthorizationService.IsClient || AuthorizationService.IsWorker || AuthorizationService.IsTrainer || AuthorizationService.IsAdmin)
+                {
+                    <RadzenPanelMenuItem Path="training/classes" Icon="sports_gymnastics" Text="Zajęcia" />
+                }
+                @if (AuthorizationService.IsUser || AuthorizationService.IsClient || AuthorizationService.IsWorker || AuthorizationService.IsTrainer || AuthorizationService.IsAdmin)
+                {
+                    <RadzenPanelMenuItem Icon="exercise" Text="Plany treningowe">
+                        @if (AuthorizationService.IsClient || AuthorizationService.IsTrainer || AuthorizationService.IsAdmin)
+                        {
+                            <RadzenPanelMenuItem Text="Moje ćwiczenia" Path="training/workout-exercises" Icon="sports_gymnastics" />
+                        }
+                        @if (AuthorizationService.IsUser || AuthorizationService.IsClient || AuthorizationService.IsWorker || AuthorizationService.IsTrainer || AuthorizationService.IsAdmin)
+                        {
+                            <RadzenPanelMenuItem Text="Ćwiczenia" Path="training/exercises" Icon="fitness_center" />
+                        }
+                        @if (AuthorizationService.IsUser || AuthorizationService.IsClient || AuthorizationService.IsWorker || AuthorizationService.IsTrainer || AuthorizationService.IsAdmin)
+                        {
+                            <RadzenPanelMenuItem Text="Plany treningowe" Path="training/workout-plans" Icon="exercise" />
+                        }
+                    </RadzenPanelMenuItem>
+                }
             </RadzenPanelMenuItem>
         </RadzenPanelMenu>
 
         <RadzenPanelMenu>
             <RadzenPanelMenuItem Text="Sklep" Icon="store">
-                <RadzenPanelMenuItem Path="store/cart" Icon="shopping_cart" Text="Koszyk" />
-                <RadzenPanelMenuItem Path="store/products-catalog" Icon="category" Text="Katalog produktów" />
-                <RadzenPanelMenuItem Path="store/products" Icon="add_business" Text="Zarządzanie produktami" />
-                <RadzenPanelMenuItem Path="store/orders" Icon="orders" Text="Zamówienia" />
-                <RadzenPanelMenuItem Path="store/product-categories" Icon="loyalty" Text="Kategorie" />
+                @if (AuthorizationService.IsUser || AuthorizationService.IsClient || AuthorizationService.IsWorker || AuthorizationService.IsTrainer || AuthorizationService.IsAdmin)
+                {
+                    <RadzenPanelMenuItem Path="store/cart" Icon="shopping_cart" Text="Koszyk" />
+                }
+                @if (AuthorizationService.IsUser || AuthorizationService.IsClient || AuthorizationService.IsWorker || AuthorizationService.IsTrainer || AuthorizationService.IsAdmin)
+                {
+                    <RadzenPanelMenuItem Path="store/products-catalog" Icon="category" Text="Katalog produktów" />
+                }
+                @if (AuthorizationService.IsWorker || AuthorizationService.IsAdmin)
+                {
+                    <RadzenPanelMenuItem Path="store/products" Icon="add_business" Text="Zarządzanie produktami" />
+                }
+                @if (AuthorizationService.IsClient || AuthorizationService.IsWorker || AuthorizationService.IsAdmin)
+                {
+                    <RadzenPanelMenuItem Path="store/orders" Icon="orders" Text="Zamówienia" />
+                }
+                @if (AuthorizationService.IsUser || AuthorizationService.IsClient || AuthorizationService.IsWorker || AuthorizationService.IsTrainer || AuthorizationService.IsAdmin)
+                {
+                    <RadzenPanelMenuItem Path="store/product-categories" Icon="loyalty" Text="Kategorie" />
+                }
             </RadzenPanelMenuItem>
-        </RadzenPanelMenu>
-        
-        <RadzenPanelMenu>
-            <RadzenPanelMenuItem Text="Analityka" Icon="monitoring" Path="/analytics" />
         </RadzenPanelMenu>
 
         <RadzenPanelMenu>
-            <RadzenPanelMenuItem Text="Ustawienia" Icon="settings" >
-                <RadzenPanelMenuItem Path="settings/profile" Icon="person" Text="Profil" />
-                <RadzenPanelMenuItem Icon="universal_currency" Text="Subskrypcja">
-                    <RadzenPanelMenuItem Path="settings/subscription/status" Icon="universal_currency" Text="Status subskrypcji"/>
-                    <RadzenPanelMenuItem Path="settings/subscription/purchase" Icon="settings_accessibility" Text="Pakiety" />
-                    <RadzenPanelMenuItem Path="settings/subscriptions" Icon="clear_all" Text="Lista subskrypcji" />
-                </RadzenPanelMenuItem>
-                <RadzenPanelMenuItem Path="settings/application-users" Icon="group" Text="Użytkownicy" />
-                <RadzenPanelMenuItem Path="settings/application-roles" Icon="badge" Text="Role" />
-                <RadzenPanelMenuItem Path="settings/logs" Icon="code" Text="Logi" />
+            @if (AuthorizationService.IsClient || AuthorizationService.IsWorker || AuthorizationService.IsTrainer || AuthorizationService.IsAdmin)
+            {
+                <RadzenPanelMenuItem Text="Analityka" Icon="monitoring" Path="/analytics" />
+            }
+        </RadzenPanelMenu>
+
+
+        <RadzenPanelMenu>
+            <RadzenPanelMenuItem Text="Ustawienia" Icon="settings">
+                @if (AuthorizationService.IsUser || AuthorizationService.IsClient || AuthorizationService.IsWorker || AuthorizationService.IsTrainer || AuthorizationService.IsAdmin)
+                {
+                    <RadzenPanelMenuItem Path="settings/profile" Icon="person" Text="Profil" />
+                }
+
+                @if (AuthorizationService.IsUser || AuthorizationService.IsClient || AuthorizationService.IsWorker || AuthorizationService.IsAdmin)
+                {
+                    <RadzenPanelMenuItem Icon="universal_currency" Text="Subskrypcja">
+                        @if (AuthorizationService.IsUser || AuthorizationService.IsClient || AuthorizationService.IsWorker || AuthorizationService.IsAdmin)
+                        {
+                            <RadzenPanelMenuItem Path="settings/subscription/status" Icon="universal_currency" Text="Status karnetu" />
+                        }
+                        @if (AuthorizationService.IsUser || AuthorizationService.IsClient || AuthorizationService.IsWorker || AuthorizationService.IsAdmin)
+                        {
+                            <RadzenPanelMenuItem Path="settings/subscription/purchase" Icon="settings_accessibility" Text="Pakiety" />
+                        }
+                        @if (AuthorizationService.IsWorker || AuthorizationService.IsAdmin)
+                        {
+                            <RadzenPanelMenuItem Path="settings/subscriptions" Icon="clear_all" Text="Lista subskrypcji" />
+                        }
+                    </RadzenPanelMenuItem>
+                }
+
+                @if (AuthorizationService.IsWorker || AuthorizationService.IsAdmin)
+                {
+                    <RadzenPanelMenuItem Path="settings/application-users" Icon="group" Text="Użytkownicy" />
+                }
+
+                @if (AuthorizationService.IsWorker || AuthorizationService.IsAdmin)
+                {
+                    <RadzenPanelMenuItem Path="settings/application-roles" Icon="badge" Text="Role" />
+                }
+
+                @if (AuthorizationService.IsAdmin)
+                {
+                    <RadzenPanelMenuItem Path="settings/logs" Icon="code" Text="Logi" />
+                }
             </RadzenPanelMenuItem>
         </RadzenPanelMenu>
     </RadzenSidebar>
