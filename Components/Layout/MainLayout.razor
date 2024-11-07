@@ -13,10 +13,11 @@
                     <RadzenAppearanceToggle @bind-Value="@isDarkMode" />
                     <RadzenProfileMenu Visible="@Security.IsAuthenticated()" Click="@ProfileMenuClick" Style="background-color: #000000" >
                         <ChildContent>
-                            <RadzenProfileMenuItem Path="profile" Icon="settings" Text="Profile" />
-                            <RadzenProfileMenuItem Path="application-users" Icon="person" Text="Users" />
-                            <RadzenProfileMenuItem Path="application-roles" Icon="security" Text="Roles" />
-                            <RadzenProfileMenuItem Text="Logout" Value="Logout" Icon="power_settings_new" />
+                            <RadzenProfileMenuItem Path="settings/profile" Icon="person" Text="Profil" />
+                            <RadzenProfileMenuItem Path="settings/subscription/status" Icon="universal_currency" Text="Subskrypcja" />
+                            <RadzenProfileMenuItem Icon="notifications" Text="Powiadomienia" />
+                            <RadzenProfileMenuItem Icon="shopping_cart" Text="Koszyk" />
+                            <RadzenProfileMenuItem Text="Wyloguj się" Value="Logout" Icon="power_settings_new" />
                         </ChildContent>
                         <Template>
                             @Security.User?.Name

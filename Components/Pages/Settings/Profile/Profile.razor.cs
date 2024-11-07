@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Radzen;
 using Radzen.Blazor;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using static System.Net.WebRequestMethods;
 
 namespace FISTNESSGYM.Components.Pages.Settings.Profile
 {
@@ -29,6 +31,7 @@ namespace FISTNESSGYM.Components.Pages.Settings.Profile
 
         [Inject]
         protected NotificationService NotificationService { get; set; }
+
 
         protected string oldPassword = "";
         protected string newPassword = "";
