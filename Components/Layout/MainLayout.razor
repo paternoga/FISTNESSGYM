@@ -145,6 +145,11 @@
 
                 @if (AuthorizationService.IsWorker || AuthorizationService.IsAdmin)
                 {
+                    <RadzenPanelMenuItem Path="settings/asp-net-users" Icon="groups" Text="Użytkownicy szczegółowo" />
+                }
+
+                @if (AuthorizationService.IsWorker || AuthorizationService.IsAdmin)
+                {
                     <RadzenPanelMenuItem Path="settings/application-roles" Icon="badge" Text="Role" />
                 }
 

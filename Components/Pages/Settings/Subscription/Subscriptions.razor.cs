@@ -33,15 +33,27 @@ namespace FISTNESSGYM.Components.Pages.Settings.Subscription
         [Inject]
         public databaseService databaseService { get; set; }
 
+        [Inject]
+        protected SecurityService Security { get; set; }
+
         protected IEnumerable<FISTNESSGYM.Models.database.Subscription> subscriptions;
 
         protected RadzenDataGrid<FISTNESSGYM.Models.database.Subscription> grid0;
 
-        [Inject]
-        protected SecurityService Security { get; set; }
+        protected string search = "";
+
         protected override async Task OnInitializedAsync()
         {
             subscriptions = await databaseService.GetSubscriptions(new Query { Expand = "AspNetUser,SubscriptionStatus" });
+        }
+
+        protected async Task Search(ChangeEventArgs args)
+        {
+            search = $"{args.Value}";
+
+            await grid0.GoToPage(0);
+
+            subscriptions = await databaseService.GetSubscriptions(new Query { Filter = $@"i => i.AspNetUser.UserName.Contains(@0)", FilterParameters = new object[] { search } });
         }
 
         protected async Task AddButtonClick(MouseEventArgs args)

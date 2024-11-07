@@ -1,19 +1,20 @@
-@page "/asp-net-users"
+@page "/settings/asp-net-users"
 
 @attribute [Authorize]
 
-<PageTitle>U¯YTKOWNICY</PageTitle>
+<PageTitle>U¯YTKOWNICY SZCZEGÓ£OWO</PageTitle>
 <RadzenStack>
     <RadzenRow AlignItems="AlignItems.Center">
         <RadzenColumn Size="12" SizeMD="6">
-            <RadzenText Text="AspNetUsers" TextStyle="TextStyle.H3" TagName="TagName.H1" style="margin: 0" />
+            <RadzenText Text="U¿ytkownicy szczegó³owo" TextStyle="TextStyle.H3" TagName="TagName.H1" style="margin: 0" />
         </RadzenColumn>
         <RadzenColumn Size="12" SizeMD="6">
             <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.End" Gap="0.5rem">
-                <RadzenButton Icon="add_circle_outline" Text="Add" Click="@AddButtonClick" Variant="Variant.Flat" />
+                <RadzenButton Icon="add_circle_outline" Text="Dodaj" Click="@AddButtonClick" Variant="Variant.Flat" />
             </RadzenStack>
         </RadzenColumn>
     </RadzenRow>
+    <RadzenTextBox Placeholder="Wyszukaj ..." style="display: block; width: 100%" @oninput="@Search" aria-label="Search by all string columns" />
     <RadzenRow>
       <RadzenColumn SizeMD=12>
         <RadzenDataGrid @ref="grid0" ColumnWidth="200px"   AllowFiltering="true" FilterMode="FilterMode.Advanced" AllowPaging="true" AllowSorting="true" ShowPagingSummary="true" PageSizeOptions=@(new int[]{5, 10, 20, 30})
@@ -21,33 +22,31 @@
             <Columns>
                 <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.AspNetUser" Property="Id" Title="Id">
                 </RadzenDataGridColumn>
-                <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.AspNetUser" Property="AccessFailedCount" Title="Access Failed Count">
+                <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.AspNetUser" Property="AccessFailedCount" Title="Liczba nieudanych prób dostêpu">
                 </RadzenDataGridColumn>
-                <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.AspNetUser" Property="ConcurrencyStamp" Title="Concurrency Stamp">
+                <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.AspNetUser" Property="ConcurrencyStamp" Title="Pieczêæ wspó³bie¿noœci">
                 </RadzenDataGridColumn>
                 <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.AspNetUser" Property="Email" Title="Email">
                 </RadzenDataGridColumn>
-                <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.AspNetUser" Property="EmailConfirmed" Title="Email Confirmed">
+                <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.AspNetUser" Property="EmailConfirmed" Title="Email potwierdzony">
                 </RadzenDataGridColumn>
-                <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.AspNetUser" Property="LockoutEnabled" Title="Lockout Enabled">
+                <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.AspNetUser" Property="LockoutEnabled" Title="Blokada w³¹czona">
                 </RadzenDataGridColumn>
-                <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.AspNetUser" Property="LockoutEnd" Title="Lockout End">
+                <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.AspNetUser" Property="LockoutEnd" Title="Koniec blokady">
                 </RadzenDataGridColumn>
-                <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.AspNetUser" Property="NormalizedEmail" Title="Normalized Email">
+                <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.AspNetUser" Property="NormalizedEmail" Title="Znormalizowany e-mail">
                 </RadzenDataGridColumn>
-                <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.AspNetUser" Property="NormalizedUserName" Title="Normalized User Name">
+                <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.AspNetUser" Property="NormalizedUserName" Title="Znormalizowana nazwa u¿ytkownika">
                 </RadzenDataGridColumn>
-                <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.AspNetUser" Property="PasswordHash" Title="Password Hash">
+                <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.AspNetUser" Property="PasswordHash" Title="Password Zahashowana">
                 </RadzenDataGridColumn>
-                <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.AspNetUser" Property="PhoneNumber" Title="Phone Number">
+                <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.AspNetUser" Property="PhoneNumber" Title="Numer tel.">
                 </RadzenDataGridColumn>
-                <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.AspNetUser" Property="PhoneNumberConfirmed" Title="Phone Number Confirmed">
+                    <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.AspNetUser" Property="PhoneNumberConfirmed" Title="Numer telefonu potwierdzony">
                 </RadzenDataGridColumn>
-                <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.AspNetUser" Property="SecurityStamp" Title="Security Stamp">
+                    <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.AspNetUser" Property="SecurityStamp" Title="Pieczêæ bezpieczeñstwa">
                 </RadzenDataGridColumn>
-                <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.AspNetUser" Property="TwoFactorEnabled" Title="Two Factor Enabled">
-                </RadzenDataGridColumn>
-                <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.AspNetUser" Property="UserName" Title="User Name">
+                <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.AspNetUser" Property="UserName" Title="Nazwa">
                 </RadzenDataGridColumn>
                 <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.AspNetUser" Filterable="false" Sortable="false" Width="70px" TextAlign="TextAlign.Center">
                     <Template Context="aspNetUser">

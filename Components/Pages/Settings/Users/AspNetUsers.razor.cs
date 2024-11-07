@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Radzen;
 using Radzen.Blazor;
+using FISTNESSGYM.Components.Pages.Training.TrainingPlans.Exercises;
 
 namespace FISTNESSGYM.Components.Pages.Settings.Users
 {
@@ -33,15 +34,26 @@ namespace FISTNESSGYM.Components.Pages.Settings.Users
         [Inject]
         public databaseService databaseService { get; set; }
 
+        [Inject]
+        protected SecurityService Security { get; set; }
+
         protected IEnumerable<FISTNESSGYM.Models.database.AspNetUser> aspNetUsers;
 
         protected RadzenDataGrid<FISTNESSGYM.Models.database.AspNetUser> grid0;
 
-        [Inject]
-        protected SecurityService Security { get; set; }
+        protected string search = "";
+
         protected override async Task OnInitializedAsync()
         {
             aspNetUsers = await databaseService.GetAspNetUsers();
+        }
+
+        protected async Task Search(ChangeEventArgs args)
+        {
+            search = $"{args.Value}";
+            await grid0.GoToPage(0);
+
+            aspNetUsers = await databaseService.GetAspNetUsers(new Query { Filter = $@"i => i.Email.Contains(@0) || i.UserName.Contains(@0)", FilterParameters = new object[] { search } });
         }
 
         protected async Task AddButtonClick(MouseEventArgs args)
