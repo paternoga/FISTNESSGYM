@@ -55,6 +55,7 @@
             </RadzenCarousel>
     }
 </RadzenCard>
+
 @code {
     RadzenCarousel carousel;
     bool auto = true;
@@ -79,6 +80,8 @@
         {
             throw new Exception("Użytkownik nie jest zalogowany.");
         }
+
+        StateHasChanged();
     }
 
     private async Task Purchase(int subscriptionTypeId)

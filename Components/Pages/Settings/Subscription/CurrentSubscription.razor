@@ -7,71 +7,83 @@
 @inject AuthenticationStateProvider AuthenticationStateProvider
 
 <PageTitle>SUBSKRYPCJA</PageTitle>
+<RadzenStack>
+    <RadzenColumn Size="12" SizeMD="6">
+        <RadzenText Text="Twoja subskrypcja" TextStyle="TextStyle.H3" TagName="TagName.H1" style="margin: 0" />
+    </RadzenColumn>
 
-<h3>Subskrypcja</h3>
+    @if (currentSubscription != null)
+    {
+        <RadzenCard>
+            <ChildContent>
+                <h4>Aktualna Subskrypcja</h4>
+                <p><strong>Typ subskrypcji:</strong> @currentSubscription.SubscriptionType?.TypeName</p>
+                <p><strong>Opis:</strong> @currentSubscription.SubscriptionType?.Description</p>
+                <p><strong>Data rozpoczęcia:</strong> @currentSubscription.StartDate.ToString("dd/MM/yyyy")</p>
+                <p><strong>Data zakończenia:</strong> @currentSubscription.EndDate.ToString("dd/MM/yyyy")</p>
 
-@if (currentSubscription != null)
-{
-    <SubscriptionStatus />
-    <h4>Aktualna Subskrypcja</h4>
-    <p>Typ subskrypcji: @currentSubscription.SubscriptionType?.TypeName</p>
-    <p>Opis: @currentSubscription.SubscriptionType?.Description</p>
-    <p>Data rozpoczęcia: @currentSubscription.StartDate.ToString("dd/MM/yyyy")</p>
-    <p>Data zakończenia: @currentSubscription.EndDate.ToString("dd/MM/yyyy")</p>
+                <RadzenButton Text="Zrezygnuj z subskrypcji" ButtonStyle="ButtonStyle.Danger" Click="() => CancelSubscription()" style="margin-top: 20px;">
+                </RadzenButton>
 
-    <button @onclick="CancelSubscription">Zrezygnuj z subskrypcji</button>
-}
-else
-{
-    <h4>Zakup Subskrypcji</h4>
+            </ChildContent>
+        </RadzenCard>
+    }
+    else
+    {
+        <h4>Brak aktualnej subskrypcji, zakup subskrypcję w zakładce Pakiety!</h4>
+    }
 
-    <select @bind="selectedSubscriptionTypeId">
-        <option value="">Wybierz typ subskrypcji</option>
-        <option value="1">Miesięczna - 99 zł</option>
-        <option value="2">Roczna - 950 zł</option>
-        <option value="3">Próbna - 1 zł</option>
-    </select>
 
-    <button @onclick="Purchase">Kup</button>
-}
+    <h4>Historia Subskrypcji</h4>
 
-<h4>Historia Subskrypcji</h4>
-@if (subscriptions != null && subscriptions.Count > 0)
-{
-    <table>
-        <thead>
-            <tr>
-                <th>Typ subskrypcji</th>
-                <th>Data rozpoczęcia</th>
-                <th>Data zakończenia</th>
-                <th>Cena</th>
-                <th>Status</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var subscription in subscriptions)
-            {
-                <tr>
-                    <td>@subscription.SubscriptionType?.TypeName</td>
-                    <td>@subscription.StartDate.ToString("dd/MM/yyyy")</td>
-                    <td>@subscription.EndDate.ToString("dd/MM/yyyy")</td>
-                    <td>@subscription.Price.ToString("C")</td>
-                    <td>@subscription.SubscriptionStatus?.Status</td> 
-                </tr>
-            }
-        </tbody>
-    </table>
-}
-else
-{
-    <p>Brak historii subskrypcji.</p>
-}
+    @if (subscriptions != null && subscriptions.Count > 0)
+    {
+        <RadzenDataList Data="@subscriptions" WrapItems="true">
+            <Template Context="subscription">
+                <RadzenCard Style="margin-bottom: 10px;">
+                    <ChildContent>
+                        <div class="row">
+                            <div class="col-6">
+                                <strong>Typ subskrypcji:</strong> @subscription.SubscriptionType?.TypeName
+                            </div>
+                            <div class="col-6">
+                                <strong>Data rozpoczęcia:</strong> @subscription.StartDate.ToString("dd/MM/yyyy")
+                            </div>
+                            <div class="col-6">
+                                <strong>Data zakończenia:</strong> @subscription.EndDate.ToString("dd/MM/yyyy")
+                            </div>
+                            <div class="col-6">
+                                <strong>Cena:</strong> @subscription.Price.ToString("C")
+                            </div>
+                            <div class="col-6">
+                                <strong>Status:</strong> @subscription.SubscriptionStatus?.Status.ToString()
+                            </div>
+                        </div>
+                    </ChildContent>
+                </RadzenCard>
+            </Template>
+        </RadzenDataList>
+    }
+    else
+    {
+        <p>Brak historii subskrypcji.</p>
+    }
+
+
+</RadzenStack>
 
 @code {
     private Subscription currentSubscription;
     private List<Subscription> subscriptions = new List<Subscription>();
     private int selectedSubscriptionTypeId;
     private string userId;
+
+    private List<SubscriptionType> subscriptionTypes = new List<SubscriptionType>
+    {
+        new SubscriptionType { Id = 1, TypeName = "Miesięczna - 99 zł" },
+        new SubscriptionType { Id = 2, TypeName = "Roczna - 950 zł" },
+        new SubscriptionType { Id = 3, TypeName = "Próbna - 1 zł" }
+    };
 
     protected override async Task OnInitializedAsync()
     {
@@ -87,27 +99,6 @@ else
         else
         {
             throw new Exception("Użytkownik nie jest zalogowany.");
-        }
-    }
-
-    private async Task Purchase()
-    {
-        if (currentSubscription != null)
-        {
-            Console.WriteLine("Nie możesz kupić nowej subskrypcji, ponieważ masz już aktywną subskrypcję.");
-            return;
-        }
-
-        try
-        {
-            await SubscriptionService.PurchaseSubscriptionAsync(userId, selectedSubscriptionTypeId);
-            Console.WriteLine("Zakup subskrypcji zakończony sukcesem.");
-            currentSubscription = await SubscriptionService.GetCurrentSubscriptionAsync(userId);
-            subscriptions = await SubscriptionService.GetSubscriptionsByUserIdAsync(userId);
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Błąd podczas zakupu subskrypcji: {ex.Message}");
         }
     }
 

@@ -1,4 +1,4 @@
-@page "/settings/subscriptions"
+﻿@page "/settings/subscriptions"
 
 @attribute [Authorize]
 
@@ -6,7 +6,7 @@
 <RadzenStack>
     <RadzenRow AlignItems="AlignItems.Center">
         <RadzenColumn Size="12" SizeMD="6">
-            <RadzenText Text="Subscriptions" TextStyle="TextStyle.H3" TagName="TagName.H1" style="margin: 0" />
+            <RadzenText Text="Subskrypcje" TextStyle="TextStyle.H3" TagName="TagName.H1" style="margin: 0" />
         </RadzenColumn>
         <RadzenColumn Size="12" SizeMD="6">
             <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.End" Gap="0.5rem">
@@ -15,38 +15,46 @@
         </RadzenColumn>
     </RadzenRow>
     <RadzenRow>
-      <RadzenColumn SizeMD=12>
-        <RadzenDataGrid @ref="grid0" ColumnWidth="200px"   AllowFiltering="true" FilterMode="FilterMode.Advanced" AllowPaging="true" AllowSorting="true" ShowPagingSummary="true" PageSizeOptions=@(new int[]{5, 10, 20, 30})
-            Data="@subscriptions" TItem="FISTNESSGYM.Models.database.Subscription" RowSelect="@EditRow">
-            <Columns>
-                <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.Subscription" Property="Id" Title="Id">
-                </RadzenDataGridColumn>
-                <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.Subscription" Property="AspNetUser.UserName" Title="Asp Net User">
-                </RadzenDataGridColumn>
-                <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.Subscription" Property="SubscriptionTypeId" Title="Subscription Type Id">
-                </RadzenDataGridColumn>
-                <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.Subscription" Property="StartDate" Title="Start Date">
-                </RadzenDataGridColumn>
-                <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.Subscription" Property="EndDate" Title="End Date">
-                </RadzenDataGridColumn>
-                <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.Subscription" Property="SubscriptionStatus.Status" Title="Subscription Status">
-                </RadzenDataGridColumn>
-                <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.Subscription" Property="Price" Title="Price">
-                </RadzenDataGridColumn>
-                <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.Subscription" Property="SubscriptionType" Title="Subscription Type">
-                </RadzenDataGridColumn>
-                <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.Subscription" Filterable="false" Sortable="false" Width="70px" TextAlign="TextAlign.Center">
-                    <Template Context="subscription">
+        <RadzenColumn SizeMD=12>
+            <RadzenDataGrid @ref="grid0" ColumnWidth="200px"   AllowFiltering="true" FilterMode="FilterMode.Advanced" AllowPaging="true" AllowSorting="true" ShowPagingSummary="true" PageSizeOptions=@(new int[]{5, 10, 20, 30})
+                Data="@subscriptions" TItem="FISTNESSGYM.Models.database.Subscription" RowSelect="@EditRow">
+                <Columns>
+                    <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.Subscription" Property="Id" Title="Id">
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.Subscription" Property="AspNetUser.UserName" Title="Użytkownicy">
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.Subscription" Property="StartDate" Title="Data początku">
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.Subscription" Property="EndDate" Title="Data końca">
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.Subscription" Title="Status" Width="100px" TextAlign="TextAlign.Center">
+                        <Template Context="subscription">
+                            @if (subscription.SubscriptionStatus.Status == "Aktywna")
+                            {
+                                <i class="status-icon active-icon">✔️</i>
+                            }
+                            else if (subscription.SubscriptionStatus.Status == "Wygasła")
+                            {
+                                <i class="status-icon expired-icon">⌛</i> 
+                            }
+                            else
+                            {
+                                <i class="status-icon inactive-icon">❌</i>
+                            }
+                        </Template>
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.Subscription" Property="Price" Title="Kwota">
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.Subscription" Filterable="false" Sortable="false" Width="70px" TextAlign="TextAlign.Center">
+                        <Template Context="subscription">
 
-                        <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="delete" Size="ButtonSize.Medium"
-                            Shade="Shade.Lighter" Variant="Variant.Flat"
-                            Click=@(args => GridDeleteButtonClick(args, subscription)) @onclick:stopPropagation="true" />
-                    </Template>
-                </RadzenDataGridColumn>
-            </Columns>
-
-        </RadzenDataGrid>
-
-    </RadzenColumn>
-  </RadzenRow>
+                            <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="delete" Size="ButtonSize.Medium"
+                                Shade="Shade.Lighter" Variant="Variant.Flat"
+                                Click=@(args => GridDeleteButtonClick(args, subscription)) @onclick:stopPropagation="true" />
+                        </Template>
+                    </RadzenDataGridColumn>
+                </Columns>
+            </RadzenDataGrid>
+        </RadzenColumn>
+    </RadzenRow>
 </RadzenStack>
