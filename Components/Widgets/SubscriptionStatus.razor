@@ -6,32 +6,34 @@
 @inject SubscriptionService SubscriptionService
 @inject AuthenticationStateProvider AuthenticationStateProvider
 
-<div class="subscription-status">
+<RadzenCard Style="padding: 20px; border-radius: 8px; border: 1px solid #e0e0e0; width: 340px; height: 160px;">
+    <h4 style="color: #3a3a3a; font-weight: 600; margin-top: 0px;">Status Subskrypcji</h4>
     @if (currentSubscription != null)
     {
-        <h4>Status Subskrypcji</h4>
         var daysLeft = GetDaysLeft();
         var totalDays = GetTotalDays();
-        var progressPercentage = totalDays > 0 ? (daysLeft * 100.0 / totalDays) : 0;
+        var progressPercentage = totalDays > 0 ? Math.Round(daysLeft * 100.0 / totalDays) : 0;
 
-        <p>Typ subskrypcji: @currentSubscription.SubscriptionType?.TypeName</p>
-        <p>Pozostałe dni do wygaśnięcia: @daysLeft</p>
+        <div style="display: flex; align-items: center; justify-content: space-between;">
 
-        <div class="progress">
-            <div class="progress-bar"
-                 role="progressbar"
-                 style="width: @(progressPercentage.ToString("F2", CultureInfo.InvariantCulture))%;"
-                 aria-valuenow="@daysLeft"
-                 aria-valuemin="0"
-                 aria-valuemax="100">
-            </div>
+            <span style="color: #3a3a3a; font-weight: 500;">Typ subskrypcji:</span>
+            <span style="font-size: 22px; color: #085786; font-weight: 300;">@currentSubscription.SubscriptionType?.TypeName</span>
+            
         </div>
+        <div style="display: flex; align-items: center; justify-content: space-between;">
+            <span style="color: #3a3a3a; font-weight: 500;">Pozostało dni:</span>
+            <span style="font-size: 22px; color: #085786; font-weight: 600;">@daysLeft</span>
+        </div>
+
+        <RadzenProgressBar ProgressBarStyle="ProgressBarStyle.Info" Value="@(progressPercentage)" ShowValue="false" Style="height: 20px; background-color: #d0e7f5;" />
     }
     else
     {
-        <p>Brak aktywnej subskrypcji.</p>
+        <p style="color: #757575;">Brak aktywnej subskrypcji.</p>
     }
-</div>
+</RadzenCard>
+
+
 
 
 
@@ -57,17 +59,17 @@
             return 0;
         }
 
-        return currentSubscription.GetDaysUntilExpiration(); // Pozostałe dni do wygaśnięcia
+        return currentSubscription.GetDaysUntilExpiration(); 
     }
 
     public int GetTotalDays()
     {
         if (currentSubscription == null)
         {
-            return 1; // Zwróć 1, aby uniknąć dzielenia przez 0
+            return 1; 
         }
 
-        return (currentSubscription.EndDate - currentSubscription.StartDate).Days; // Całkowite dni subskrypcji
+        return (currentSubscription.EndDate - currentSubscription.StartDate).Days; 
     }
 }
 

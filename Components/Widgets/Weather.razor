@@ -1,5 +1,64 @@
-﻿<h3>Weatherrazor</h3>
+﻿@page "/weather"
+@using FISTNESSGYM.Models.Database.ModelsDTO
+@inject HttpClient Http
+
+<RadzenCard Style="padding: 20px; border-radius: 8px; border: 1px solid #e0e0e0; width: 340px; height: 160px;">
+    <h4 style="color: #3a3a3a; font-weight: 600; margin-top: 0px;">Temperatura</h4>
+    <RadzenRow>
+        <RadzenColumn Size="6">
+            @if (weatherData != null)
+            {
+                <div style="display: flex; flex-direction: column; align-items: start;">
+                    <h4 style="margin: 0; color: #007acc; font-weight: 600;">@weatherData.Name</h4>
+                    <p style="font-size: 24px; margin: 0; font-weight: bold; color: #3a3a3a;">
+                        @weatherData.Main.Temp.ToString("0")°C
+                    </p>
+                    <p style="margin-top: 5px; color: #757575; font-size: 14px;">
+                        @char.ToUpper(weatherData.Weather[0].Description[0])@weatherData.Weather[0].Description.Substring(1)
+                    </p>
+                </div>
+            }
+            else if (errorMessage != null)
+            {
+                <p style="color: #757575;">@errorMessage</p>
+            }
+        </RadzenColumn>
+        <RadzenColumn Size="6">
+            <div style="display: flex; flex-direction: column; align-items: end;">
+                <h4 style="margin: 0; color: #007acc; font-weight: 600;">Siłownia</h4>
+                <p style="font-size: 24px; margin: 0; font-weight: bold; color: #3a3a3a;">
+                    20°C
+                </p>
+                <p style="margin-top: 5px; color: #757575; font-size: 14px;">
+                    Umiarkowanie ciepło
+                </p>
+            </div>
+        </RadzenColumn>
+    </RadzenRow>
+</RadzenCard>
+
+
+
 
 @code {
+    private WeatherDataDTO weatherData;
+    private string errorMessage;
 
+    protected override async Task OnInitializedAsync()
+    {
+        var cityName = "Lodz";  
+        var apiKey = "be84c952ab6efcfda62fcff33a216737"; 
+        var url = $"https://api.openweathermap.org/data/2.5/weather?q={cityName}&units=metric&appid={apiKey}&lang=pl";
+
+        try
+        {
+            weatherData = await Http.GetFromJsonAsync<WeatherDataDTO>(url);
+            errorMessage = null;
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Error: {ex.Message}";
+            weatherData = null;
+        }
+    }
 }
