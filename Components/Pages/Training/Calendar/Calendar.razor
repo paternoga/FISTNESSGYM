@@ -1,37 +1,48 @@
 @page "/training/calendar"
 @using FISTNESSGYM.Components.Pages.Calendar
+@using FISTNESSGYM.Services
 @using FISTNESSGYM.Models
 @using Radzen.Blazor
 @inject databaseService databaseService
 @inject DialogService DialogService
 @inject SecurityService SecurityService
+@inject AuthorizationService AuthorizationService
+@inject IJSRuntime JSRuntime
 
 <PageTitle>KALENDARZ</PageTitle>
 
 <RadzenScheduler TItem="SchedulerEvent" Data="@events" StartProperty="Start" EndProperty="End" TextProperty="Title"
                  Style="height: 680px; width: 1400px" SlotSelect="OnSlotSelect" AppointmentSelect="OnEventSelect">
-    <RadzenDayView TimeFormat="HH:mm"></RadzenDayView>
-    <RadzenWeekView TimeFormat="HH:mm"></RadzenWeekView>
+    <RadzenDayView TimeFormat="HH:mm" />
+    <RadzenWeekView TimeFormat="HH:mm" />
 </RadzenScheduler>
+
+<script>
+    function translateScheduler() {
+        document.querySelectorAll('.rz-button-text').forEach(button => {
+            if (button.textContent.trim() === 'Day') {
+                button.textContent = 'Dzieñ';
+            }
+            if (button.textContent.trim() === 'Week') {
+                button.textContent = 'Tydzieñ';
+            }
+        });
+        const todayButton = document.querySelector('.rz-button.rz-today');
+        if (todayButton && todayButton.textContent.trim() === 'Today') {
+            todayButton.textContent = 'Dzisiaj';
+        }
+    }
+</script>
 
 @code {
     List<SchedulerEvent> events;
-    bool userIsClient;
-    bool userIsWorker;
-    bool isTrainer;
-    bool isAdmin;
     string currentUserId;
 
     protected override async Task OnInitializedAsync()
     {
-        // Check if the user is authenticated and fetch their role
+
         if (SecurityService.User != null && SecurityService.IsAuthenticated())
         {
-            // Check if the user is in the "Client" role
-            userIsClient = SecurityService.IsInRole("Klient");
-            userIsWorker = SecurityService.IsInRole("Pracownik");
-            isTrainer = SecurityService.IsInRole("Trener");
-            isAdmin = SecurityService.IsInRole("Administrator");
             // Retrieve the logged-in user's ID
             currentUserId = SecurityService.User.Id;
         }
@@ -48,7 +59,7 @@
 
     async Task OnSlotSelect(SchedulerSlotSelectEventArgs args)
     {
-        if (userIsWorker || isAdmin || isTrainer)
+        if (AuthorizationService.IsWorker || AuthorizationService.IsTrainer || AuthorizationService.IsAdmin)
         {
             // Open the dialog to add a new event with a default duration of 1 hour
             var newEvent = await DialogService.OpenAsync<EventDialog>("Add Event", new Dictionary<string, object>
@@ -69,7 +80,7 @@
 
     async Task OnEventSelect(SchedulerAppointmentSelectEventArgs<SchedulerEvent> args)
     {
-        if (userIsClient)
+        if (AuthorizationService.IsClient)
         {
             var eventDetails = await DialogService.OpenAsync<EventDetailsDialog>("Szczegó³y wydarzenia", new Dictionary<string, object>
         {
@@ -82,7 +93,7 @@
                 await LoadEventsAsync(); // Refresh events after reservation
             }
         }
-        else if(userIsWorker || isAdmin || isTrainer)
+        else if (AuthorizationService.IsWorker || AuthorizationService.IsTrainer || AuthorizationService.IsAdmin)
         {
             // Show event edit dialog for admin
             var editedEvent = await DialogService.OpenAsync<EditEventDialog>("Edytuj wydarzenie", new Dictionary<string, object>
@@ -99,6 +110,13 @@
                 await databaseService.UpdateEventAsync(editedEvent);
                 await LoadEventsAsync();
             }
+        }
+    }
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await JSRuntime.InvokeVoidAsync("translateScheduler");
         }
     }
 

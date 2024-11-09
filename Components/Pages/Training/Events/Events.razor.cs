@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Components.Web;
 using Radzen;
 using FISTNESSGYM.Models.database;
 using Radzen.Blazor;
+using FISTNESSGYM.Services;
 
 namespace FISTNESSGYM.Components.Pages.Training.Events
 {
@@ -16,31 +17,24 @@ namespace FISTNESSGYM.Components.Pages.Training.Events
         [Inject] public NotificationService NotificationService { get; set; }
         [Inject] public databaseService databaseService { get; set; }
         [Inject] public SecurityService Security { get; set; }
+        [Inject] public AuthorizationService AuthorizationService { get; set; }
 
         protected IEnumerable<Event> events;
         protected RadzenDataGrid<Event> grid0;
-        private bool isEmployee;
-        private bool isClient;
-        private bool isTrainer;
-        private bool isAdmin;
         private string currentUserId;
 
         protected string search = "";
 
         protected override async Task OnInitializedAsync()
         {
-            isEmployee = Security.IsInRole("Pracownik");
-            isClient = Security.IsInRole("Klient");
-            isTrainer = Security.IsInRole("Trener");
-            isAdmin = Security.IsInRole("Administrator");
             currentUserId = Security.User?.Id;
 
             // Load events based on role
-            if (isEmployee || isTrainer || isAdmin)
+            if (AuthorizationService.IsWorker || AuthorizationService.IsTrainer || AuthorizationService.IsAdmin)
             {
                 events = await databaseService.GetEvents(); // All events for privileged roles
             }
-            else if (isClient)
+            else if (AuthorizationService.IsClient)
             {
                 events = await databaseService.GetUserRegisteredEventsAsync(currentUserId); // Registered events for client
             }
@@ -57,7 +51,7 @@ namespace FISTNESSGYM.Components.Pages.Training.Events
 
         protected async Task AddButtonClick(MouseEventArgs args)
         {
-            if (isEmployee || isTrainer || isAdmin) 
+            if (AuthorizationService.IsWorker || AuthorizationService.IsTrainer || AuthorizationService.IsAdmin) 
             {
                 await DialogService.OpenAsync<AddEvent>("Add Event", null);
                 await grid0.Reload();
@@ -67,7 +61,7 @@ namespace FISTNESSGYM.Components.Pages.Training.Events
 
         protected async Task EditRow(Event args)
         {
-            if (isEmployee || isTrainer || isAdmin)
+            if (AuthorizationService.IsWorker || AuthorizationService.IsTrainer || AuthorizationService.IsAdmin)
             {
                 await DialogService.OpenAsync<EditEvent>("Edit Event", new Dictionary<string, object> { { "Id", args.Id } });
             }
@@ -121,7 +115,7 @@ namespace FISTNESSGYM.Components.Pages.Training.Events
                     });
 
 
-                   if (isClient)
+                   if (AuthorizationService.IsClient)
                     {
                         events = await databaseService.GetUserRegisteredEventsAsync(currentUserId);
                     }
