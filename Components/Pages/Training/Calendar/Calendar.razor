@@ -11,7 +11,7 @@
 
 <PageTitle>KALENDARZ</PageTitle>
 
-<RadzenScheduler TItem="SchedulerEvent" Data="@events" StartProperty="Start" EndProperty="End" TextProperty="Title"
+<RadzenScheduler TItem="SchedulerEvent" TodayText="Dzisiaj" Data="@events" StartProperty="Start" EndProperty="End" TextProperty="Title"
                  Style="height: 680px; width: 1400px" SlotSelect="OnSlotSelect" AppointmentSelect="OnEventSelect">
     <RadzenDayView TimeFormat="HH:mm" />
     <RadzenWeekView TimeFormat="HH:mm" />
@@ -27,10 +27,6 @@
                 button.textContent = 'Tydzieñ';
             }
         });
-        const todayButton = document.querySelector('.rz-button.rz-today');
-        if (todayButton && todayButton.textContent.trim() === 'Today') {
-            todayButton.textContent = 'Dzisiaj';
-        }
     }
 </script>
 
