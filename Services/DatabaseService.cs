@@ -3298,7 +3298,7 @@ namespace FISTNESSGYM
                 if (!string.IsNullOrEmpty(query.Expand))
                 {
                     var propertiesToExpand = query.Expand.Split(',');
-                    foreach(var p in propertiesToExpand)
+                    foreach (var p in propertiesToExpand)
                     {
                         items = items.Include(p.Trim());
                     }
@@ -3311,6 +3311,18 @@ namespace FISTNESSGYM
 
             return await Task.FromResult(items);
         }
+
+        public async Task<IQueryable<WorkoutPlan>> GetWorkoutPlansForUser(string userId)
+        {
+            var workoutPlans = Context.WorkoutPlans
+                .Where(wp => wp.UserId == userId)
+                .Include(wp => wp.WorkoutExercises)
+                    .ThenInclude(we => we.Exercise) // £adujemy równie¿ æwiczenia powi¹zane z ka¿dym `WorkoutExercise`
+                .AsQueryable();
+
+            return await Task.FromResult(workoutPlans);
+        }
+
 
         partial void OnWorkoutPlanGet(FISTNESSGYM.Models.database.WorkoutPlan item);
         partial void OnGetWorkoutPlanById(ref IQueryable<FISTNESSGYM.Models.database.WorkoutPlan> items);

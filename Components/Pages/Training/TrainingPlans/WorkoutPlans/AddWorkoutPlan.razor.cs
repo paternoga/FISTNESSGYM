@@ -63,5 +63,21 @@ namespace FISTNESSGYM.Components.Pages.Training.TrainingPlans.WorkoutPlans
         {
             DialogService.Close(null);
         }
+        protected async Task FormSubmitForClient()
+        {
+            try
+            {
+                // Ustawiamy UserId na aktualnego u¿ytkownika i datê utworzenia
+                workoutPlan.UserId = Security.User?.Id;
+                workoutPlan.CreatedDate = DateTime.Now;
+
+                await databaseService.CreateWorkoutPlan(workoutPlan);
+                DialogService.Close(workoutPlan);
+            }
+            catch (Exception ex)
+            {
+                errorVisible = true;
+            }
+        }
     }
 }

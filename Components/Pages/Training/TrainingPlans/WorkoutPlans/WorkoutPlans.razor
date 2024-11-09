@@ -1,47 +1,108 @@
 @page "/training/workout-plans"
-
+@using FISTNESSGYM.Services
+@inject AuthorizationService AuthorizationService
 @attribute [Authorize]
 
-<PageTitle>PLANY TRENINGOWE</PageTitle>
-<RadzenStack>
-    <RadzenRow AlignItems="AlignItems.Center">
-        <RadzenColumn Size="12" SizeMD="6">
-            <RadzenText Text="Plany treningowe" TextStyle="TextStyle.H3" TagName="TagName.H1" style="margin: 0" />
-        </RadzenColumn>
-        <RadzenColumn Size="12" SizeMD="6">
-            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.End" Gap="0.5rem">
-                <RadzenButton Icon="add_circle_outline" Text="Dodaj" Click="@AddButtonClick" Variant="Variant.Flat" />
-            </RadzenStack>
-        </RadzenColumn>
-    </RadzenRow>
-    <RadzenTextBox Placeholder="Wyszukaj ..." style="display: block; width: 100%" @oninput="@Search" aria-label="Search by all string columns" />
-    <RadzenRow>
-      <RadzenColumn SizeMD=12>
-        <RadzenDataGrid @ref="grid0" ColumnWidth="200px"   AllowFiltering="true" FilterMode="FilterMode.Advanced" AllowPaging="true" AllowSorting="true" ShowPagingSummary="true" PageSizeOptions=@(new int[]{5, 10, 20, 30})
-            Data="@workoutPlans" TItem="FISTNESSGYM.Models.database.WorkoutPlan" RowSelect="@EditRow">
-            <Columns>
-                <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.WorkoutPlan" Property="Id" Title="Id">
-                </RadzenDataGridColumn>
-                <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.WorkoutPlan" Property="Name" Title="Nazwa">
-                </RadzenDataGridColumn>
-                <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.WorkoutPlan" Property="Description" Title="Opis planu">
-                </RadzenDataGridColumn>
-                <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.WorkoutPlan" Property="AspNetUser.UserName" Title="U¿ytkownik">
-                </RadzenDataGridColumn>
-                    <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.WorkoutPlan" Property="CreatedDate" Title="Data utworzenia" FormatString="{0:yyyy-MM-dd HH:mm}">
-                </RadzenDataGridColumn>
-                <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.WorkoutPlan" Filterable="false" Sortable="false" Width="70px" TextAlign="TextAlign.Center">
-                    <Template Context="workoutPlan">
+@if (AuthorizationService.IsWorker || AuthorizationService.IsTrainer || AuthorizationService.IsAdmin)
+{
+    <PageTitle>PLANY TRENINGOWE</PageTitle>
+    <RadzenStack>
+        <RadzenRow AlignItems="AlignItems.Center">
+            <RadzenColumn Size="12" SizeMD="6">
+                <RadzenText Text="Plany treningowe" TextStyle="TextStyle.H3" TagName="TagName.H1" style="margin: 0" />
+            </RadzenColumn>
+            <RadzenColumn Size="12" SizeMD="6">
+                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.End" Gap="0.5rem">
+                    <RadzenButton Icon="add_circle_outline" Text="Dodaj" Click="@AddButtonClick" Variant="Variant.Flat" />
+                </RadzenStack>
+            </RadzenColumn>
+        </RadzenRow>
+        <RadzenTextBox Placeholder="Wyszukaj ..." style="display: block; width: 100%" @oninput="@Search" aria-label="Search by all string columns" />
+        <RadzenRow>
+            <RadzenColumn SizeMD=12>
+                <RadzenDataGrid @ref="grid0" ColumnWidth="200px" AllowFiltering="true" FilterMode="FilterMode.Advanced" AllowPaging="true" AllowSorting="true" ShowPagingSummary="true" PageSizeOptions=@(new int[]{5, 10, 20, 30})
+                                Data="@workoutPlans" TItem="FISTNESSGYM.Models.database.WorkoutPlan" RowSelect="@EditRow">
+                    <Columns>
+                        <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.WorkoutPlan" Property="Id" Title="Id">
+                        </RadzenDataGridColumn>
+                        <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.WorkoutPlan" Property="Name" Title="Nazwa">
+                        </RadzenDataGridColumn>
+                        <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.WorkoutPlan" Property="Description" Title="Opis planu">
+                        </RadzenDataGridColumn>
+                        <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.WorkoutPlan" Property="AspNetUser.UserName" Title="U¿ytkownik">
+                        </RadzenDataGridColumn>
+                        <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.WorkoutPlan" Property="CreatedDate" Title="Data utworzenia" FormatString="{0:yyyy-MM-dd HH:mm}">
+                        </RadzenDataGridColumn>
+                        <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.WorkoutPlan" Filterable="false" Sortable="false" Width="70px" TextAlign="TextAlign.Center">
+                            <Template Context="workoutPlan">
 
-                        <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="delete" Size="ButtonSize.Medium"
-                            Shade="Shade.Lighter" Variant="Variant.Flat"
-                            Click=@(args => GridDeleteButtonClick(args, workoutPlan)) @onclick:stopPropagation="true" />
-                    </Template>
-                </RadzenDataGridColumn>
-            </Columns>
+                                <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="delete" Size="ButtonSize.Medium"
+                                              Shade="Shade.Lighter" Variant="Variant.Flat"
+                                              Click=@(args => GridDeleteButtonClick(args, workoutPlan)) @onclick:stopPropagation="true" />
+                            </Template>
+                        </RadzenDataGridColumn>
+                    </Columns>
 
-        </RadzenDataGrid>
+                </RadzenDataGrid>
 
-    </RadzenColumn>
-  </RadzenRow>
-</RadzenStack>
+            </RadzenColumn>
+        </RadzenRow>
+    </RadzenStack>
+}
+else if (AuthorizationService.IsClient)
+{
+    <PageTitle>TWOJE PLANY TRENINGOWE</PageTitle>
+    <RadzenStack>
+        <RadzenRow AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Gap="1rem">
+            <RadzenButton Icon="add_circle_outline" Click="@AddButtonClick" Text="Dodaj Plan" Style="margin-bottom: 20px" />
+        </RadzenRow>
+        <RadzenRow>
+            @if (workoutPlans == null || !workoutPlans.Any())
+            {
+                <RadzenAlert Text="Brak dostêpnych planów treningowych" Severity="Severity.Info" />
+            }
+            else
+            {
+                @foreach (var plan in workoutPlans)
+                {
+                    <RadzenColumn Size="12" SizeMD="6" Style="margin-bottom: 1rem;">
+                        <RadzenCard Style="border: 1px solid #ddd; padding: 1rem; box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.1);">
+                            <div class="rz-card-title">
+                                <h5>@plan.Name</h5>
+                                <small>Data utworzenia: @(plan.CreatedDate.ToString("yyyy-MM-dd") ?? "Brak danych")</small>
+                            </div>
+                            <div class="rz-card-content">
+                                <p>@(plan.Description ?? "Brak opisu")</p>
+                                <h6>Æwiczenia:</h6>
+                                @if (plan.WorkoutExercises != null && plan.WorkoutExercises.Any())
+                                {
+                                    <ul>
+                                        @foreach (var exercise in plan.WorkoutExercises)
+                                        {
+                                            <li>@(exercise?.Exercise?.Name ?? "Nieznane æwiczenie") - @(exercise?.Sets ?? 0) x @(exercise?.Reps ?? 0)</li>
+                                        }
+                                    </ul>
+                                }
+                                else
+                                {
+                                    <p>Brak æwiczeñ w tym planie.</p>
+                                }
+                            </div>
+                            <div class="rz-card-actions">
+                                <RadzenButton Icon="edit" Text="Edytuj" Style="margin-right: 10px;"
+                                              Click="@(() => EditClientWorkoutPlan(plan.Id))" />
+                                <RadzenButton Icon="delete" Text="Usuñ" ButtonStyle="ButtonStyle.Danger"
+                                              Click="@(() => DeleteClientWorkoutPlan(plan.Id))" />
+                            </div>
+                        </RadzenCard>
+                    </RadzenColumn>
+                }
+            }
+        </RadzenRow>
+    </RadzenStack>
+}
+else
+{
+    <RadzenAlert Text="Brak dostêpu" Severity="Severity.Warning" />
+}
+
