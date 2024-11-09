@@ -1,0 +1,68 @@
+﻿@page "/heart-rate"
+@using FISTNESSGYM.Models.Database.ModelsDTO
+@inject IJSRuntime JSRuntime
+
+<RadzenCard Style="padding: 20px; border-radius: 8px; border: 1px solid #e0e0e0; width: 340px; height: 480px;">
+    <h4 style="color: #3a3a3a; font-weight: 600; margin-top: 0px;">Śledzenie Tętna</h4>
+
+    <div style="display: flex; flex-direction: column; align-items: center; margin-top: 20px;">
+        <p style="font-size: 18px; color: #007acc; margin: 0;">Aktualne tętno:</p>
+        <strong style="font-size: 36px; color: #3a3a3a;">@CurrentHeartRate BPM</strong>
+    </div>
+
+    <RadzenChart Width="400px" Height="200px">
+        <RadzenLineSeries Data="@HeartRateHistory" CategoryProperty="Time" ValueProperty="HeartRate" />
+        <RadzenLegend Visible="false" />
+    </RadzenChart>
+</RadzenCard>
+
+@code {
+    private int CurrentHeartRate;
+    private Timer heartRateTimer;
+    private static readonly Random RandomGen = new Random();
+
+    private List<HeartRateRecordDTO> HeartRateHistory = new List<HeartRateRecordDTO>();
+
+    protected override void OnInitialized()
+    {
+        CurrentHeartRate = RandomGen.Next(70, 80);
+
+        heartRateTimer = new Timer(UpdateHeartRate, null, TimeSpan.Zero, TimeSpan.FromSeconds(5));
+    }
+
+    private void UpdateHeartRate(object state)
+    {
+        CurrentHeartRate = GenerateHeartRate();
+
+        var time = DateTime.Now;
+
+        HeartRateHistory.Add(new HeartRateRecordDTO
+            {
+                Time = time,  
+                FormattedTime = time.ToString("HH:mm:ss"), 
+                HeartRate = CurrentHeartRate  
+            });
+
+        if (HeartRateHistory.Count > 20)
+        {
+            HeartRateHistory.RemoveAt(0);
+        }
+
+        Console.WriteLine($"Added: Time = {time}, HeartRate = {CurrentHeartRate}");
+
+        InvokeAsync(StateHasChanged);
+    }
+
+    private int GenerateHeartRate()
+    {
+        int change = RandomGen.Next(-3, 4);
+        int newHeartRate = CurrentHeartRate + change;
+
+        return Math.Clamp(newHeartRate, 60, 120);
+    }
+
+    public void Dispose()
+    {
+        heartRateTimer?.Dispose();
+    }
+}

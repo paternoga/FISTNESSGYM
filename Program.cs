@@ -36,6 +36,7 @@ builder.Services.AddScoped<SecurityService>();
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<SubscriptionService>();
 builder.Services.AddScoped<ICartService, CartService>();
+builder.Services.AddScoped<MeasurementService>();   
 
 builder.Services.AddScoped<AuthorizationService>();
 

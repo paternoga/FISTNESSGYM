@@ -15,21 +15,31 @@
 @if (AuthorizationService.IsUser)
 {
     <RadzenRow>
-        <RadzenColumn Size="3">
-            @if (currentSubscription != null)
-            {
-                <SubscriptionStatus />
-            }
+        <RadzenColumn Size="9">
+            <RadzenRow>
+                <RadzenColumn Size="4">
+                    <SubscriptionStatus />
+                </RadzenColumn>
+
+                <RadzenColumn Size="4">
+                    <Weather />
+                </RadzenColumn>
+
+                <RadzenColumn Size="4">
+                    <GymOccupancy />
+                </RadzenColumn>
+            </RadzenRow>
+
+            <Progress />
+
         </RadzenColumn>
 
         <RadzenColumn Size="3">
-            <Weather />
+            <HeartRate />
         </RadzenColumn>
+    </RadzenRow>
 
-        <RadzenColumn Size="3">
-            <GymOccupancy/>
-        </RadzenColumn>
-
+    <RadzenRow>
         <RadzenColumn Size="3">
 
         </RadzenColumn>
@@ -123,7 +133,6 @@
 <RadzenSearchBar Placeholder="Szukaj..." />
 
 @code {
-    private Subscription currentSubscription;
     private string userId;
 
     protected override async Task OnInitializedAsync()
@@ -132,7 +141,6 @@
         var user = authState.User;
 
         userId = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        currentSubscription = await SubscriptionService.GetCurrentSubscriptionAsync(userId);
     }
 
 }

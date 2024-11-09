@@ -1,0 +1,348 @@
+﻿@page "/progress"
+@using FISTNESSGYM.Models.database
+@using FISTNESSGYM.Services
+@using System.Security.Claims
+@inject MeasurementService MeasurementService
+@inject NotificationService NotificationService
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+@* Radzen Progress Bar *@
+<RadzenCard Style="padding: 20px; border-radius: 8px; border: 1px solid #e0e0e0; max-width: 1060px; height: 300px; margin-top: 20px;">
+    <h4 style="color: #3a3a3a; font-weight: 600; margin-top: 0px;">
+        Twoje Postępy - porównanie
+        @if ( latestMeasurement != null)
+        {
+            @(latestMeasurement.MeasurementDate.ToString("dd.MM.yyyy"));
+        }
+        z
+        @if (secondLatestMeasurement != null)
+        {
+            @(secondLatestMeasurement.MeasurementDate.ToString("dd.MM.yyyy"));
+        }
+    </h4>
+
+    @if (isLoading)
+    {
+        <RadzenProgressBar Indeterminate="true" ShowValue="false" Class="progress-bar-indeterminate" />
+    }
+    else
+    {
+        @if (secondLatestMeasurement != null)
+        {
+            <RadzenRow Style="margin-top: 20px;">
+                <RadzenColumn Size="4">
+                    <RadzenRow>
+                        <RadzenColumn Size="6">
+                            <div style="display: flex; flex-direction: column; align-items: start;">
+                                <span style="color: #3a3a3a; font-weight: 500;">Waga aktualna:</span>
+                                <p style="margin-top: 15px; color: #757575; font-size: 14px;">
+                                    Waga poprzednio:
+                                </p>
+                            </div>
+                        </RadzenColumn>
+                        <RadzenColumn Size="6">
+                            <div style="display: flex; flex-direction: column; align-items: end; margin-right: 2px;">
+                                <span style="font-size: 22px; color: #085786; font-weight: 300;">
+                                    @latestMeasurement.Weight kg
+                                    @if (secondLatestMeasurement != null)
+                                    {
+
+                                        @if (latestMeasurement.Weight > secondLatestMeasurement.Weight)
+                                        {
+                                            <span style="color: green; font-size: 20px;">↑</span>
+                                        }
+                                        else if (latestMeasurement.Weight < secondLatestMeasurement.Weight)
+                                        {
+                                            <span style="color: red; font-size: 20px;">↓</span>
+                                        }
+                                        else
+                                        {
+                                            <span style="color: gray; font-size: 20px;">→</span>
+                                        }
+                                    }
+                                </span>
+
+                            </div>
+                            <div style="display: flex; flex-direction: column; align-items: end; margin-right: 2px;">
+                                <p style="margin-top: 5px; color: #757575; font-size: 14px;">
+                                    @secondLatestMeasurement.Weight
+                                </p>
+                            </div>
+                            
+                        </RadzenColumn>
+                    </RadzenRow>
+
+                    <RadzenProgressBar ProgressBarStyle="ProgressBarStyle.Info" Value="@CalculateProgress(latestMeasurement.Weight, secondLatestMeasurement.Weight)" ShowValue="false" Style="height: 20px; width: 320px; margin-top: 10px; margin-bottom: 20px; background-color: #d0e7f5;" />               
+                </RadzenColumn>
+
+                <RadzenColumn Size="4">
+                    <RadzenRow>
+                        <RadzenColumn Size="6">
+                            <div style="display: flex; flex-direction: column; align-items: start; margin-left: 2px;">
+                                <span style="color: #3a3a3a; font-weight: 500;">Talia aktualnie:</span>
+                                <p style="margin-top: 15px; color: #757575; font-size: 14px;">
+                                    Talia poprzednio:
+                                </p>
+                            </div>
+                        </RadzenColumn>
+                        <RadzenColumn Size="6">
+                            <div style="display: flex; flex-direction: column; align-items: end; margin-right: 2px;">
+                                <span style="font-size: 22px; color: #085786; font-weight: 300;">
+                                    @latestMeasurement.WaistCircumference cm
+                                    @if (secondLatestMeasurement != null)
+                                    {
+                                        @if (latestMeasurement.WaistCircumference > secondLatestMeasurement.WaistCircumference)
+                                        {
+                                            <span style="color: green; font-size: 20px;">↑</span>
+                                        }
+                                        else if (latestMeasurement.WaistCircumference < secondLatestMeasurement.WaistCircumference)
+                                        {
+                                            <span style="color: red; font-size: 20px;">↓</span>
+                                        }
+                                        else
+                                        {
+                                            <span style="color: gray; font-size: 20px;">→</span>
+                                        }
+                                    }
+                                </span>
+                            </div>
+                            <div style="display: flex; flex-direction: column; align-items: end; margin-right: 2px;">
+                                <p style="margin-top: 5px; color: #757575; font-size: 14px;">
+                                    @secondLatestMeasurement.WaistCircumference cm
+                                </p>
+                            </div>
+                        </RadzenColumn>
+                    </RadzenRow>
+
+                    <RadzenProgressBar ProgressBarStyle="ProgressBarStyle.Info" Value="@CalculateProgress(latestMeasurement.WaistCircumference, secondLatestMeasurement.WaistCircumference)" ShowValue="false" Style="height: 20px; width: 320px; margin-top: 10px; margin-bottom: 20px; background-color: #d0e7f5;" />
+                </RadzenColumn>
+
+                <RadzenColumn Size="4">
+                    <RadzenRow>
+                        <RadzenColumn Size="6">
+                            <div style="display: flex; flex-direction: column; align-items: start; margin-left: 2px;">
+                                <span style="color: #3a3a3a; font-weight: 500;">Bodyfat aktualnie:</span>
+                                <p style="margin-top: 15px; color: #757575; font-size: 14px;">
+                                    Bodyfat poprzednio:
+                                </p>
+                            </div>
+                        </RadzenColumn>
+                        <RadzenColumn Size="6">
+                            <div style="display: flex; flex-direction: column; align-items: end;">
+                                <span style="font-size: 22px; color: #085786; font-weight: 300;">
+                                    @latestMeasurement.BodyFat %
+                                    @if (secondLatestMeasurement != null)
+                                    {
+                                        @if (latestMeasurement.BodyFat > secondLatestMeasurement.BodyFat)
+                                        {
+                                            <span style="color: green; font-size: 20px;">↑</span>
+                                        }
+                                        else if (latestMeasurement.BodyFat < secondLatestMeasurement.BodyFat)
+                                        {
+                                            <span style="color: red; font-size: 20px;">↓</span>
+                                        }
+                                        else
+                                        {
+                                            <span style="color: gray; font-size: 20px;">→</span>
+                                        }
+                                    }
+                                </span>
+                            </div>
+                            <div style="display: flex; flex-direction: column; align-items: end;">
+                                <p style="margin-top: 5px; color: #757575; font-size: 14px;">
+                                    @secondLatestMeasurement.BodyFat %
+                                </p>
+                            </div>
+                        </RadzenColumn>
+                    </RadzenRow>
+
+                    <RadzenProgressBar ProgressBarStyle="ProgressBarStyle.Info" Value="@CalculateProgress(latestMeasurement.BodyFat, secondLatestMeasurement.BodyFat)" ShowValue="false" Style="height: 20px; width: 320px; margin-top: 10px; margin-bottom: 20px; background-color: #d0e7f5;" />
+                </RadzenColumn>
+
+            </RadzenRow>
+            <RadzenRow>
+                <RadzenColumn Size="4">
+                    <RadzenRow>
+                        <RadzenColumn Size="6">
+                            <div style="display: flex; flex-direction: column; align-items: start;">
+                                <span style="color: #3a3a3a; font-weight: 500;">Klatka piersiowa:</span>
+                                <p style="margin-top: 15px; color: #757575; font-size: 14px;">
+                                    Klatka poprzednio:
+                                </p>
+                            </div>
+                        </RadzenColumn>
+                        <RadzenColumn Size="6">
+                            <div style="display: flex; flex-direction: column; align-items: end; margin-right: 2px;">
+                                <span style="font-size: 22px; color: #085786; font-weight: 300;">
+                                    @latestMeasurement.ChestCircumference cm
+                                    @if (secondLatestMeasurement != null)
+                                    {
+                                        @if (latestMeasurement.ChestCircumference > secondLatestMeasurement.ChestCircumference)
+                                        {
+                                            <span style="color: green; font-size: 20px;">↑</span>
+                                        }
+                                        else if (latestMeasurement.ChestCircumference < secondLatestMeasurement.ChestCircumference)
+                                        {
+                                            <span style="color: red; font-size: 20px;">↓</span>
+                                        }
+                                        else
+                                        {
+                                            <span style="color: gray; font-size: 20px;">→</span>
+                                        }
+                                    }
+                                </span>
+                            </div>
+                            <div style="display: flex; flex-direction: column; align-items: end; margin-right: 2px;">
+                                <p style="margin-top: 5px; color: #757575; font-size: 14px;">
+                                    @secondLatestMeasurement.ChestCircumference cm
+                                </p>
+                            </div>
+                        </RadzenColumn>
+                    </RadzenRow>
+
+                    <RadzenProgressBar ProgressBarStyle="ProgressBarStyle.Info" Value="@CalculateProgress(latestMeasurement.ChestCircumference, secondLatestMeasurement.ChestCircumference)" ShowValue="false" Style="height: 20px; width: 320px; margin-top: 10px; background-color: #d0e7f5;" />
+                </RadzenColumn>
+
+                <RadzenColumn Size="4">
+                    <RadzenRow>
+                        <RadzenColumn Size="6">
+                            <div style="display: flex; flex-direction: column; align-items: start; margin-left: 2px;">
+                                <span style="color: #3a3a3a; font-weight: 500;">Ramię aktualnie:</span>
+                                <p style="margin-top: 15px; color: #757575; font-size: 14px;">
+                                    Ramię poprzednio:
+                                </p>
+                            </div>
+                        </RadzenColumn>
+                        <RadzenColumn Size="6">
+                            <div style="display: flex; flex-direction: column; align-items: end; margin-right: 2px;">
+                                <span style="font-size: 22px; color: #085786; font-weight: 300;">
+                                    @latestMeasurement.ArmCircumference cm
+                                    @if (secondLatestMeasurement != null)
+                                    {
+                                        @if (latestMeasurement.ArmCircumference > secondLatestMeasurement.ArmCircumference)
+                                        {
+                                            <span style="color: green; font-size: 20px;">↑</span>
+                                        }
+                                        else if (latestMeasurement.ArmCircumference < secondLatestMeasurement.ArmCircumference)
+                                        {
+                                            <span style="color: red; font-size: 20px;">↓</span>
+                                        }
+                                        else
+                                        {
+                                            <span style="color: gray; font-size: 20px;">→</span>
+                                        }
+                                    }
+                                </span>
+                            </div>
+                            <div style="display: flex; flex-direction: column; align-items: end; margin-right: 2px;">
+                                <p style="margin-top: 5px; color: #757575; font-size: 14px;">
+                                    @secondLatestMeasurement.ArmCircumference cm
+                                </p>
+                            </div>
+                        </RadzenColumn>
+                    </RadzenRow>
+
+                    <RadzenProgressBar ProgressBarStyle="ProgressBarStyle.Info" Value="@CalculateProgress(latestMeasurement.ArmCircumference, secondLatestMeasurement.ArmCircumference)" ShowValue="false" Style="height: 20px; width: 320px; margin-top: 10px; background-color: #d0e7f5;" />
+                </RadzenColumn>
+
+                <RadzenColumn Size="4">
+                    <RadzenRow>
+                        <RadzenColumn Size="6">
+                            <div style="display: flex; flex-direction: column; align-items: start; margin-left: 2px;">
+                                <span style="color: #3a3a3a; font-weight: 500;">Noga aktualna:</span>
+                                <p style="margin-top: 15px; color: #757575; font-size: 14px;">
+                                    Noga poprzednio:
+                                </p>
+                            </div>
+                        </RadzenColumn>
+                        <RadzenColumn Size="6">
+                            <div style="display: flex; flex-direction: column; align-items: end;">
+                                <span style="font-size: 22px; color: #085786; font-weight: 300;">
+                                    @latestMeasurement.LegCircumference cm
+                                    @if (secondLatestMeasurement != null)
+                                    {
+                                        @if (latestMeasurement.LegCircumference > secondLatestMeasurement.LegCircumference)
+                                        {
+                                            <span style="color: green; font-size: 20px;">↑</span>
+                                        }
+                                        else if (latestMeasurement.LegCircumference < secondLatestMeasurement.LegCircumference)
+                                        {
+                                            <span style="color: red; font-size: 20px;">↓</span>
+                                        }
+                                        else
+                                        {
+                                            <span style="color: gray; font-size: 20px;">→</span>
+                                        }
+                                    }
+                                </span>
+                            </div>
+                            <div style="display: flex; flex-direction: column; align-items: end;">
+                                <p style="margin-top: 5px; color: #757575; font-size: 14px;">
+                                    @secondLatestMeasurement.LegCircumference cm
+                                </p>
+                            </div>
+                        </RadzenColumn>
+                    </RadzenRow>
+
+                    <RadzenProgressBar ProgressBarStyle="ProgressBarStyle.Info" Value="@CalculateProgress(latestMeasurement.LegCircumference, secondLatestMeasurement.LegCircumference)" ShowValue="false" Style="height: 20px; width: 320px; margin-top: 10px; background-color: #d0e7f5;" />
+                </RadzenColumn>
+
+            </RadzenRow>
+
+        }
+    }
+</RadzenCard>
+
+@code {
+    private Measurement latestMeasurement;
+    private Measurement secondLatestMeasurement;
+    private bool isLoading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        if (user.Identity.IsAuthenticated)
+        {
+            var userId = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            await Task.Delay(500); // Simulating load time
+            isLoading = true;
+
+            // Fetch measurements
+            var (latest, secondLatest) = await MeasurementService.GetLatestAndSecondLatestMeasurementsByUserIdAsync(userId);
+
+            latestMeasurement = latest;
+            secondLatestMeasurement = secondLatest;
+
+            isLoading = false;
+
+            if (latestMeasurement == null)
+            {
+                NotificationService.Notify(NotificationSeverity.Warning, "No Measurements Found", "No measurements were found for this user.");
+            }
+        }
+        else
+        {
+            NotificationService.Notify(NotificationSeverity.Error, "User not authenticated", "You need to be logged in to view your measurements.");
+        }
+    }
+
+    // Method to calculate progress based on 100% scale from first measurement
+    private double CalculateProgress(decimal firstValue, decimal secondValue)
+    {
+        // To avoid division by zero and to provide meaningful progress calculation
+        if (firstValue == 0)
+            return 0;
+
+        double firstValueDouble = (double)firstValue;
+        double secondValueDouble = (double)secondValue;
+
+        // Calculate progress based on first value being 100%
+        double progress = (secondValueDouble / firstValueDouble) * 100;
+
+        // Ensure the progress value is within 0 to 100 range
+        return Math.Min(Math.Max(progress, 0), 100);
+    }
+}
