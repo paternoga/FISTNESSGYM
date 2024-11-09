@@ -3535,15 +3535,6 @@ namespace FISTNESSGYM
                 .Select(r => r.AspNetUser) // Zak³adaj¹c, ¿e AspNetUser jest powi¹zany z Reservation przez UserId
                 .ToListAsync();
         }
-        public async Task RemoveUserFromEvent(int eventId, string userId)
-        {
-            var reservation = await Context.Reservations.FirstOrDefaultAsync(r => r.EventId == eventId && r.UserId == userId);
-            if (reservation != null)
-            {
-                Context.Reservations.Remove(reservation);
-                await Context.SaveChangesAsync();
-            }
-        }
-
+        
     }
 }

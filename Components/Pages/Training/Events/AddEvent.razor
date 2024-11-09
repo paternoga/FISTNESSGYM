@@ -1,8 +1,11 @@
 @page "/add-event"
-
+@using FISTNESSGYM.Services
+@inject AuthorizationService AuthorizationService
 @attribute [Authorize]
 
-<PageTitle>DODAJ ZAJÊCIA</PageTitle>
+@if (AuthorizationService.IsWorker || AuthorizationService.IsTrainer || AuthorizationService.IsAdmin)
+{
+    <PageTitle>DODAJ ZAJÊCIA</PageTitle>
     <RadzenColumn SizeMD=12>
         <RadzenAlert Shade="Shade.Lighter" Variant="Variant.Flat" Size="AlertSize.Small" AlertStyle="AlertStyle.Danger" Visible="@errorVisible">Cannot save Event</RadzenAlert>
         <RadzenTemplateForm TItem="FISTNESSGYM.Models.database.Event" Data="@_event" Visible="@(_event != null)" Submit="@FormSubmit">
@@ -28,7 +31,7 @@
                     <RadzenLabel Text="Event Start Date" Component="EventStartDate" style="width: 100%" />
                 </RadzenColumn>
                 <RadzenColumn SizeMD="9">
-                <RadzenDatePicker style="display: block; width: 100%" @bind-Value="@_event.EventStartDate" ShowTime="true" Name="EventStartDate" />
+                    <RadzenDatePicker style="display: block; width: 100%" @bind-Value="@_event.EventStartDate" ShowTime="true" Name="EventStartDate" />
                     <RadzenRequiredValidator Component="EventStartDate" Text="EventStartDate is required" />
                 </RadzenColumn>
             </RadzenRow>
@@ -37,7 +40,7 @@
                     <RadzenLabel Text="Event End Date" Component="EventEndDate" style="width: 100%" />
                 </RadzenColumn>
                 <RadzenColumn SizeMD="9">
-                <RadzenDatePicker style="display: block; width: 100%" @bind-Value="@_event.EventEndDate" ShowTime="true" Name="EventEndDate" />
+                    <RadzenDatePicker style="display: block; width: 100%" @bind-Value="@_event.EventEndDate" ShowTime="true" Name="EventEndDate" />
                     <RadzenRequiredValidator Component="EventEndDate" Text="EventEndDate is required" />
                 </RadzenColumn>
             </RadzenRow>
@@ -50,10 +53,20 @@
                     <RadzenRequiredValidator Component="MaxParticipants" Text="MaxParticipants is required" />
                 </RadzenColumn>
             </RadzenRow>
-          <RadzenStack  Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.End" Gap="0.5rem">
-                    <RadzenButton ButtonStyle="ButtonStyle.Primary" ButtonType="ButtonType.Submit" Icon="save" Text="Save" Variant="Variant.Flat" />
-                    <RadzenButton ButtonStyle="ButtonStyle.Light" Text="Cancel" Variant="Variant.Flat" Click="@CancelButtonClick"  />
-          </RadzenStack>
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.End" Gap="0.5rem">
+                <RadzenButton ButtonStyle="ButtonStyle.Primary" ButtonType="ButtonType.Submit" Icon="save" Text="Save" Variant="Variant.Flat" />
+                <RadzenButton ButtonStyle="ButtonStyle.Light" Text="Cancel" Variant="Variant.Flat" Click="@CancelButtonClick" />
+            </RadzenStack>
         </RadzenTemplateForm>
     </RadzenColumn>
+}
+else
+{
+    <RadzenText>Próba nieautoryzowanego dostêpu zostaje zg³oszona na policjê!</RadzenText>
+    <PageTitle>Próba nieautoryzowanego dostêpu zostaje zg³oszona na policjê!</PageTitle>
+}
+
+
+
+
 

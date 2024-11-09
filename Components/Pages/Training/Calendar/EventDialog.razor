@@ -1,61 +1,64 @@
 ﻿@page "/event-dialog"
 @using FISTNESSGYM.Components.Pages.Calendar
+@using FISTNESSGYM.Services
+@inject AuthorizationService AuthorizationService
 @inject DialogService DialogService
+@if (AuthorizationService.IsWorker || AuthorizationService.IsTrainer || AuthorizationService.IsAdmin)
+{
+    <PageTitle>KALENDARZ</PageTitle>
 
-<PageTitle>KALENDARZ</PageTitle>
+    <RadzenTemplateForm TItem="SchedulerEvent" Data="@model" Submit="@OnSubmit">
+        <RadzenStack Gap="1rem">
+            <!-- Field for Event Title -->
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap">
+                <RadzenLabel Text="Tytuł" Style="width: 8rem;" />
+                <RadzenTextBox @bind-Value="model.Title" Name="Title" Style="width: 25rem;" />
+                <RadzenRequiredValidator Component="Title" Text="Tytuł jest wymagany" />
+            </RadzenStack>
 
-<RadzenTemplateForm TItem="SchedulerEvent" Data="@model" Submit="@OnSubmit">
-    <RadzenStack Gap="1rem">
-        <!-- Field for Event Title -->
-        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap">
-            <RadzenLabel Text="Tytuł" Style="width: 8rem;" />
-            <RadzenTextBox @bind-Value="model.Title" Name="Title" Style="width: 25rem;" />
-            <RadzenRequiredValidator Component="Title" Text="Tytuł jest wymagany" />
+            <!-- Field for Instructor Name -->
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap">
+                <RadzenLabel Text="Instruktor" Style="width: 8rem;" />
+                <RadzenTextBox @bind-Value="model.InstructorName" Name="InstructorName" Style="width: 25rem;" />
+                <RadzenRequiredValidator Component="InstructorName" Text="Imię instruktora jest wymagane" />
+            </RadzenStack>
+
+            <!-- Field for Start Date and Time -->
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap">
+                <RadzenLabel Text="Początek" Style="width: 8rem;" />
+                <RadzenDatePicker @bind-Value="model.Start" Name="Start" ShowTime="true" Style="width: 25rem;" />
+                <RadzenRequiredValidator Component="Start" Text="Czas rozpoczęcia jest wymagany" />
+            </RadzenStack>
+
+            <!-- Field for End Date and Time -->
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap">
+                <RadzenLabel Text="Koniec" Style="width: 8rem;" />
+                <RadzenDatePicker Name="End" @bind-Value="model.End" ShowTime="true" Style="width: 25rem;" />
+                <RadzenRequiredValidator Component="End" Text="Czas zakończenia jest wymagany" />
+            </RadzenStack>
+
+            <!-- Field for Maximum Participants -->
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap">
+                <RadzenLabel Text="Liczba uczestników" Style="width: 8rem;" />
+                <RadzenNumeric @bind-Value="model.MaxParticipants" Name="MaxParticipants" Style="width: 25rem;" />
+
+                <!-- Validator to ensure the field is required -->
+                <RadzenRequiredValidator Component="MaxParticipants" Text="Maksymalna liczba uczestników jest wymagana" />
+
+                <!-- Validator to ensure the value is at least 1 -->
+                <RadzenNumericRangeValidator Component="MaxParticipants" Min="1" Text="Liczba uczestników nie może być mniejsza niż 1" />
+            </RadzenStack>
+
+
+
+            <!-- Save Button -->
+            <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End">
+                <RadzenButton ButtonType="ButtonType.Submit" Text="Zapisz" />
+            </RadzenStack>
         </RadzenStack>
+    </RadzenTemplateForm>
 
-        <!-- Field for Instructor Name -->
-        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap">
-            <RadzenLabel Text="Instruktor" Style="width: 8rem;" />
-            <RadzenTextBox @bind-Value="model.InstructorName" Name="InstructorName" Style="width: 25rem;" />
-            <RadzenRequiredValidator Component="InstructorName" Text="Imię instruktora jest wymagane" />
-        </RadzenStack>
-
-        <!-- Field for Start Date and Time -->
-        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap">
-            <RadzenLabel Text="Początek" Style="width: 8rem;" />
-            <RadzenDatePicker @bind-Value="model.Start" Name="Start" ShowTime="true" Style="width: 25rem;" />
-            <RadzenRequiredValidator Component="Start" Text="Czas rozpoczęcia jest wymagany" />
-        </RadzenStack>
-
-        <!-- Field for End Date and Time -->
-        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap">
-            <RadzenLabel Text="Koniec" Style="width: 8rem;" />
-            <RadzenDatePicker Name="End" @bind-Value="model.End" ShowTime="true" Style="width: 25rem;" />
-            <RadzenRequiredValidator Component="End" Text="Czas zakończenia jest wymagany" />
-        </RadzenStack>
-
-        <!-- Field for Maximum Participants -->
-        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap">
-            <RadzenLabel Text="Liczba uczestników" Style="width: 8rem;" />
-            <RadzenNumeric @bind-Value="model.MaxParticipants" Name="MaxParticipants" Style="width: 25rem;" />
-
-            <!-- Validator to ensure the field is required -->
-            <RadzenRequiredValidator Component="MaxParticipants" Text="Maksymalna liczba uczestników jest wymagana" />
-
-            <!-- Validator to ensure the value is at least 1 -->
-            <RadzenNumericRangeValidator Component="MaxParticipants" Min="1" Text="Liczba uczestników nie może być mniejsza niż 1" />
-        </RadzenStack>
-
-
-
-        <!-- Save Button -->
-        <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End">
-            <RadzenButton ButtonType="ButtonType.Submit" Text="Zapisz" />
-        </RadzenStack>
-    </RadzenStack>
-</RadzenTemplateForm>
-
-@code {
+    @code {
     [Parameter]
     public DateTime Start { get; set; }
 
@@ -78,7 +81,7 @@
         {
             model.Start = Start;
             model.End = End;
-            model.MaxParticipants = 1; 
+            model.MaxParticipants = 1;
         }
     }
 
@@ -87,4 +90,11 @@
         // Close the dialog and return the modified event
         DialogService.Close(model);
     }
+    }
 }
+else
+{
+    <RadzenText>Próba nieautoryzowanego dostępu zostaje zgłoszona na policję!</RadzenText>
+    <PageTitle>Próba nieautoryzowanego dostępu zostaje zgłoszona na policję!</PageTitle>
+}
+
