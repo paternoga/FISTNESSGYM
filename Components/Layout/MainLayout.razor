@@ -120,6 +120,20 @@
                     <RadzenPanelMenuItem Path="settings/profile" Icon="person" Text="Profil" />
                 }
 
+                @if (AuthorizationService.IsUser || AuthorizationService.IsClient || AuthorizationService.IsWorker || AuthorizationService.IsTrainer || AuthorizationService.IsAdmin)
+                {
+                    <RadzenPanelMenuItem Icon="settings_accessibility" Text="Personalne">
+                    @if (AuthorizationService.IsUser || AuthorizationService.IsClient || AuthorizationService.IsWorker || AuthorizationService.IsTrainer || AuthorizationService.IsAdmin)
+                    {
+                        <RadzenPanelMenuItem Path="settings/personal/measurement" Icon="straighten" Text="Pomiary" />
+                    }
+                    @if (AuthorizationService.IsUser || AuthorizationService.IsClient || AuthorizationService.IsWorker || AuthorizationService.IsTrainer || AuthorizationService.IsAdmin)
+                    {
+                        <RadzenPanelMenuItem Path="settings/personal/results" Icon="query_stats" Text="Rezultaty" />
+                    }
+                    </RadzenPanelMenuItem>
+                }
+
                 @if (AuthorizationService.IsUser || AuthorizationService.IsClient || AuthorizationService.IsWorker || AuthorizationService.IsAdmin)
                 {
                     <RadzenPanelMenuItem Icon="universal_currency" Text="Subskrypcja">
