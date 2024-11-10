@@ -38,31 +38,32 @@
             <HeartRate />
         </RadzenColumn>
     </RadzenRow>
-
-    <RadzenRow>
-        <RadzenColumn Size="3">
-
-        </RadzenColumn>
-    </RadzenRow>
 }
 
 @if (AuthorizationService.IsClient)
 {
     <RadzenRow>
-        <RadzenColumn Size="3">
+        <RadzenColumn Size="9">
+            <RadzenRow>
+                <RadzenColumn Size="4">
+                    <SubscriptionStatus />
+                </RadzenColumn>
+
+                <RadzenColumn Size="4">
+                    <Weather />
+                </RadzenColumn>
+
+                <RadzenColumn Size="4">
+                    <GymOccupancy />
+                </RadzenColumn>
+            </RadzenRow>
+
+            <Progress />
 
         </RadzenColumn>
 
         <RadzenColumn Size="3">
-
-        </RadzenColumn>
-
-        <RadzenColumn Size="3">
-
-        </RadzenColumn>
-
-        <RadzenColumn Size="3">
-
+            <HeartRate />
         </RadzenColumn>
     </RadzenRow>
 }

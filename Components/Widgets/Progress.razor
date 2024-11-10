@@ -6,15 +6,15 @@
 @inject NotificationService NotificationService
 @inject AuthenticationStateProvider AuthenticationStateProvider
 
-@* Radzen Progress Bar *@
 <RadzenCard Style="padding: 20px; border-radius: 8px; border: 1px solid #e0e0e0; max-width: 1060px; height: 300px; margin-top: 20px;">
     <h4 style="color: #3a3a3a; font-weight: 600; margin-top: 0px;">
         Twoje Postępy - porównanie
         @if ( latestMeasurement != null)
         {
             @(latestMeasurement.MeasurementDate.ToString("dd.MM.yyyy"));
+            <p>z</p>
         }
-        z
+        
         @if (secondLatestMeasurement != null)
         {
             @(secondLatestMeasurement.MeasurementDate.ToString("dd.MM.yyyy"));
@@ -290,6 +290,12 @@
             </RadzenRow>
 
         }
+        else
+        {
+            <div style="display: flex; align-items: center; justify-content: center; height: 80%; text-align: center;">
+                <p>Nie znaleziono pomiarów, dodaj dwa pomiary by mieć porównanie.</p>
+            </div>
+        }
     }
 </RadzenCard>
 
@@ -320,12 +326,12 @@
 
             if (latestMeasurement == null)
             {
-                NotificationService.Notify(NotificationSeverity.Warning, "No Measurements Found", "No measurements were found for this user.");
+                NotificationService.Notify(NotificationSeverity.Warning, "Nie znaleziono żadnych pomiarów", "Nie znaleziono żadnych pomiarów dla tego użytkownika.");
             }
         }
         else
         {
-            NotificationService.Notify(NotificationSeverity.Error, "User not authenticated", "You need to be logged in to view your measurements.");
+            NotificationService.Notify(NotificationSeverity.Error, "Użytkownik nie został uwierzytelniony", "Aby zobaczyć swoje pomiary, musisz się zalogować.");
         }
     }
 
