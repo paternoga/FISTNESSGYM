@@ -8,31 +8,40 @@
 
 <PageTitle>KOSZYK</PageTitle>
 
-<h3>Koszyk</h3>
+<h3 style="text-align: center; margin-bottom: 20px;">Twój koszyk</h3>
 
 @if (cartItems == null)
 {
-    <p>Ładowanie koszyka...</p>
+    
 }
 else if (!cartItems.Any())
 {
-    <p>Twój koszyk jest pusty.</p>
+    <p style="text-align: center;">Twój koszyk jest pusty.</p>
 }
 else
 {
-    <div>
-        <ul>
-            @foreach (var item in cartItems)
-            {
-                <li>
-                    @item.Product.Name - @item.Quantity sztuk - @item.Product.Price zł
-                    <button @onclick="() => RemoveFromCart(item.Product.Id)">Usuń</button>
-                    <button @onclick="PlaceOrder">Złóż zamówienie</button>
-                </li>
-            }
-        </ul>
-        <p>Łączna kwota: @totalAmount zł</p>
-        <button @onclick="ClearCart">Wyczyść koszyk</button>
+    <div style="margin: 0 auto; max-width: 600px;">
+        @foreach (var item in cartItems)
+        {
+            <RadzenCard Style="margin-bottom: 10px;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <h4>@item.Product.Name</h4>
+                        <p>@item.Quantity sztuk - @item.Product.Price zł</p>
+                    </div>
+                    <div>
+                        <RadzenButton Text="Usuń" Click="@(async () => await RemoveFromCart(item.Product.Id))" Style="margin-right: 5px;" 
+                                      class="button-primary" />
+                    </div>
+                </div>
+            </RadzenCard>
+        }
+
+        <RadzenCard Style="margin-top: 20px; text-align: center;">
+            <p><strong>Łączna kwota:</strong> @totalAmount zł</p>
+            <RadzenButton Text="Złóż zamówienie" Click="@PlaceOrder" Style="margin: 10px;" class="button-primary" />
+            <RadzenButton Text="Wyczyść koszyk" Click="@ClearCart" Style="margin: 10px;" class="button-primary" />
+        </RadzenCard>
     </div>
 }
 
@@ -145,7 +154,4 @@ else
             }
         }
     }
-
-
 }
-
