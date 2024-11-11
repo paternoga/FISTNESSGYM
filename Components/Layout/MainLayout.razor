@@ -66,12 +66,7 @@
         <RadzenStack AlignItems="Radzen.AlignItems.Center" Style="padding: var(--rz-panel-menu-item-padding); border-bottom: var(--rz-panel-menu-item-border); height: 81px">
             <RadzenImage Path="@GetLogoPath()" style="width: 251px; height: 83px; float: none; visibility: visible" AlternateText="" />
         </RadzenStack>
-        <RadzenPanelMenu>
-            @if (AuthorizationService.IsUser || AuthorizationService.IsClient || AuthorizationService.IsWorker || AuthorizationService.IsTrainer || AuthorizationService.IsAdmin)
-            {
-                <RadzenPanelMenuItem Text="Strona główna" Icon="home" Path="" />
-            }
-        </RadzenPanelMenu>
+        
 
         <RadzenPanelMenu>
             <RadzenPanelMenuItem Text="Trening" Icon="calendar_month">
@@ -124,6 +119,10 @@
                 @if (AuthorizationService.IsUser || AuthorizationService.IsClient || AuthorizationService.IsWorker || AuthorizationService.IsTrainer || AuthorizationService.IsAdmin)
                 {
                     <RadzenPanelMenuItem Path="store/product-categories" Icon="loyalty" Text="Kategorie" />
+                }
+                @if (AuthorizationService.IsWorker || AuthorizationService.IsAdmin)
+                {
+                    <RadzenPanelMenuItem Path="sales-dashboard" Icon="monitoring" Text="Analityka Sklepu" />
                 }
             </RadzenPanelMenuItem>
         </RadzenPanelMenu>

@@ -155,7 +155,8 @@ namespace FISTNESSGYM.Services
                     OrderId = order.Id,
                     ProductId = cartItem.ProductId,
                     Quantity = cartItem.Quantity,
-                    UnitPrice = cartItem.Product.Price // zakładam, że price jest pobierane z produktu
+                    UnitPrice = cartItem.Product.Price,
+                    CreationDate = DateTime.Now// zakładam, że price jest pobierane z produktu
                 };
 
                 await _context.OrderItems.AddAsync(orderItem);
@@ -180,6 +181,55 @@ namespace FISTNESSGYM.Services
             // Zapisz zmiany w bazie danych
             await _context.SaveChangesAsync();
         }
+
+        //Analityka sklepu///////
+        public async Task<int> GetTotalSoldTodayAsync()
+        {
+            // Pobieramy dzisiejszą datę bez czasu
+            var todayStart = DateTime.Today;
+            var todayEnd = todayStart.AddDays(1).AddSeconds(-1); // koniec dnia (23:59:59)
+
+            // Pobieramy wszystkie pozycje OrderItem, które zostały utworzone dzisiaj
+            var totalSoldToday = await _context.OrderItems
+                .Where(oi => oi.CreationDate >= todayStart && oi.CreationDate <= todayEnd) // Filtrowanie po dacie
+                .SumAsync(oi => oi.Quantity); // Sumowanie ilości sprzedanych produktów
+
+            return totalSoldToday;
+        }
+
+        public async Task<List<SalesData>> GetSalesDataForLastDaysAsync(int days = 7)
+        {
+            var todayStart = DateTime.Today;
+            var startDate = todayStart.AddDays(-days); // Pobieramy dane z ostatnich 'days' dni
+
+            var salesData = await _context.OrderItems
+                .Where(oi => oi.CreationDate >= startDate && oi.CreationDate < todayStart)
+                .GroupBy(oi => oi.CreationDate.Date) // Grupowanie według daty
+                .Select(g => new SalesData
+                {
+                    Date = g.Key.ToString("yyyy-MM-dd"), // Formatowanie daty
+                    Quantity = g.Sum(oi => oi.Quantity) // Suma ilości sprzedanych przedmiotów w danym dniu
+                })
+                .OrderBy(s => s.Date) // Posortowanie po dacie
+                .ToListAsync();
+
+            return salesData;
+        }
+
+        public async Task<List<OrderItem>> GetOrderItemsSoldTodayAsync()
+        {
+            // Pobierz dane z bazy (np. wszystkie OrderItemy) - używamy LINQ, więc nie potrzebujemy zapytań SQL
+            var allOrderItems = await _context.OrderItems.ToListAsync();
+
+            // Filtrujemy dane po dacie (musi to być dzisiaj)
+            return allOrderItems.Where(item => item.CreationDate.Date == DateTime.Today).ToList();
+        }
+
+
+
+
+
+
 
     }
 }

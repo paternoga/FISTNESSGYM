@@ -1,0 +1,60 @@
+@page "/sales-dashboard"
+@inject ICartService CartService
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@using System.Security.Claims
+@using FISTNESSGYM.Models.database
+@using FISTNESSGYM.Models.Database
+@using FISTNESSGYM.Services
+
+<div style="display: flex; gap: 20px;">
+    <!-- Pierwsza karta - Sprzedane produkty dzisiaj -->
+    <RadzenCard Style="padding: 20px; border-radius: 8px; border: 1px solid #e0e0e0; width: 340px; height: 160px;">
+        <h4 style="color: #3a3a3a; font-weight: 600; margin-top: 0px;">Sprzedane produkty dzisiaj</h4>
+
+        @if (totalSoldToday > 0)
+        {
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+                <span style="color: #3a3a3a; font-weight: 500;">£¹czna liczba:</span>
+                <span style="font-size: 22px; color: #085786; font-weight: 600;">@totalSoldToday</span>
+            </div>
+        }
+        else
+        {
+            <p style="color: #757575;">Brak sprzedanych produktów dzisiaj.</p>
+        }
+    </RadzenCard>
+
+    <!-- Druga karta - Zarobione pieni¹dze dzisiaj -->
+    <RadzenCard Style="padding: 20px; border-radius: 8px; border: 1px solid #e0e0e0; width: 340px; height: 160px;">
+        <h4 style="color: #3a3a3a; font-weight: 600; margin-top: 0px;">Zarobione pieni¹dze dzisiaj</h4>
+
+        @if (totalRevenueToday > 0)
+        {
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+                <span style="color: #3a3a3a; font-weight: 500;">£¹czna kwota:</span>
+                <span style="font-size: 22px; color: #085786; font-weight: 600;">@totalRevenueToday</span>
+            </div>
+        }
+        else
+        {
+            <p style="color: #757575;">Brak zarobionych pieniêdzy dzisiaj.</p>
+        }
+    </RadzenCard>
+</div>
+
+@code {
+    private decimal totalRevenueToday;
+    private int totalSoldToday;
+
+    // Ta metoda oblicza ³¹czny przychód dzisiaj za pomoc¹ LINQ
+    protected override async Task OnInitializedAsync()
+    {
+        totalSoldToday = await CartService.GetTotalSoldTodayAsync();
+
+        var orderItems = await CartService.GetOrderItemsSoldTodayAsync();
+
+        totalRevenueToday = orderItems
+            .Where(item => item.CreationDate.Date == DateTime.Today)
+            .Sum(item => item.Quantity * item.UnitPrice);
+    }
+}
