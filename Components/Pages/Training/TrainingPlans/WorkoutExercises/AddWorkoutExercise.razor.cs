@@ -32,29 +32,42 @@ namespace FISTNESSGYM.Components.Pages.Training.TrainingPlans.WorkoutExercises
         [Inject]
         public databaseService databaseService { get; set; }
 
+        [Parameter]
+        public int? WorkoutPlanId { get; set; }
+
         protected override async Task OnInitializedAsync()
         {
             workoutExercise = new FISTNESSGYM.Models.database.WorkoutExercise();
 
             exercisesForExerciseId = (await databaseService.GetExercises()).ToList() ?? new List<FISTNESSGYM.Models.database.Exercise>();
 
-            if (AuthorizationService.IsClient)
+            // Jeœli WorkoutPlanId jest ustawione, przypisujemy je do æwiczenia
+            if (WorkoutPlanId.HasValue)
             {
-                string userId = Security.User?.Id;
-                if (!string.IsNullOrEmpty(userId))
-                {
-                    workoutPlansForWorkoutPlanId = (await databaseService.GetWorkoutPlansForUser(userId)).ToList() ?? new List<FISTNESSGYM.Models.database.WorkoutPlan>();
-                }
-                else
-                {
-                    workoutPlansForWorkoutPlanId = new List<FISTNESSGYM.Models.database.WorkoutPlan>();
-                }
+                workoutExercise.WorkoutPlanId = WorkoutPlanId.Value;
             }
-            else if(AuthorizationService.IsWorker || AuthorizationService.IsTrainer || AuthorizationService.IsAdmin)
+            else
             {
-                workoutPlansForWorkoutPlanId = (await databaseService.GetWorkoutPlans()).ToList() ?? new List<FISTNESSGYM.Models.database.WorkoutPlan>();
+                // Jeœli nie ma WorkoutPlanId, za³aduj plany dla wyboru przez u¿ytkownika
+                if (AuthorizationService.IsClient)
+                {
+                    string userId = Security.User?.Id;
+                    if (!string.IsNullOrEmpty(userId))
+                    {
+                        workoutPlansForWorkoutPlanId = (await databaseService.GetWorkoutPlansForUser(userId)).ToList() ?? new List<FISTNESSGYM.Models.database.WorkoutPlan>();
+                    }
+                    else
+                    {
+                        workoutPlansForWorkoutPlanId = new List<FISTNESSGYM.Models.database.WorkoutPlan>();
+                    }
+                }
+                else if (AuthorizationService.IsWorker || AuthorizationService.IsTrainer || AuthorizationService.IsAdmin)
+                {
+                    workoutPlansForWorkoutPlanId = (await databaseService.GetWorkoutPlans()).ToList() ?? new List<FISTNESSGYM.Models.database.WorkoutPlan>();
+                }
             }
         }
+
         protected bool errorVisible;
         protected FISTNESSGYM.Models.database.WorkoutExercise workoutExercise;
 

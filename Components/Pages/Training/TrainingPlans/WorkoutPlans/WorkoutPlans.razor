@@ -89,11 +89,12 @@ else if (AuthorizationService.IsClient)
                                 }
                             </div>
                             <div class="rz-card-actions">
+                                <RadzenButton Icon="add" Text="Dodaj Æwiczenie" Style="margin-right: 10px;"
+                                              Click="@(() => AddExerciseToPlan(plan.Id))"  />
                                 <RadzenButton Icon="edit" Text="Edytuj" Style="margin-right: 10px;"
                                               Click="@(() => EditClientWorkoutPlan(plan.Id))" />
                                 <RadzenButton Icon="delete" Text="Usuñ" ButtonStyle="ButtonStyle.Danger"
                                               Click="@(() => DeleteClientWorkoutPlan(plan.Id))" />
-                                <RadzenButton Icon="add" Text="Dodaj Æwiczenie" Click="@(() => AddExerciseToPlan(plan.Id))" />
                             </div>
                         </RadzenCard>
                     </RadzenColumn>
