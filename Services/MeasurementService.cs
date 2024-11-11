@@ -51,17 +51,15 @@ namespace FISTNESSGYM.Services
         {
             try
             {
-                // Fetch the latest two measurements by date for the specified user
                 var measurements = await _context.Measurement
                     .Where(m => m.UserId == userId)
                     .OrderByDescending(m => m.MeasurementDate)
                     .Take(2)
                     .ToListAsync();
 
-                // If only one or zero measurements exist, handle gracefully
                 if (measurements.Count == 0)
                 {
-                    _logger.LogWarning("No measurements found for user: {UserId}", userId);
+                    _logger.LogWarning("Nie znaleziono pomiarów dla: {UserId}", userId);
                     return (null, null);
                 }
 
@@ -72,12 +70,9 @@ namespace FISTNESSGYM.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred while fetching measurements for user: {UserId}", userId);
+                _logger.LogError(ex, "Wystąpił błąd podczas pobierania pomiarów dla użytkownika: {UserId}", userId);
                 throw;
             }
         }
-
-
-
     }
 }
