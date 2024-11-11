@@ -2985,6 +2985,14 @@ namespace FISTNESSGYM
 
             return await Task.FromResult(items);
         }
+        public async Task<IEnumerable<WorkoutExercise>> GetWorkoutExercisesForUser(string userId)
+        {
+            return await Context.WorkoutExercises
+                .Include(e => e.Exercise)
+                .Include(e => e.WorkoutPlan)
+                .Where(e => e.WorkoutPlan.UserId == userId)
+                .ToListAsync();
+        }
 
         partial void OnWorkoutExerciseGet(FISTNESSGYM.Models.database.WorkoutExercise item);
         partial void OnGetWorkoutExerciseById(ref IQueryable<FISTNESSGYM.Models.database.WorkoutExercise> items);
