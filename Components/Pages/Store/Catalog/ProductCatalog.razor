@@ -63,6 +63,17 @@
                 <p class="product-price">@product.Price zł</p>
                 @if (!AuthorizationService.IsUser)
                 {
+                    @if (product.StockQuantity == 0)
+                    {
+                        <RadzenButton Icon="shopping_cart"
+                                      Click="() => AddToCart(product)"
+                                      ButtonStyle="ButtonStyle.Danger"
+                                      Disabled="true"
+                                      Style="width: 50%; height: 36px; background-color: red;"
+                                      class="add-to-cart-button" />
+                    }
+                    else
+                    {
                     <div class="button-group">
                     <RadzenButton Icon="shopping_cart"
                                   Click="() => AddToCart(product)"
@@ -70,6 +81,7 @@
                                   Style="width: 50%; height: 36px; background-color: #ffc107;"
                                   class="add-to-cart-button" />
                     </div>
+                    }
                 }
                 else
                 {
