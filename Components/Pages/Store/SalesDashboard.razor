@@ -9,7 +9,6 @@
 @attribute [Authorize]
 
 <div style="display: flex; gap: 20px;">
-    <!-- Pierwsza karta - Sprzedane produkty dzisiaj -->
     <RadzenCard Style="padding: 20px; border-radius: 8px; border: 1px solid #e0e0e0; width: 340px; height: 160px;">
         <h4 style="color: #3a3a3a; font-weight: 600; margin-top: 0px;">Sprzedane produkty dzisiaj</h4>
 
@@ -26,7 +25,6 @@
         }
     </RadzenCard>
 
-    <!-- Druga karta - Zarobione pieni¹dze dzisiaj -->
     <RadzenCard Style="padding: 20px; border-radius: 8px; border: 1px solid #e0e0e0; width: 340px; height: 160px;">
         <h4 style="color: #3a3a3a; font-weight: 600; margin-top: 0px;">Obrót dzisiaj</h4>
 
@@ -44,7 +42,6 @@
     </RadzenCard>
 </div>
 
-<!-- Karta z wykresem -->
 <RadzenStack>
     <RadzenCard>
         <div style="margin-bottom: 20px; display: flex; justify-content: space-between;">
@@ -74,7 +71,6 @@
     private int totalSoldToday;
     private List<SalesData> salesData = new List<SalesData>();
 
-    // Data wybrana przez u¿ytkownika
     private int selectedMonth = DateTime.Today.Month;
     private int selectedYear = DateTime.Today.Year;
 
@@ -101,7 +97,6 @@
         new DropDownItem { Text = (DateTime.Today.Year + 1).ToString(), Value = DateTime.Today.Year + 1 }
     };
 
-    // Ta metoda oblicza ³¹czny przychód dzisiaj
     protected override async Task OnInitializedAsync()
     {
         await LoadSalesData();
@@ -116,7 +111,6 @@
 
     private async Task OnFilterClick()
     {
-        // Filtrowanie danych na podstawie wybranego miesi¹ca i roku
         await LoadSalesData();
     }
 

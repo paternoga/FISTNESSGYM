@@ -59,9 +59,11 @@
         {
             <div class="product-item">
                 <h4 class="product-name">@product.Name</h4>
-                <p class="product-description">@product.Description</p>
+                <h5 class="product-category">@product.Category</h5>
+                @* <p class="product-description">@product.Description</p> *@
                 <p class="product-price">@product.Price zł</p>
-                @if (!AuthorizationService.IsUser)
+                <p class="product-quantity">@product.StockQuantity szt.</p>
+                @if (AuthorizationService.IsClient)
                 {
                     @if (product.StockQuantity == 0)
                     {
@@ -157,7 +159,7 @@
             .Where(p => string.IsNullOrEmpty(selectedCategory) || p.Category == selectedCategory)
             .ToList();
 
-        currentPage = 1; // Resetuj do pierwszej strony po filtrowaniu
+        currentPage = 1;
     }
 
     private void NavigateToDetails(int productId)
@@ -200,12 +202,12 @@
                         cartItem.Quantity++;
                         await CartService.UpdateCartItemAsync(cartItem);
                         message = $"{product.Name} został zwiększony w koszyku.";
-                        severity = NotificationSeverity.Success; // Ustawienie na sukces
+                        severity = NotificationSeverity.Success; 
                     }
                     else
                     {
                         message = $"{product.Name} nie może być dodany do koszyka, ponieważ dostępna ilość w magazynie to tylko {stockQuantity}.";
-                        severity = NotificationSeverity.Error; // Ustawienie na błąd
+                        severity = NotificationSeverity.Error;
                     }
                 }
                 else
@@ -214,16 +216,15 @@
                     {
                         await CartService.AddToCart(userId, product, 1);
                         message = $"{product.Name} został dodany do koszyka!";
-                        severity = NotificationSeverity.Success; // Ustawienie na sukces
+                        severity = NotificationSeverity.Success; 
                     }
                     else
                     {
                         message = $"{product.Name} jest obecnie niedostępny w magazynie.";
-                        severity = NotificationSeverity.Error; // Ustawienie na błąd
+                        severity = NotificationSeverity.Error; 
                     }
                 }
 
-                // Wyświetl powiadomienie tylko raz
                 ShowNotification(message, severity);
 
                 StateHasChanged();

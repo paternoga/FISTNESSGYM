@@ -109,9 +109,6 @@
                 @if (AuthorizationService.IsUser || AuthorizationService.IsClient || AuthorizationService.IsWorker || AuthorizationService.IsTrainer || AuthorizationService.IsAdmin)
                 {
                     <RadzenPanelMenuItem Path="store/cart" Icon="shopping_cart" Text="Koszyk" />
-                }
-                @if (AuthorizationService.IsUser || AuthorizationService.IsClient || AuthorizationService.IsWorker || AuthorizationService.IsTrainer || AuthorizationService.IsAdmin)
-                {
                     <RadzenPanelMenuItem Path="store/products-catalog" Icon="category" Text="Katalog produktów" />
                 }
                 @if (AuthorizationService.IsClient || AuthorizationService.IsWorker || AuthorizationService.IsAdmin)

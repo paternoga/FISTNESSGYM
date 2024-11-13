@@ -47,12 +47,10 @@ namespace FISTNESSGYM.Components.Pages.Store.Orders
         {
             if (AuthorizationService.IsAdmin || AuthorizationService.IsTrainer || AuthorizationService.IsWorker)
             {
-                // Admins and authorized staff see all orders
                 orders = await databaseService.GetOrders(new Query { Expand = "AspNetUser,OrderStatus" });
             }
             else if (AuthorizationService.IsClient)
             {
-                // Clients see only their own orders
                 string userId = Security.User?.Id;
 
                 if (!string.IsNullOrEmpty(userId))
@@ -61,7 +59,6 @@ namespace FISTNESSGYM.Components.Pages.Store.Orders
                 }
             }
 
-            // Fetch additional related data
             aspNetUsersForUserId = await databaseService.GetAspNetUsers();
             orderStatusesForOrderStatusId = await databaseService.GetOrderStatuses();
         }
