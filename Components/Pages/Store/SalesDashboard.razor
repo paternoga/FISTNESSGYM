@@ -44,19 +44,80 @@
     </RadzenCard>
 </div>
 
+<div style="display: flex; justify-content: space-between;">
+    <!-- Przycisk przewijania do ty³u -->
+    <RadzenButton Text="Poprzednie 7 dni" Click="LoadPreviousWeek" Style="margin-top: 20px;" />
+
+    <!-- Przycisk przewijania do przodu -->
+    <RadzenButton Text="Nastêpne 7 dni" Click="LoadNextWeek" Style="margin-top: 20px;" />
+</div>
+
+<RadzenStack>
+    <RadzenCard>
+        <RadzenChart>
+
+            <RadzenColumnSeries Data="@salesData" CategoryProperty="Date" ValueProperty="Quantity" Title="Sprzedane produkty">
+                <RadzenSeriesDataLabels Visible="true" />
+            </RadzenColumnSeries>
+
+            <RadzenCategoryAxis>
+                <RadzenAxisTitle Text="Data" />
+            </RadzenCategoryAxis>
+
+            <RadzenValueAxis>
+                <RadzenAxisTitle Text="Iloœæ sprzedanych produktów" />
+            </RadzenValueAxis>
+        </RadzenChart>
+    </RadzenCard>
+</RadzenStack>
+
 @code {
     private decimal totalRevenueToday;
     private int totalSoldToday;
+    private List<SalesData> salesData = new List<SalesData>();
+    private DateTime startDate = DateTime.Today.AddDays(-7); // pocz¹tek zakresu (7 dni temu)
+    private DateTime endDate = DateTime.Today; // koniec zakresu (dzisiaj)
 
     // Ta metoda oblicza ³¹czny przychód dzisiaj za pomoc¹ LINQ
     protected override async Task OnInitializedAsync()
     {
+        await LoadSalesData();
+    }
+
+    // £adowanie danych sprzeda¿y z CartService
+    private async Task LoadSalesData()
+    {
+        // Pobranie danych sprzeda¿y z serwisu w oparciu o daty
+        salesData = await CartService.GetSalesDataForPeriodAsync(startDate, endDate);
+
+        // Pobranie iloœci sprzedanych produktów dzisiaj
         totalSoldToday = await CartService.GetTotalSoldTodayAsync();
 
+        // Pobranie przedmiotów sprzedanych dzisiaj
         var orderItems = await CartService.GetOrderItemsSoldTodayAsync();
 
+        // Obliczenie ³¹cznego przychodu dzisiaj
         totalRevenueToday = orderItems
             .Where(item => item.CreationDate.Date == DateTime.Today)
             .Sum(item => item.Quantity * item.UnitPrice);
     }
+
+    // Funkcja do ³adowania danych sprzeda¿y dla poprzednich 7 dni
+    private async Task LoadPreviousWeek()
+    {
+        startDate = startDate.AddDays(-7);
+        endDate = endDate.AddDays(-7);
+        await LoadSalesData();
+    }
+
+    // Funkcja do ³adowania danych sprzeda¿y dla nastêpnych 7 dni
+    private async Task LoadNextWeek()
+    {
+        startDate = startDate.AddDays(7);
+        endDate = endDate.AddDays(7);
+        await LoadSalesData();
+    }
+
+
+
 }

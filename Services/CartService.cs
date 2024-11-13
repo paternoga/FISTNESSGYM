@@ -225,6 +225,53 @@ namespace FISTNESSGYM.Services
             return allOrderItems.Where(item => item.CreationDate.Date == DateTime.Today).ToList();
         }
 
+        public async Task<List<SalesData>> GetSalesDataForWeekAsync()
+        {
+            var startDate = DateTime.Today.AddDays(-6);
+            var endDate = DateTime.Today;
+
+            // First, retrieve the data from the database
+            var sales = await _context.OrderItems
+                .Where(item => item.CreationDate >= startDate && item.CreationDate <= endDate)
+                .GroupBy(item => item.CreationDate.Date) // Group by date without formatting
+                .Select(group => new
+                {
+                    Date = group.Key, // Store the DateTime value as is
+                    Quantity = group.Sum(item => item.Quantity)
+                })
+                .ToListAsync();
+
+            // Now, after retrieving the data, format the DateTime to a string
+            var salesData = sales.Select(x => new SalesData
+            {
+                Date = x.Date.ToString("yyyy-MM-dd"), // Apply the formatting here
+                Quantity = x.Quantity
+            }).ToList();
+
+            return salesData;
+        }
+
+        public async Task<List<SalesData>> GetSalesDataForPeriodAsync(DateTime startDate, DateTime endDate)
+        {
+            var salesData = await _context.OrderItems
+                .Where(o => o.CreationDate >= startDate && o.CreationDate <= endDate)
+                .GroupBy(o => o.CreationDate.Date)
+                .Select(g => new
+                {
+                    Date = g.Key,
+                    Quantity = g.Sum(item => item.Quantity)
+                })
+                .ToListAsync();
+
+            // Konwertowanie daty do formatu "yyyy-MM-dd" po pobraniu danych
+            return salesData
+                .Select(g => new SalesData
+                {
+                    Date = g.Date.ToString("yyyy-MM-dd"),
+                    Quantity = g.Quantity
+                })
+                .ToList();
+        }
 
 
 
