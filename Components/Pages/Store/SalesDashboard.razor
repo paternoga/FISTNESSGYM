@@ -6,6 +6,8 @@
 @using FISTNESSGYM.Models.Database
 @using FISTNESSGYM.Services
 
+@attribute [Authorize]
+
 <div style="display: flex; gap: 20px;">
     <!-- Pierwsza karta - Sprzedane produkty dzisiaj -->
     <RadzenCard Style="padding: 20px; border-radius: 8px; border: 1px solid #e0e0e0; width: 340px; height: 160px;">
@@ -26,7 +28,7 @@
 
     <!-- Druga karta - Zarobione pieni¹dze dzisiaj -->
     <RadzenCard Style="padding: 20px; border-radius: 8px; border: 1px solid #e0e0e0; width: 340px; height: 160px;">
-        <h4 style="color: #3a3a3a; font-weight: 600; margin-top: 0px;">Zarobione pieni¹dze dzisiaj</h4>
+        <h4 style="color: #3a3a3a; font-weight: 600; margin-top: 0px;">Obrót dzisiaj</h4>
 
         @if (totalRevenueToday > 0)
         {

@@ -4,11 +4,11 @@
 @attribute [Authorize]
 @if (AuthorizationService.IsWorker || AuthorizationService.IsTrainer || AuthorizationService.IsAdmin)
 {
-    <PageTitle>MOJE ÆWICZENIA</PageTitle>
+    <PageTitle>MOJE ï¿½WICZENIA</PageTitle>
     <RadzenStack>
         <RadzenRow AlignItems="AlignItems.Center">
             <RadzenColumn Size="12" SizeMD="6">
-                <RadzenText Text="Moje æwiczenia" TextStyle="TextStyle.H3" TagName="TagName.H1" style="margin: 0" />
+                <RadzenText Text="Moje ï¿½wiczenia" TextStyle="TextStyle.H3" TagName="TagName.H1" style="margin: 0" />
             </RadzenColumn>
             <RadzenColumn Size="12" SizeMD="6">
                 <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.End" Gap="0.5rem">
@@ -24,15 +24,15 @@
                     <Columns>
                         <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.WorkoutExercise" Property="Id" Title="Id">
                         </RadzenDataGridColumn>
-                        <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.WorkoutExercise" Property="Exercise.Category" Title="Æwiczenie">
+                        <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.WorkoutExercise" Property="Exercise.Category" Title="ï¿½wiczenie">
                         </RadzenDataGridColumn>
                         <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.WorkoutExercise" Property="WorkoutPlan.Name" Title="Plan treningowy">
                         </RadzenDataGridColumn>
-                        <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.WorkoutExercise" Property="Weight" Title="Ciê¿ar">
+                        <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.WorkoutExercise" Property="Weights" Title="Ciï¿½ar">
                         </RadzenDataGridColumn>
                         <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.WorkoutExercise" Property="Sets" Title="Serie">
                         </RadzenDataGridColumn>
-                        <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.WorkoutExercise" Property="Reps" Title="Powtórzenia">
+                        <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.WorkoutExercise" Property="Reps" Title="Powtï¿½rzenia">
                         </RadzenDataGridColumn>
                         <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.WorkoutExercise" Filterable="false" Sortable="false" Width="70px" TextAlign="TextAlign.Center">
                             <Template Context="workoutExercise">
@@ -52,11 +52,11 @@
 }
 else if (AuthorizationService.IsClient)
 {
-    <PageTitle>MOJE ÆWICZENIA</PageTitle>
+    <PageTitle>MOJE ï¿½WICZENIA</PageTitle>
     <RadzenStack>
         <RadzenRow AlignItems="AlignItems.Center">
             <RadzenColumn Size="12" SizeMD="6">
-                <RadzenText Text="Moje æwiczenia" TextStyle="TextStyle.H3" TagName="TagName.H1" style="margin: 0" />
+                <RadzenText Text="Moje ï¿½wiczenia" TextStyle="TextStyle.H3" TagName="TagName.H1" style="margin: 0" />
             </RadzenColumn>
             <RadzenColumn Size="12" SizeMD="6">
                 <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.End" Gap="0.5rem">
@@ -70,13 +70,13 @@ else if (AuthorizationService.IsClient)
                 <RadzenDataGrid @ref="grid0" ColumnWidth="200px" AllowFiltering="true" FilterMode="FilterMode.Advanced" AllowPaging="true" AllowSorting="true" ShowPagingSummary="true" PageSizeOptions=@(new int[]{5, 10, 20, 30})
                                 Data="@workoutExercises" TItem="FISTNESSGYM.Models.database.WorkoutExercise">
                     <Columns>
-                        <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.WorkoutExercise" Property="Exercise.Category" Title="Æwiczenie">
+                        <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.WorkoutExercise" Property="Exercise.Category" Title="ï¿½wiczenie">
                         </RadzenDataGridColumn>
                         <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.WorkoutExercise" Property="WorkoutPlan.Name" Title="Plan treningowy">
                         </RadzenDataGridColumn>
                         <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.WorkoutExercise" Property="Sets" Title="Serie">
                         </RadzenDataGridColumn>
-                        <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.WorkoutExercise" Property="Reps" Title="Powtórzenia">
+                        <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.WorkoutExercise" Property="Reps" Title="Powtï¿½rzenia">
                         </RadzenDataGridColumn>
                         <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.WorkoutExercise" Filterable="false" Sortable="false" Width="70px" TextAlign="TextAlign.Center">
                             <Template Context="workoutExercise">

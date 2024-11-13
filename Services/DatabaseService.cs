@@ -2994,6 +2994,16 @@ namespace FISTNESSGYM
                 .ToListAsync();
         }
 
+        public async Task<IEnumerable<Order>> GetOrdersForUser(string userId)
+        {
+            return await Context.Orders
+                .Where(order => order.UserId == userId)
+                .Include(order => order.AspNetUser) 
+                .Include(order => order.OrderStatus) 
+                .ToListAsync();
+        }
+
+
         partial void OnWorkoutExerciseGet(FISTNESSGYM.Models.database.WorkoutExercise item);
         partial void OnGetWorkoutExerciseById(ref IQueryable<FISTNESSGYM.Models.database.WorkoutExercise> items);
 

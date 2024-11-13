@@ -62,7 +62,7 @@ namespace FISTNESSGYM.Components.Pages.Training.TrainingPlans.WorkoutExercises
 
                 if (!string.IsNullOrEmpty(userId))
                 {
-                    // Pobiera æwiczenia dla planów treningowych przypisanych do zalogowanego u¿ytkownika
+                    // Pobiera ï¿½wiczenia dla planï¿½w treningowych przypisanych do zalogowanego uï¿½ytkownika
                     workoutExercises = await databaseService.GetWorkoutExercisesForUser(userId);
                 }
             }
@@ -72,17 +72,17 @@ namespace FISTNESSGYM.Components.Pages.Training.TrainingPlans.WorkoutExercises
         {
             var result = await DialogService.OpenAsync<AddWorkoutExercise>("Add WorkoutExercise", null);
 
-            if (result != null) // Sprawdzamy, czy dodanie æwiczenia siê powiod³o
+            if (result != null) // Sprawdzamy, czy dodanie ï¿½wiczenia siï¿½ powiodï¿½o
             {
                 if (AuthorizationService.IsClient)
                 {
-                    // Ponownie za³aduj æwiczenia klienta
+                    // Ponownie zaï¿½aduj ï¿½wiczenia klienta
                     workoutExercises = await databaseService.GetWorkoutExercisesForUser(Security.User?.Id);
-                    StateHasChanged(); // Odœwie¿enie widoku
+                    StateHasChanged(); // Odï¿½wieï¿½enie widoku
                 }
                 else
                 {
-                    // Odœwie¿ grid dla administratora
+                    // Odï¿½wieï¿½ grid dla administratora
                     await grid0.Reload();
                 }
             }

@@ -5,11 +5,14 @@
 @inject NavigationManager NavigationManager
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject NotificationService NotificationService
+@inject AuthorizationService AuthorizationService
 @using FISTNESSGYM.Models.database
 @using System.Security.Claims
 @using Radzen
 @using Radzen.Blazor
 @inherits LayoutComponentBase
+
+@attribute [Authorize]
 
 <PageTitle>KATALOG PRODUKTÓW</PageTitle>
 
@@ -58,20 +61,28 @@
                 <h4 class="product-name">@product.Name</h4>
                 <p class="product-description">@product.Description</p>
                 <p class="product-price">@product.Price zł</p>
-
-                <div class="button-group">
-                    <RadzenButton Text="Szczegóły"
-                                  Click="() => NavigateToDetails(product.Id)"
-                                  ButtonStyle="ButtonStyle.Primary"
-                                  Style="width: 60%; height: 36px;"
-                                  class="rz-button rz-button-md rz-variant-filled rz-primary rz-shade-default filter-button" />
-
+                @if (!AuthorizationService.IsUser)
+                {
+                    <div class="button-group">
                     <RadzenButton Icon="shopping_cart"
                                   Click="() => AddToCart(product)"
                                   ButtonStyle="ButtonStyle.Warning"
-                                  Style="width: 25%; height: 36px; background-color: #ffc107;"
+                                  Style="width: 50%; height: 36px; background-color: #ffc107;"
                                   class="add-to-cart-button" />
-                </div>
+                    </div>
+                }
+                else
+                {
+
+                    <div class="button-group">
+                        <RadzenButton Icon="shopping_cart"
+                                      Click="() => AddToCart(product)"
+                                      ButtonStyle="ButtonStyle.Danger"
+                                      Disabled="true"
+                                      Style="width: 50%; height: 36px; background-color: red;"
+                                      class="add-to-cart-button" />
+                    </div>
+                }
             </div>
         }
     }

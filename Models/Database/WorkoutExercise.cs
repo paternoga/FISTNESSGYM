@@ -27,5 +27,7 @@ namespace FISTNESSGYM.Models.database
 
         [Required]
         public int Reps { get; set; }
+        
+        public decimal? Weights { get; set; }
     }
 }

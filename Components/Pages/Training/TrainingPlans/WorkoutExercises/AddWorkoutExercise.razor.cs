@@ -41,14 +41,14 @@ namespace FISTNESSGYM.Components.Pages.Training.TrainingPlans.WorkoutExercises
 
             exercisesForExerciseId = (await databaseService.GetExercises()).ToList() ?? new List<FISTNESSGYM.Models.database.Exercise>();
 
-            // Jeœli WorkoutPlanId jest ustawione, przypisujemy je do æwiczenia
+            // Jeï¿½li WorkoutPlanId jest ustawione, przypisujemy je do ï¿½wiczenia
             if (WorkoutPlanId.HasValue)
             {
                 workoutExercise.WorkoutPlanId = WorkoutPlanId.Value;
             }
             else
             {
-                // Jeœli nie ma WorkoutPlanId, za³aduj plany dla wyboru przez u¿ytkownika
+                // Jeï¿½li nie ma WorkoutPlanId, zaï¿½aduj plany dla wyboru przez uï¿½ytkownika
                 if (AuthorizationService.IsClient)
                 {
                     string userId = Security.User?.Id;
