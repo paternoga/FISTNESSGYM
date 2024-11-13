@@ -114,20 +114,14 @@
                 {
                     <RadzenPanelMenuItem Path="store/products-catalog" Icon="category" Text="Katalog produktów" />
                 }
-                @if (AuthorizationService.IsWorker || AuthorizationService.IsAdmin)
-                {
-                    <RadzenPanelMenuItem Path="store/products" Icon="add_business" Text="Zarządzanie produktami" />
-                }
                 @if (AuthorizationService.IsClient || AuthorizationService.IsWorker || AuthorizationService.IsAdmin)
                 {
                     <RadzenPanelMenuItem Path="store/orders" Icon="orders" Text="Zamówienia" />
                 }
-                @if (AuthorizationService.IsUser || AuthorizationService.IsClient || AuthorizationService.IsWorker || AuthorizationService.IsTrainer || AuthorizationService.IsAdmin)
-                {
-                    <RadzenPanelMenuItem Path="store/product-categories" Icon="loyalty" Text="Kategorie" />
-                }
                 @if (AuthorizationService.IsWorker || AuthorizationService.IsAdmin)
                 {
+                    <RadzenPanelMenuItem Path="store/products" Icon="add_business" Text="Zarządzanie produktami" />
+                    <RadzenPanelMenuItem Path="store/product-categories" Icon="loyalty" Text="Kategorie" />
                     <RadzenPanelMenuItem Path="sales-dashboard" Icon="monitoring" Text="Analityka Sklepu" />
                 }
             </RadzenPanelMenuItem>
