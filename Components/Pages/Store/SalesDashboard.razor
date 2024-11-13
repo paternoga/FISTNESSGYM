@@ -1,10 +1,10 @@
 @page "/sales-dashboard"
 @inject ICartService CartService
 @inject AuthenticationStateProvider AuthenticationStateProvider
-@using System.Security.Claims
 @using FISTNESSGYM.Models.database
 @using FISTNESSGYM.Models.Database
 @using FISTNESSGYM.Services
+@using Radzen
 
 @attribute [Authorize]
 
@@ -44,18 +44,16 @@
     </RadzenCard>
 </div>
 
-<div style="display: flex; justify-content: space-between;">
-    <!-- Przycisk przewijania do ty³u -->
-    <RadzenButton Text="Poprzednie 7 dni" Click="LoadPreviousWeek" Style="margin-top: 20px;" />
-
-    <!-- Przycisk przewijania do przodu -->
-    <RadzenButton Text="Nastêpne 7 dni" Click="LoadNextWeek" Style="margin-top: 20px;" />
-</div>
-
+<!-- Karta z wykresem -->
 <RadzenStack>
     <RadzenCard>
-        <RadzenChart>
+        <div style="margin-bottom: 20px; display: flex; justify-content: space-between;">
+            <RadzenDropDown @bind-Value="selectedMonth" Data="@monthList" TextProperty="Text" ValueProperty="Value" Style="width: 150px;" />
+            <RadzenDropDown @bind-Value="selectedYear" Data="@yearList" TextProperty="Text" ValueProperty="Value" Style="width: 150px;" />
+            <RadzenButton Text="Filtruj" Click="@OnFilterClick" Style="height: 36px; width: 100px;" />
+        </div>
 
+        <RadzenChart>
             <RadzenColumnSeries Data="@salesData" CategoryProperty="Date" ValueProperty="Quantity" Title="Sprzedane produkty">
                 <RadzenSeriesDataLabels Visible="true" />
             </RadzenColumnSeries>
@@ -75,49 +73,61 @@
     private decimal totalRevenueToday;
     private int totalSoldToday;
     private List<SalesData> salesData = new List<SalesData>();
-    private DateTime startDate = DateTime.Today.AddDays(-7); // pocz¹tek zakresu (7 dni temu)
-    private DateTime endDate = DateTime.Today; // koniec zakresu (dzisiaj)
 
-    // Ta metoda oblicza ³¹czny przychód dzisiaj za pomoc¹ LINQ
+    // Data wybrana przez u¿ytkownika
+    private int selectedMonth = DateTime.Today.Month;
+    private int selectedYear = DateTime.Today.Year;
+
+    private List<DropDownItem> monthList = new List<DropDownItem>
+    {
+        new DropDownItem { Text = "Styczeñ", Value = 1 },
+        new DropDownItem { Text = "Luty", Value = 2 },
+        new DropDownItem { Text = "Marzec", Value = 3 },
+        new DropDownItem { Text = "Kwiecieñ", Value = 4 },
+        new DropDownItem { Text = "Maj", Value = 5 },
+        new DropDownItem { Text = "Czerwiec", Value = 6 },
+        new DropDownItem { Text = "Lipiec", Value = 7 },
+        new DropDownItem { Text = "Sierpieñ", Value = 8 },
+        new DropDownItem { Text = "Wrzesieñ", Value = 9 },
+        new DropDownItem { Text = "PaŸdziernik", Value = 10 },
+        new DropDownItem { Text = "Listopad", Value = 11 },
+        new DropDownItem { Text = "Grudzieñ", Value = 12 }
+    };
+
+    private List<DropDownItem> yearList = new List<DropDownItem>
+    {
+        new DropDownItem { Text = (DateTime.Today.Year - 1).ToString(), Value = DateTime.Today.Year - 1 },
+        new DropDownItem { Text = DateTime.Today.Year.ToString(), Value = DateTime.Today.Year },
+        new DropDownItem { Text = (DateTime.Today.Year + 1).ToString(), Value = DateTime.Today.Year + 1 }
+    };
+
+    // Ta metoda oblicza ³¹czny przychód dzisiaj
     protected override async Task OnInitializedAsync()
     {
         await LoadSalesData();
-    }
-
-    // £adowanie danych sprzeda¿y z CartService
-    private async Task LoadSalesData()
-    {
-        // Pobranie danych sprzeda¿y z serwisu w oparciu o daty
-        salesData = await CartService.GetSalesDataForPeriodAsync(startDate, endDate);
-
-        // Pobranie iloœci sprzedanych produktów dzisiaj
         totalSoldToday = await CartService.GetTotalSoldTodayAsync();
 
-        // Pobranie przedmiotów sprzedanych dzisiaj
         var orderItems = await CartService.GetOrderItemsSoldTodayAsync();
 
-        // Obliczenie ³¹cznego przychodu dzisiaj
         totalRevenueToday = orderItems
             .Where(item => item.CreationDate.Date == DateTime.Today)
             .Sum(item => item.Quantity * item.UnitPrice);
     }
 
-    // Funkcja do ³adowania danych sprzeda¿y dla poprzednich 7 dni
-    private async Task LoadPreviousWeek()
+    private async Task OnFilterClick()
     {
-        startDate = startDate.AddDays(-7);
-        endDate = endDate.AddDays(-7);
+        // Filtrowanie danych na podstawie wybranego miesi¹ca i roku
         await LoadSalesData();
     }
 
-    // Funkcja do ³adowania danych sprzeda¿y dla nastêpnych 7 dni
-    private async Task LoadNextWeek()
+    private async Task LoadSalesData()
     {
-        startDate = startDate.AddDays(7);
-        endDate = endDate.AddDays(7);
-        await LoadSalesData();
+        salesData = await CartService.GetSalesDataForMonthAsync(selectedYear, selectedMonth);
     }
 
-
-
+    public class DropDownItem
+    {
+        public string Text { get; set; }
+        public int Value { get; set; }
+    }
 }

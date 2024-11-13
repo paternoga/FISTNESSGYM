@@ -273,6 +273,48 @@ namespace FISTNESSGYM.Services
                 .ToList();
         }
 
+        public async Task<List<SalesData>> GetSalesDataForMonthAsync(int year, int month)
+        {
+            var startDate = new DateTime(year, month, 1);
+            var endDate = startDate.AddMonths(1).AddDays(-1); // Ostatni dzień miesiąca
+
+            // Pobieranie danych sprzedaży dla podanego miesiąca
+            var salesDataQuery = await _context.OrderItems
+                .Where(o => o.CreationDate >= startDate && o.CreationDate <= endDate)
+                .GroupBy(o => o.CreationDate.Day) // Grupowanie po numerze dnia (1-31)
+                .Select(g => new SalesData
+                {
+                    Date = g.Key.ToString(), // Numer dnia jako string
+                    Quantity = g.Sum(item => item.Quantity)
+                })
+                .ToListAsync();
+
+            // Tworzenie pełnej listy dni w miesiącu
+            var allDaysInMonth = Enumerable.Range(1, DateTime.DaysInMonth(year, month))
+                .Select(day => new SalesData
+                {
+                    Date = day.ToString(), // Numer dnia jako string
+                    Quantity = 0 // Domyślna wartość 0
+                })
+                .ToList();
+
+            // Uzupełnianie brakujących dni w danych sprzedaży
+            foreach (var dayData in salesDataQuery)
+            {
+                var day = int.Parse(dayData.Date);
+                var existingDay = allDaysInMonth.FirstOrDefault(d => d.Date == day.ToString());
+                if (existingDay != null)
+                {
+                    existingDay.Quantity = dayData.Quantity; // Aktualizacja ilości, jeśli dzień istnieje w danych
+                }
+            }
+
+            return allDaysInMonth;
+        }
+
+
+
+
 
 
 
