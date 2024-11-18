@@ -38,6 +38,7 @@ namespace FISTNESSGYM.Services
         Task<List<SalesData>> GetSalesDataForWeekAsync();
         Task<List<SalesData>> GetSalesDataForPeriodAsync(DateTime startDate, DateTime endDate);
         Task<List<SalesData>> GetSalesDataForMonthAsync(int year, int month);
+        Task<List<TopProduct>> GetTopProductsForMonthAsync(int year, int month);
 
 
 

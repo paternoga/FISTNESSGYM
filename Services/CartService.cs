@@ -1,5 +1,6 @@
 ﻿using FISTNESSGYM.Data;
 using FISTNESSGYM.Models.database;
+using FISTNESSGYM.Models.Database;
 using Microsoft.AspNetCore.Components;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
@@ -311,6 +312,24 @@ namespace FISTNESSGYM.Services
 
             return allDaysInMonth;
         }
+
+        public async Task<List<TopProduct>> GetTopProductsForMonthAsync(int year, int month)
+        {
+            return await _context.OrderItems
+                .Where(item => item.CreationDate.Year == year && item.CreationDate.Month == month)
+                .GroupBy(item => new { item.ProductId, item.Product.Name }) // Grupuj po ID produktu i jego nazwie
+                .Select(group => new TopProduct
+                {
+                    ProductId = group.Key.ProductId,
+                    ProductName = group.Key.Name,
+                    TotalQuantity = group.Sum(item => item.Quantity)
+                })
+                .OrderByDescending(product => product.TotalQuantity)
+                .Take(5)
+                .ToListAsync();
+        }
+
+
 
 
 

@@ -66,6 +66,28 @@
     </RadzenCard>
 </RadzenStack>
 
+<RadzenCard Style="padding: 20px; border-radius: 8px; border: 1px solid #e0e0e0; width: 340px; height: auto;">
+    <h4 style="color: #3a3a3a; font-weight: 600; margin-top: 0px;">Top 5 produktów miesi¹ca</h4>
+
+    @if (topProducts != null && topProducts.Any())
+    {
+        <ul style="list-style: none; padding-left: 0;">
+            @foreach (var product in topProducts)
+            {
+                <li style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                    <span style="color: #3a3a3a; font-weight: 500;">@product.ProductName:</span>
+                    <span style="font-size: 18px; color: #085786; font-weight: 600;">@product.TotalQuantity</span>
+                </li>
+            }
+        </ul>
+    }
+    else
+    {
+        <p style="color: #757575;">Brak danych dla wybranego miesi¹ca.</p>
+    }
+</RadzenCard>
+
+
 @code {
     private decimal totalRevenueToday;
     private int totalSoldToday;
@@ -73,6 +95,11 @@
 
     private int selectedMonth = DateTime.Today.Month;
     private int selectedYear = DateTime.Today.Year;
+
+    private List<TopProduct> topProducts;
+
+    int currentYear = DateTime.Now.Year; 
+    int currentMonth = DateTime.Now.Month; 
 
     private List<DropDownItem> monthList = new List<DropDownItem>
     {
@@ -107,6 +134,9 @@
         totalRevenueToday = orderItems
             .Where(item => item.CreationDate.Date == DateTime.Today)
             .Sum(item => item.Quantity * item.UnitPrice);
+
+        topProducts = await CartService.GetTopProductsForMonthAsync(currentYear, currentMonth);
+
     }
 
     private async Task OnFilterClick()
