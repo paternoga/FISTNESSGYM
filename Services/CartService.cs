@@ -20,29 +20,25 @@ namespace FISTNESSGYM.Services
 
         public async Task AddToCart(string userId, Product product, int quantity)
         {
-            // Sprawdź, czy produkt już istnieje w koszyku dla danego użytkownika
             var existingCartItem = await _context.CartItems
                 .FirstOrDefaultAsync(ci => ci.UserId == userId && ci.ProductId == product.Id);
 
             if (existingCartItem != null)
             {
-                // Jeśli element już istnieje, zaktualizuj jego ilość
                 existingCartItem.Quantity += quantity;
-                _context.CartItems.Update(existingCartItem); // Oznacz element do aktualizacji
+                _context.CartItems.Update(existingCartItem); 
             }
             else
             {
-                // Jeśli element nie istnieje, dodaj nowy
                 var newCartItem = new CartItem
                 {
                     UserId = userId,
                     ProductId = product.Id,
                     Quantity = quantity
                 };
-                await _context.CartItems.AddAsync(newCartItem); // Dodaj nowy element do kontekstu
+                await _context.CartItems.AddAsync(newCartItem); 
             }
 
-            // Zapisz zmiany w bazie danych
             await _context.SaveChangesAsync();
         }
 
@@ -60,7 +56,7 @@ namespace FISTNESSGYM.Services
         {
             return _context.CartItems
                 .Where(ci => ci.UserId == userId)
-                .Include(ci => ci.Product) // Załaduj powiązane produkty
+                .Include(ci => ci.Product) 
                 .ToList();
         }
 
@@ -68,7 +64,7 @@ namespace FISTNESSGYM.Services
         {
             return _context.CartItems
                 .Where(ci => ci.UserId == userId)
-                .Sum(ci => ci.Quantity * ci.Product.Price); // Zakłada, że masz załadowane produkty
+                .Sum(ci => ci.Quantity * ci.Product.Price); 
         }
 
         public void ClearCart(string userId)
@@ -100,7 +96,7 @@ namespace FISTNESSGYM.Services
         {
             return await _context.CartItems
                                  .Where(ci => ci.UserId == userId)
-                                 .Include(ci => ci.Product) // dołącz szczegóły produktu
+                                 .Include(ci => ci.Product) 
                                  .ToListAsync();
         }
 
@@ -126,16 +122,15 @@ namespace FISTNESSGYM.Services
 
         public async Task AddToCartAsync(string userId, CartItem item)
         {
-            // Można dodać logikę do dodawania przedmiotu do koszyka, z aktualizacją ilości
             var existingItem = await _context.CartItems
                                               .FirstOrDefaultAsync(ci => ci.UserId == userId && ci.ProductId == item.ProductId);
             if (existingItem != null)
             {
-                existingItem.Quantity += item.Quantity; // aktualizacja ilości
+                existingItem.Quantity += item.Quantity;
             }
             else
             {
-                item.UserId = userId; // ustawienie UserId przed dodaniem
+                item.UserId = userId;
                 await _context.CartItems.AddAsync(item);
             }
 
@@ -144,11 +139,9 @@ namespace FISTNESSGYM.Services
 
         public async Task PlaceOrderAsync(Order order, List<CartItem> cartItems)
         {
-            // Dodaj zamówienie do bazy danych
             await _context.Orders.AddAsync(order);
             await _context.SaveChangesAsync();
 
-            // Dodaj pozycje zamówienia
             foreach (var cartItem in cartItems)
             {
                 var orderItem = new OrderItem
@@ -157,43 +150,37 @@ namespace FISTNESSGYM.Services
                     ProductId = cartItem.ProductId,
                     Quantity = cartItem.Quantity,
                     UnitPrice = cartItem.Product.Price,
-                    CreationDate = DateTime.Now// zakładam, że price jest pobierane z produktu
+                    CreationDate = DateTime.Now
                 };
 
                 await _context.OrderItems.AddAsync(orderItem);
                 
-                // Aktualizacja stanu magazynowego
                 var product = await _context.Products.FindAsync(cartItem.ProductId);
                 if (product != null)
                 {
-                    // Kontrola stanu magazynowego
                     if (product.StockQuantity >= cartItem.Quantity)
                     {
-                        product.StockQuantity -= cartItem.Quantity; // Odejmij ilość zamówioną od stanu magazynowego
+                        product.StockQuantity -= cartItem.Quantity; 
                     }
                     else
                     {
-                        //throw new Exception("Niewystarczająca ilość produktu w magazynie."); // Obsłuż sytuację, gdy brak wystarczającej ilości
                         throw new InvalidOperationException("Niewystarczająca ilość produktu w magazynie.");
                     }
                 }
             }
 
-            // Zapisz zmiany w bazie danych
             await _context.SaveChangesAsync();
         }
 
         //Analityka sklepu///////
         public async Task<int> GetTotalSoldTodayAsync()
         {
-            // Pobieramy dzisiejszą datę bez czasu
             var todayStart = DateTime.Today;
-            var todayEnd = todayStart.AddDays(1).AddSeconds(-1); // koniec dnia (23:59:59)
+            var todayEnd = todayStart.AddDays(1).AddSeconds(-1); 
 
-            // Pobieramy wszystkie pozycje OrderItem, które zostały utworzone dzisiaj
             var totalSoldToday = await _context.OrderItems
-                .Where(oi => oi.CreationDate >= todayStart && oi.CreationDate <= todayEnd) // Filtrowanie po dacie
-                .SumAsync(oi => oi.Quantity); // Sumowanie ilości sprzedanych produktów
+                .Where(oi => oi.CreationDate >= todayStart && oi.CreationDate <= todayEnd) 
+                .SumAsync(oi => oi.Quantity); 
 
             return totalSoldToday;
         }
@@ -201,17 +188,17 @@ namespace FISTNESSGYM.Services
         public async Task<List<SalesData>> GetSalesDataForLastDaysAsync(int days = 7)
         {
             var todayStart = DateTime.Today;
-            var startDate = todayStart.AddDays(-days); // Pobieramy dane z ostatnich 'days' dni
+            var startDate = todayStart.AddDays(-days); 
 
             var salesData = await _context.OrderItems
                 .Where(oi => oi.CreationDate >= startDate && oi.CreationDate < todayStart)
-                .GroupBy(oi => oi.CreationDate.Date) // Grupowanie według daty
+                .GroupBy(oi => oi.CreationDate.Date) 
                 .Select(g => new SalesData
                 {
-                    Date = g.Key.ToString("yyyy-MM-dd"), // Formatowanie daty
-                    Quantity = g.Sum(oi => oi.Quantity) // Suma ilości sprzedanych przedmiotów w danym dniu
+                    Date = g.Key.ToString("yyyy-MM-dd"), 
+                    Quantity = g.Sum(oi => oi.Quantity) 
                 })
-                .OrderBy(s => s.Date) // Posortowanie po dacie
+                .OrderBy(s => s.Date) 
                 .ToListAsync();
 
             return salesData;
@@ -219,10 +206,8 @@ namespace FISTNESSGYM.Services
 
         public async Task<List<OrderItem>> GetOrderItemsSoldTodayAsync()
         {
-            // Pobierz dane z bazy (np. wszystkie OrderItemy) - używamy LINQ, więc nie potrzebujemy zapytań SQL
             var allOrderItems = await _context.OrderItems.ToListAsync();
 
-            // Filtrujemy dane po dacie (musi to być dzisiaj)
             return allOrderItems.Where(item => item.CreationDate.Date == DateTime.Today).ToList();
         }
 
@@ -231,21 +216,19 @@ namespace FISTNESSGYM.Services
             var startDate = DateTime.Today.AddDays(-6);
             var endDate = DateTime.Today;
 
-            // First, retrieve the data from the database
             var sales = await _context.OrderItems
                 .Where(item => item.CreationDate >= startDate && item.CreationDate <= endDate)
-                .GroupBy(item => item.CreationDate.Date) // Group by date without formatting
+                .GroupBy(item => item.CreationDate.Date) 
                 .Select(group => new
                 {
-                    Date = group.Key, // Store the DateTime value as is
+                    Date = group.Key, 
                     Quantity = group.Sum(item => item.Quantity)
                 })
                 .ToListAsync();
 
-            // Now, after retrieving the data, format the DateTime to a string
             var salesData = sales.Select(x => new SalesData
             {
-                Date = x.Date.ToString("yyyy-MM-dd"), // Apply the formatting here
+                Date = x.Date.ToString("yyyy-MM-dd"), 
                 Quantity = x.Quantity
             }).ToList();
 
@@ -264,7 +247,6 @@ namespace FISTNESSGYM.Services
                 })
                 .ToListAsync();
 
-            // Konwertowanie daty do formatu "yyyy-MM-dd" po pobraniu danych
             return salesData
                 .Select(g => new SalesData
                 {
@@ -277,36 +259,33 @@ namespace FISTNESSGYM.Services
         public async Task<List<SalesData>> GetSalesDataForMonthAsync(int year, int month)
         {
             var startDate = new DateTime(year, month, 1);
-            var endDate = startDate.AddMonths(1).AddDays(-1); // Ostatni dzień miesiąca
+            var endDate = startDate.AddMonths(1).AddDays(-1);
 
-            // Pobieranie danych sprzedaży dla podanego miesiąca
             var salesDataQuery = await _context.OrderItems
                 .Where(o => o.CreationDate >= startDate && o.CreationDate <= endDate)
-                .GroupBy(o => o.CreationDate.Day) // Grupowanie po numerze dnia (1-31)
+                .GroupBy(o => o.CreationDate.Day) 
                 .Select(g => new SalesData
                 {
-                    Date = g.Key.ToString(), // Numer dnia jako string
+                    Date = g.Key.ToString(), 
                     Quantity = g.Sum(item => item.Quantity)
                 })
                 .ToListAsync();
 
-            // Tworzenie pełnej listy dni w miesiącu
             var allDaysInMonth = Enumerable.Range(1, DateTime.DaysInMonth(year, month))
                 .Select(day => new SalesData
                 {
-                    Date = day.ToString(), // Numer dnia jako string
-                    Quantity = 0 // Domyślna wartość 0
+                    Date = day.ToString(), 
+                    Quantity = 0 
                 })
                 .ToList();
 
-            // Uzupełnianie brakujących dni w danych sprzedaży
             foreach (var dayData in salesDataQuery)
             {
                 var day = int.Parse(dayData.Date);
                 var existingDay = allDaysInMonth.FirstOrDefault(d => d.Date == day.ToString());
                 if (existingDay != null)
                 {
-                    existingDay.Quantity = dayData.Quantity; // Aktualizacja ilości, jeśli dzień istnieje w danych
+                    existingDay.Quantity = dayData.Quantity;
                 }
             }
 
@@ -317,7 +296,7 @@ namespace FISTNESSGYM.Services
         {
             return await _context.OrderItems
                 .Where(item => item.CreationDate.Year == year && item.CreationDate.Month == month)
-                .GroupBy(item => new { item.ProductId, item.Product.Name }) // Grupuj po ID produktu i jego nazwie
+                .GroupBy(item => new { item.ProductId, item.Product.Name }) 
                 .Select(group => new TopProduct
                 {
                     ProductId = group.Key.ProductId,
@@ -328,6 +307,27 @@ namespace FISTNESSGYM.Services
                 .Take(5)
                 .ToListAsync();
         }
+
+        public async Task<int> GetTotalSoldForMonthAsync(int year, int month)
+        {
+            var startDate = new DateTime(year, month, 1);
+            var endDate = startDate.AddMonths(1).AddDays(-1); 
+
+            var totalSoldForMonth = await _context.OrderItems
+                .Where(oi => oi.CreationDate >= startDate && oi.CreationDate <= endDate)
+                .SumAsync(oi => oi.Quantity); 
+
+            return totalSoldForMonth;
+        }
+        public async Task<decimal> GetTotalRevenueForMonthAsync(int year, int month)
+        {
+            var totalSoldMonth = await _context.OrderItems
+                .Where(oi => oi.CreationDate.Year == year && oi.CreationDate.Month == month)
+                .SumAsync(oi => oi.Quantity * oi.UnitPrice);
+
+            return totalSoldMonth;
+        }
+
 
 
 
