@@ -351,6 +351,13 @@ namespace FISTNESSGYM.Services
             return ranking;
         }
 
+        public async Task<List<OrderItem>> GetOrderItemsSoldForMonthAsync(int year, int month)
+        {
+            return await _context.OrderItems
+                .Where(oi => oi.CreationDate.Year == year && oi.CreationDate.Month == month)
+                .ToListAsync();
+        }
+
 
 
 

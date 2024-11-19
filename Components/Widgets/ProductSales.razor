@@ -1,0 +1,83 @@
+﻿@page "/product-sales"
+@using FISTNESSGYM.Services
+@inject ICartService CartService
+
+
+    <!-- Pierwsza karta -->
+    <RadzenCard Style="padding: 20px; border-radius: 8px; border: 1px solid #e0e0e0; width: 340px; height: 160px;">
+        <h4 style="color: #3a3a3a; font-weight: 600; margin-top: 0px;">Sprzedane produkty</h4>
+
+        <div style="margin-bottom: 10px;">
+            @if (TotalSoldToday > 0)
+            {
+                <div style="display: flex; align-items: center; justify-content: space-between;">
+                    <span style="color: #3a3a3a; font-weight: 500;">Dzisiaj</span>
+                    <span style="font-size: 20px; color: #085786; font-weight: 600;">@TotalSoldToday</span>
+                </div>
+            }
+            else
+            {
+                <p style="color: #757575;">Brak sprzedanych produktów dzisiaj.</p>
+            }
+        </div>
+
+        <div>
+            @if (TotalSoldThisMonth > 0)
+            {
+                <div style="display: flex; align-items: center; justify-content: space-between;">
+                    <span style="color: #3a3a3a; font-weight: 500;">W tym miesiącu</span>
+                    <span style="font-size: 20px; color: #085786; font-weight: 600;">@TotalSoldThisMonth</span>
+                </div>
+            }
+            else
+            {
+                <p style="color: #757575;">Brak sprzedanych produktów w tym miesiącu.</p>
+            }
+        </div>
+    </RadzenCard>
+
+    
+
+
+@code {
+    private int TotalSoldToday;
+    private int TotalSoldThisMonth;
+
+    private decimal TotalRevenueToday;
+    private decimal TotalRevenueThisMonth;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Zmieniamy kolejność wywołań asynchronicznych, aby unikać jednoczesnego dostępu do bazy danych.
+        await LoadTotalSoldToday();
+        await LoadTotalSoldThisMonth();
+        await LoadTotalRevenueToday();
+        await LoadTotalRevenueThisMonth();
+    }
+
+    private async Task LoadTotalSoldToday()
+    {
+        TotalSoldToday = await CartService.GetTotalSoldTodayAsync();
+    }
+
+    private async Task LoadTotalSoldThisMonth()
+    {
+        TotalSoldThisMonth = await CartService.GetTotalSoldForMonthAsync(DateTime.Today.Year, DateTime.Today.Month);
+    }
+
+    private async Task LoadTotalRevenueToday()
+    {
+        var orderItems = await CartService.GetOrderItemsSoldTodayAsync();
+        TotalRevenueToday = orderItems
+            .Where(item => item.CreationDate.Date == DateTime.Today)
+            .Sum(item => item.Quantity * item.UnitPrice);
+    }
+
+    private async Task LoadTotalRevenueThisMonth()
+    {
+        var orderItems = await CartService.GetOrderItemsSoldForMonthAsync(DateTime.Today.Year, DateTime.Today.Month);
+        TotalRevenueThisMonth = orderItems
+            .Where(item => item.CreationDate.Month == DateTime.Today.Month)
+            .Sum(item => item.Quantity * item.UnitPrice);
+    }
+}

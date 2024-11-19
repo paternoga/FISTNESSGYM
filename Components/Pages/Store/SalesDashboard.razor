@@ -9,19 +9,23 @@
 
 @attribute [Authorize]
 
-<div style="display: flex; gap: 20px;">
+<div style="display: flex; gap: 20px; flex-wrap: wrap; justify-content: space-between;">
     <!-- Wybór Miesi¹ca i Roku -->
-    <RadzenDropDown @bind-Value="selectedMonth" Data="@monthList" TextProperty="Text" ValueProperty="Value" Style="width: 150px;" />
-    <RadzenDropDown @bind-Value="selectedYear" Data="@yearList" TextProperty="Text" ValueProperty="Value" Style="width: 150px;" />
-    <RadzenButton Text="Filtruj" Click="@OnFilterClick" Style="height: 36px; width: 100px;" />
+    <div style="flex: 1 1 200px;">
+        <RadzenDropDown @bind-Value="selectedMonth" Data="@monthList" TextProperty="Text" ValueProperty="Value" Style="width: 100%;" />
+    </div>
+    <div style="flex: 1 1 200px;">
+        <RadzenDropDown @bind-Value="selectedYear" Data="@yearList" TextProperty="Text" ValueProperty="Value" Style="width: 100%;" />
+    </div>
+    <div style="flex: 1 1 200px;">
+        <RadzenButton Text="Filtruj" Click="@OnFilterClick" Style="height: 36px; width: 100%;" />
+    </div>
 </div>
 
-<div style="display: flex; gap: 20px;">
+<div style="display: flex; gap: 20px; flex-wrap: wrap; justify-content: space-between; margin-top: 20px;">
     <!-- Widget Sprzedane Produkty Dzisiaj -->
-    <RadzenCard Style="padding: 20px; border-radius: 8px; border: 1px solid #e0e0e0; width: 340px; height: 160px;">
+    <RadzenCard Style="padding: 20px; border-radius: 8px; border: 1px solid #e0e0e0; width: 30%;">
         <h4 style="color: #3a3a3a; font-weight: 600; margin-top: 0px;">Sprzedane produkty</h4>
-
-        <!-- Sprzedane Produkty Dzisiaj -->
         <div style="margin-bottom: 10px;">
             @if (totalSoldToday > 0)
             {
@@ -35,8 +39,6 @@
                 <p style="color: #757575;">Brak sprzedanych produktów dzisiaj.</p>
             }
         </div>
-
-        <!-- Sprzedane Produkty w Tym Miesi¹cu -->
         <div>
             @if (totalSoldThisMonth > 0)
             {
@@ -53,9 +55,8 @@
     </RadzenCard>
 
     <!-- Widget Obrót -->
-    <RadzenCard Style="padding: 20px; border-radius: 8px; border: 1px solid #e0e0e0; width: 340px; height: 160px;">
+    <RadzenCard Style="padding: 20px; border-radius: 8px; border: 1px solid #e0e0e0; width: 30%;">
         <h4 style="color: #3a3a3a; font-weight: 600; margin-top: 0px;">Obrót:</h4>
-
         <div style="margin-bottom: 10px;">
             @if (totalRevenueToday > 0)
             {
@@ -69,7 +70,6 @@
                 <p style="color: #757575;">Brak obrotu pieniêdzmi dzisiaj.</p>
             }
         </div>
-
         <div style="margin-bottom: 10px;">
             @if (totalRevenueThisMonth > 0)
             {
@@ -84,9 +84,67 @@
             }
         </div>
     </RadzenCard>
+
+    <!-- Widget Produkty z brakami w magazynie -->
+    <RadzenCard Style="padding: 20px; border-radius: 8px; border: 1px solid #e0e0e0; width: 30%;">
+        <h4 style="color: #3a3a3a; font-weight: 600; margin-top: 0px;">Produkty z brakami w magazynie</h4>
+        <div style="display: flex; align-items: center; justify-content: space-between;">
+            <span style="font-size: 18px; color: #3a3a3a; font-weight: 500;">Liczba produktów:</span>
+            <span style="font-size: 20px; color: #d9534f; font-weight: 600;">@outOfStockCount</span>
+        </div>
+        @* <RadzenButton Text="PrzejdŸ do"
+                      Style="margin-top: 15px; background-color: --rz-primary; color: --rz-on-primary; border: none;"
+                      Click="@NavigateToOutOfStock" Variant="Variant.Flat"/> *@
+    </RadzenCard>
 </div>
 
-<RadzenStack>
+
+
+<!-- Widget Top 5 produktów -->
+<div style="display: flex; gap: 20px; flex-wrap: wrap; justify-content: space-between; margin-top: 20px;">
+    <RadzenCard Style="padding: 20px; border-radius: 8px; border: 1px solid #e0e0e0; width: 30%;">
+        <h4 style="color: #3a3a3a; font-weight: 600; margin-top: 0px;">Top 5 produktów miesi¹ca</h4>
+        @if (topProducts != null && topProducts.Any())
+        {
+            <ul style="list-style: none; padding-left: 0;">
+                @foreach (var product in topProducts)
+                {
+                    <li style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                        <span style="color: #3a3a3a; font-weight: 500;">@product.ProductName:</span>
+                        <span style="font-size: 18px; color: #085786; font-weight: 600;">@product.TotalQuantity</span>
+                    </li>
+                }
+            </ul>
+        }
+        else
+        {
+            <p style="color: #757575;">Brak danych dla wybranego miesi¹ca.</p>
+        }
+    </RadzenCard>
+
+    <!-- Widget Top kategorie miesi¹ca -->
+    <RadzenCard Style="padding: 20px; border-radius: 8px; border: 1px solid #e0e0e0; width: 30%;">
+        <h4 style="color: #3a3a3a; font-weight: 600; margin-top: 0px;">Top kategorie miesi¹ca</h4>
+        @if (topCategories != null && topCategories.Any())
+        {
+            <ul style="list-style: none; padding-left: 0;">
+                @foreach (var category in topCategories)
+                {
+                    <li style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                        <span style="color: #3a3a3a; font-weight: 500;">@category.CategoryName:</span>
+                        <span style="font-size: 18px; color: #085786; font-weight: 600;">@category.TotalQuantity</span>
+                    </li>
+                }
+            </ul>
+        }
+        else
+        {
+            <p style="color: #757575;">Brak danych dla wybranego miesi¹ca.</p>
+        }
+    </RadzenCard>
+</div>
+
+<RadzenStack Style="margin-top: 20px;">
     <!-- Widget Wykres -->
     <RadzenCard>
         <RadzenChart>
@@ -104,62 +162,6 @@
         </RadzenChart>
     </RadzenCard>
 </RadzenStack>
-
-<!-- Widget Top 5 produktów -->
-<RadzenCard Style="padding: 20px; border-radius: 8px; border: 1px solid #e0e0e0; width: 340px; height: auto;">
-    <h4 style="color: #3a3a3a; font-weight: 600; margin-top: 0px;">Top 5 produktów miesi¹ca</h4>
-
-    @if (topProducts != null && topProducts.Any())
-    {
-        <ul style="list-style: none; padding-left: 0;">
-            @foreach (var product in topProducts)
-            {
-                <li style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-                    <span style="color: #3a3a3a; font-weight: 500;">@product.ProductName:</span>
-                    <span style="font-size: 18px; color: #085786; font-weight: 600;">@product.TotalQuantity</span>
-                </li>
-            }
-        </ul>
-    }
-    else
-    {
-        <p style="color: #757575;">Brak danych dla wybranego miesi¹ca.</p>
-    }
-</RadzenCard>
-
-<RadzenCard Style="padding: 20px; border-radius: 8px; border: 1px solid #e0e0e0; width: 340px; height: auto;">
-    <h4 style="color: #3a3a3a; font-weight: 600; margin-top: 0px;">Top kategorie miesi¹ca</h4>
-
-    @if (topCategories != null && topCategories.Any())
-    {
-        <ul style="list-style: none; padding-left: 0;">
-            @foreach (var category in topCategories)
-            {
-                <li style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-                    <span style="color: #3a3a3a; font-weight: 500;">@category.CategoryName:</span>
-                    <span style="font-size: 18px; color: #085786; font-weight: 600;">@category.TotalQuantity</span>
-                </li>
-            }
-        </ul>
-    }
-    else
-    {
-        <p style="color: #757575;">Brak danych dla wybranego miesi¹ca.</p>
-    }
-</RadzenCard>
-
-<RadzenCard Style="padding: 20px; border-radius: 8px; border: 1px solid #e0e0e0; width: 340px; height: auto;">
-    <h4 style="color: #3a3a3a; font-weight: 600; margin-top: 0px;">Produkty z brakami w magazynie</h4>
-
-    <div style="display: flex; align-items: center; justify-content: space-between;">
-        <span style="font-size: 18px; color: #3a3a3a; font-weight: 500;">Liczba produktów:</span>
-        <span style="font-size: 20px; color: #d9534f; font-weight: 600;">@outOfStockCount</span>
-    </div>
-
-    <RadzenButton Text="PrzejdŸ do"
-                  Style="margin-top: 15px; background-color: #007bff; color: white; border: none;"
-                  Click="NavigateToOutOfStockPage" />
-</RadzenCard>
 
 
 @code {
@@ -272,10 +274,10 @@
         outOfStockCount = await ProductService.GetOutOfStockCountAsync();
     }
 
-    private void NavigateToOutOfStockPage()
-    {
-        NavigationManager.NavigateTo("/out-of-stock-products");
-    }
+    // private void NavigateToOutOfStock()
+    // {
+    //     NavigationManager.NavigateTo("/store/products?filter=StockQuantity eq 0");
+    // }
 
 
     public class DropDownItem

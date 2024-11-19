@@ -43,6 +43,8 @@ namespace FISTNESSGYM.Services
         Task<decimal> GetTotalRevenueForMonthAsync(int year, int month);
         Task<List<CategorySalesData>> GetCategoryRankingForMonthAsync(int year, int month);
 
+        Task<List<OrderItem>> GetOrderItemsSoldForMonthAsync(int year, int month);
+
 
 
 
