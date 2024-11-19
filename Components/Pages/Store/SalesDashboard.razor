@@ -1,5 +1,6 @@
 @page "/sales-dashboard"
 @inject ICartService CartService
+@inject IProductService ProductService
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @using FISTNESSGYM.Models.database
 @using FISTNESSGYM.Models.Database
@@ -126,6 +127,41 @@
     }
 </RadzenCard>
 
+<RadzenCard Style="padding: 20px; border-radius: 8px; border: 1px solid #e0e0e0; width: 340px; height: auto;">
+    <h4 style="color: #3a3a3a; font-weight: 600; margin-top: 0px;">Top kategorie miesi¹ca</h4>
+
+    @if (topCategories != null && topCategories.Any())
+    {
+        <ul style="list-style: none; padding-left: 0;">
+            @foreach (var category in topCategories)
+            {
+                <li style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                    <span style="color: #3a3a3a; font-weight: 500;">@category.CategoryName:</span>
+                    <span style="font-size: 18px; color: #085786; font-weight: 600;">@category.TotalQuantity</span>
+                </li>
+            }
+        </ul>
+    }
+    else
+    {
+        <p style="color: #757575;">Brak danych dla wybranego miesi¹ca.</p>
+    }
+</RadzenCard>
+
+<RadzenCard Style="padding: 20px; border-radius: 8px; border: 1px solid #e0e0e0; width: 340px; height: auto;">
+    <h4 style="color: #3a3a3a; font-weight: 600; margin-top: 0px;">Produkty z brakami w magazynie</h4>
+
+    <div style="display: flex; align-items: center; justify-content: space-between;">
+        <span style="font-size: 18px; color: #3a3a3a; font-weight: 500;">Liczba produktów:</span>
+        <span style="font-size: 20px; color: #d9534f; font-weight: 600;">@outOfStockCount</span>
+    </div>
+
+    <RadzenButton Text="PrzejdŸ do"
+                  Style="margin-top: 15px; background-color: #007bff; color: white; border: none;"
+                  Click="NavigateToOutOfStockPage" />
+</RadzenCard>
+
+
 @code {
     private decimal totalRevenueToday;
     private int totalSoldToday;
@@ -136,6 +172,12 @@
     private int totalSoldForMonth;
     private int totalSoldThisMonth;
     private decimal totalRevenueThisMonth;
+    private int outOfStockCount;
+
+
+    private List<CategorySalesData> categoryRanking = new();
+    private List<CategorySalesData> topCategories;
+
 
 
     private List<TopProduct> topProducts;
@@ -171,6 +213,8 @@
         await LoadTopProducts();
         await LoadTotalSoldThisMonth();
         await LoadTotalRevenueThisMonth();
+        await LoadCategoryRanking();
+        await LoadOutOfStockCount();
     }
 
     private async Task OnFilterClick()
@@ -181,6 +225,8 @@
         await LoadTopProducts();
         await LoadTotalSoldThisMonth();
         await LoadTotalRevenueThisMonth();
+        await LoadCategoryRanking();
+        await LoadOutOfStockCount();
     }
 
     private async Task LoadSalesData()
@@ -214,6 +260,23 @@
     {
         totalRevenueThisMonth = await CartService.GetTotalRevenueForMonthAsync(selectedYear, selectedMonth);
     }
+
+    private async Task LoadCategoryRanking()
+    {
+        //categoryRanking = await CartService.GetCategoryRankingForMonthAsync(selectedYear, selectedMonth);
+        topCategories = await CartService.GetCategoryRankingForMonthAsync(selectedYear, selectedMonth);
+    }
+
+    private async Task LoadOutOfStockCount()
+    {
+        outOfStockCount = await ProductService.GetOutOfStockCountAsync();
+    }
+
+    private void NavigateToOutOfStockPage()
+    {
+        NavigationManager.NavigateTo("/out-of-stock-products");
+    }
+
 
     public class DropDownItem
     {
