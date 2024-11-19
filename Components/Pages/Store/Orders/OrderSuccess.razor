@@ -2,6 +2,8 @@
 @inject NotificationService NotificationService
 @inject NavigationManager NavigationManager
 
+@attribute [Authorize]
+
 <RadzenAlert AllowClose="false" AlertStyle="AlertStyle.Success" Variant="Variant.Flat" Shade="Shade.Lighter">
     Zamówienie zostało złożone.
 </RadzenAlert>

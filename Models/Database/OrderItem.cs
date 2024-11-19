@@ -27,5 +27,7 @@ namespace FISTNESSGYM.Models.database
 
         [Required]
         public decimal UnitPrice { get; set; }
+
+        public DateTime CreationDate { get; set; }
     }
 }

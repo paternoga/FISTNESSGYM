@@ -11,6 +11,7 @@ using Radzen.Blazor;
 using Microsoft.AspNetCore.Authentication;
 using FISTNESSGYM.Models.database;
 using Microsoft.IdentityModel.Tokens;
+using FISTNESSGYM.Components.Pages.Training.TrainingPlans.WorkoutExercises;
 
 namespace FISTNESSGYM.Components.Pages.Training.TrainingPlans.WorkoutPlans
 {
@@ -177,6 +178,21 @@ namespace FISTNESSGYM.Components.Pages.Training.TrainingPlans.WorkoutPlans
             if (result != null)
             {
                 await LoadClientWorkoutPlans();
+            }
+        }
+        protected async Task AddExerciseToPlan(int workoutPlanId)
+        {
+            var parameters = new Dictionary<string, object>
+    {
+        { "WorkoutPlanId", workoutPlanId }  
+    };
+
+            var result = await DialogService.OpenAsync<AddWorkoutExercise>("Dodaj Æwiczenie", parameters);
+
+            if (result != null)
+            {
+                workoutPlans = await databaseService.GetWorkoutPlansForUser(Security.User?.Id); // Ponowne za³adowanie
+                StateHasChanged(); // Odœwie¿enie widoku
             }
         }
 

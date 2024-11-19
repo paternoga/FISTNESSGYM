@@ -2,6 +2,8 @@
 @inject NotificationService NotificationService
 @inject NavigationManager NavigationManager
 
+@attribute [Authorize]
+
 <RadzenAlert AllowClose="false" AlertStyle="AlertStyle.Danger" Variant="Variant.Flat" Shade="Shade.Lighter">
     Wystąpił błąd podczas składania zamówienia.
 </RadzenAlert>

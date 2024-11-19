@@ -1,5 +1,6 @@
 ﻿using FISTNESSGYM.Data;
 using FISTNESSGYM.Models.database;
+using FISTNESSGYM.Models.Database;
 using Microsoft.AspNetCore.Components;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
@@ -19,29 +20,25 @@ namespace FISTNESSGYM.Services
 
         public async Task AddToCart(string userId, Product product, int quantity)
         {
-            // Sprawdź, czy produkt już istnieje w koszyku dla danego użytkownika
             var existingCartItem = await _context.CartItems
                 .FirstOrDefaultAsync(ci => ci.UserId == userId && ci.ProductId == product.Id);
 
             if (existingCartItem != null)
             {
-                // Jeśli element już istnieje, zaktualizuj jego ilość
                 existingCartItem.Quantity += quantity;
-                _context.CartItems.Update(existingCartItem); // Oznacz element do aktualizacji
+                _context.CartItems.Update(existingCartItem); 
             }
             else
             {
-                // Jeśli element nie istnieje, dodaj nowy
                 var newCartItem = new CartItem
                 {
                     UserId = userId,
                     ProductId = product.Id,
                     Quantity = quantity
                 };
-                await _context.CartItems.AddAsync(newCartItem); // Dodaj nowy element do kontekstu
+                await _context.CartItems.AddAsync(newCartItem); 
             }
 
-            // Zapisz zmiany w bazie danych
             await _context.SaveChangesAsync();
         }
 
@@ -59,7 +56,7 @@ namespace FISTNESSGYM.Services
         {
             return _context.CartItems
                 .Where(ci => ci.UserId == userId)
-                .Include(ci => ci.Product) // Załaduj powiązane produkty
+                .Include(ci => ci.Product) 
                 .ToList();
         }
 
@@ -67,7 +64,7 @@ namespace FISTNESSGYM.Services
         {
             return _context.CartItems
                 .Where(ci => ci.UserId == userId)
-                .Sum(ci => ci.Quantity * ci.Product.Price); // Zakłada, że masz załadowane produkty
+                .Sum(ci => ci.Quantity * ci.Product.Price); 
         }
 
         public void ClearCart(string userId)
@@ -99,7 +96,7 @@ namespace FISTNESSGYM.Services
         {
             return await _context.CartItems
                                  .Where(ci => ci.UserId == userId)
-                                 .Include(ci => ci.Product) // dołącz szczegóły produktu
+                                 .Include(ci => ci.Product) 
                                  .ToListAsync();
         }
 
@@ -125,16 +122,15 @@ namespace FISTNESSGYM.Services
 
         public async Task AddToCartAsync(string userId, CartItem item)
         {
-            // Można dodać logikę do dodawania przedmiotu do koszyka, z aktualizacją ilości
             var existingItem = await _context.CartItems
                                               .FirstOrDefaultAsync(ci => ci.UserId == userId && ci.ProductId == item.ProductId);
             if (existingItem != null)
             {
-                existingItem.Quantity += item.Quantity; // aktualizacja ilości
+                existingItem.Quantity += item.Quantity;
             }
             else
             {
-                item.UserId = userId; // ustawienie UserId przed dodaniem
+                item.UserId = userId;
                 await _context.CartItems.AddAsync(item);
             }
 
@@ -143,11 +139,9 @@ namespace FISTNESSGYM.Services
 
         public async Task PlaceOrderAsync(Order order, List<CartItem> cartItems)
         {
-            // Dodaj zamówienie do bazy danych
             await _context.Orders.AddAsync(order);
             await _context.SaveChangesAsync();
 
-            // Dodaj pozycje zamówienia
             foreach (var cartItem in cartItems)
             {
                 var orderItem = new OrderItem
@@ -155,31 +149,195 @@ namespace FISTNESSGYM.Services
                     OrderId = order.Id,
                     ProductId = cartItem.ProductId,
                     Quantity = cartItem.Quantity,
-                    UnitPrice = cartItem.Product.Price // zakładam, że price jest pobierane z produktu
+                    UnitPrice = cartItem.Product.Price,
+                    CreationDate = DateTime.Now
                 };
 
                 await _context.OrderItems.AddAsync(orderItem);
                 
-                // Aktualizacja stanu magazynowego
                 var product = await _context.Products.FindAsync(cartItem.ProductId);
                 if (product != null)
                 {
-                    // Kontrola stanu magazynowego
                     if (product.StockQuantity >= cartItem.Quantity)
                     {
-                        product.StockQuantity -= cartItem.Quantity; // Odejmij ilość zamówioną od stanu magazynowego
+                        product.StockQuantity -= cartItem.Quantity; 
                     }
                     else
                     {
-                        //throw new Exception("Niewystarczająca ilość produktu w magazynie."); // Obsłuż sytuację, gdy brak wystarczającej ilości
                         throw new InvalidOperationException("Niewystarczająca ilość produktu w magazynie.");
                     }
                 }
             }
 
-            // Zapisz zmiany w bazie danych
             await _context.SaveChangesAsync();
         }
+
+        //Analityka sklepu///////
+        public async Task<int> GetTotalSoldTodayAsync()
+        {
+            var todayStart = DateTime.Today;
+            var todayEnd = todayStart.AddDays(1).AddSeconds(-1); 
+
+            var totalSoldToday = await _context.OrderItems
+                .Where(oi => oi.CreationDate >= todayStart && oi.CreationDate <= todayEnd) 
+                .SumAsync(oi => oi.Quantity); 
+
+            return totalSoldToday;
+        }
+
+        public async Task<List<SalesData>> GetSalesDataForLastDaysAsync(int days = 7)
+        {
+            var todayStart = DateTime.Today;
+            var startDate = todayStart.AddDays(-days); 
+
+            var salesData = await _context.OrderItems
+                .Where(oi => oi.CreationDate >= startDate && oi.CreationDate < todayStart)
+                .GroupBy(oi => oi.CreationDate.Date) 
+                .Select(g => new SalesData
+                {
+                    Date = g.Key.ToString("yyyy-MM-dd"), 
+                    Quantity = g.Sum(oi => oi.Quantity) 
+                })
+                .OrderBy(s => s.Date) 
+                .ToListAsync();
+
+            return salesData;
+        }
+
+        public async Task<List<OrderItem>> GetOrderItemsSoldTodayAsync()
+        {
+            var allOrderItems = await _context.OrderItems.ToListAsync();
+
+            return allOrderItems.Where(item => item.CreationDate.Date == DateTime.Today).ToList();
+        }
+
+        public async Task<List<SalesData>> GetSalesDataForWeekAsync()
+        {
+            var startDate = DateTime.Today.AddDays(-6);
+            var endDate = DateTime.Today;
+
+            var sales = await _context.OrderItems
+                .Where(item => item.CreationDate >= startDate && item.CreationDate <= endDate)
+                .GroupBy(item => item.CreationDate.Date) 
+                .Select(group => new
+                {
+                    Date = group.Key, 
+                    Quantity = group.Sum(item => item.Quantity)
+                })
+                .ToListAsync();
+
+            var salesData = sales.Select(x => new SalesData
+            {
+                Date = x.Date.ToString("yyyy-MM-dd"), 
+                Quantity = x.Quantity
+            }).ToList();
+
+            return salesData;
+        }
+
+        public async Task<List<SalesData>> GetSalesDataForPeriodAsync(DateTime startDate, DateTime endDate)
+        {
+            var salesData = await _context.OrderItems
+                .Where(o => o.CreationDate >= startDate && o.CreationDate <= endDate)
+                .GroupBy(o => o.CreationDate.Date)
+                .Select(g => new
+                {
+                    Date = g.Key,
+                    Quantity = g.Sum(item => item.Quantity)
+                })
+                .ToListAsync();
+
+            return salesData
+                .Select(g => new SalesData
+                {
+                    Date = g.Date.ToString("yyyy-MM-dd"),
+                    Quantity = g.Quantity
+                })
+                .ToList();
+        }
+
+        public async Task<List<SalesData>> GetSalesDataForMonthAsync(int year, int month)
+        {
+            var startDate = new DateTime(year, month, 1);
+            var endDate = startDate.AddMonths(1).AddDays(-1);
+
+            var salesDataQuery = await _context.OrderItems
+                .Where(o => o.CreationDate >= startDate && o.CreationDate <= endDate)
+                .GroupBy(o => o.CreationDate.Day) 
+                .Select(g => new SalesData
+                {
+                    Date = g.Key.ToString(), 
+                    Quantity = g.Sum(item => item.Quantity)
+                })
+                .ToListAsync();
+
+            var allDaysInMonth = Enumerable.Range(1, DateTime.DaysInMonth(year, month))
+                .Select(day => new SalesData
+                {
+                    Date = day.ToString(), 
+                    Quantity = 0 
+                })
+                .ToList();
+
+            foreach (var dayData in salesDataQuery)
+            {
+                var day = int.Parse(dayData.Date);
+                var existingDay = allDaysInMonth.FirstOrDefault(d => d.Date == day.ToString());
+                if (existingDay != null)
+                {
+                    existingDay.Quantity = dayData.Quantity;
+                }
+            }
+
+            return allDaysInMonth;
+        }
+
+        public async Task<List<TopProduct>> GetTopProductsForMonthAsync(int year, int month)
+        {
+            return await _context.OrderItems
+                .Where(item => item.CreationDate.Year == year && item.CreationDate.Month == month)
+                .GroupBy(item => new { item.ProductId, item.Product.Name }) 
+                .Select(group => new TopProduct
+                {
+                    ProductId = group.Key.ProductId,
+                    ProductName = group.Key.Name,
+                    TotalQuantity = group.Sum(item => item.Quantity)
+                })
+                .OrderByDescending(product => product.TotalQuantity)
+                .Take(5)
+                .ToListAsync();
+        }
+
+        public async Task<int> GetTotalSoldForMonthAsync(int year, int month)
+        {
+            var startDate = new DateTime(year, month, 1);
+            var endDate = startDate.AddMonths(1).AddDays(-1); 
+
+            var totalSoldForMonth = await _context.OrderItems
+                .Where(oi => oi.CreationDate >= startDate && oi.CreationDate <= endDate)
+                .SumAsync(oi => oi.Quantity); 
+
+            return totalSoldForMonth;
+        }
+        public async Task<decimal> GetTotalRevenueForMonthAsync(int year, int month)
+        {
+            var totalSoldMonth = await _context.OrderItems
+                .Where(oi => oi.CreationDate.Year == year && oi.CreationDate.Month == month)
+                .SumAsync(oi => oi.Quantity * oi.UnitPrice);
+
+            return totalSoldMonth;
+        }
+
+
+
+
+
+
+
+
+
+
+
 
     }
 }

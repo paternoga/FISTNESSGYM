@@ -52,13 +52,40 @@ namespace FISTNESSGYM.Components.Pages.Training.TrainingPlans.WorkoutExercises
         }
         protected override async Task OnInitializedAsync()
         {
-            workoutExercises = await databaseService.GetWorkoutExercises(new Query { Expand = "Exercise,WorkoutPlan" });
+            if (AuthorizationService.IsAdmin || AuthorizationService.IsTrainer || AuthorizationService.IsWorker)
+            {
+                workoutExercises = await databaseService.GetWorkoutExercises(new Query { Expand = "Exercise,WorkoutPlan" });
+            }
+            else if (AuthorizationService.IsClient)
+            {
+                string userId = Security.User?.Id;
+
+                if (!string.IsNullOrEmpty(userId))
+                {
+                    // Pobiera �wiczenia dla plan�w treningowych przypisanych do zalogowanego u�ytkownika
+                    workoutExercises = await databaseService.GetWorkoutExercisesForUser(userId);
+                }
+            }
         }
 
         protected async Task AddButtonClick(MouseEventArgs args)
         {
-            await DialogService.OpenAsync<AddWorkoutExercise>("Add WorkoutExercise", null);
-            await grid0.Reload();
+            var result = await DialogService.OpenAsync<AddWorkoutExercise>("Add WorkoutExercise", null);
+
+            if (result != null) // Sprawdzamy, czy dodanie �wiczenia si� powiod�o
+            {
+                if (AuthorizationService.IsClient)
+                {
+                    // Ponownie za�aduj �wiczenia klienta
+                    workoutExercises = await databaseService.GetWorkoutExercisesForUser(Security.User?.Id);
+                    StateHasChanged(); // Od�wie�enie widoku
+                }
+                else
+                {
+                    // Od�wie� grid dla administratora
+                    await grid0.Reload();
+                }
+            }
         }
 
         protected async Task EditRow(FISTNESSGYM.Models.database.WorkoutExercise args)
@@ -76,7 +103,15 @@ namespace FISTNESSGYM.Components.Pages.Training.TrainingPlans.WorkoutExercises
 
                     if (deleteResult != null)
                     {
-                        await grid0.Reload();
+                        if (AuthorizationService.IsClient)
+                        {
+                            workoutExercises = await databaseService.GetWorkoutExercisesForUser(Security.User?.Id);
+                            StateHasChanged(); 
+                        }
+                        else
+                        {
+                            await grid0.Reload(); 
+                        }
                     }
                 }
             }

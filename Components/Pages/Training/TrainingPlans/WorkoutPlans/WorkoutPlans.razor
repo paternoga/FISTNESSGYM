@@ -68,12 +68,12 @@ else if (AuthorizationService.IsClient)
                     <RadzenColumn Size="12" SizeMD="6" Style="margin-bottom: 1rem;">
                         <RadzenCard Style="border: 1px solid #ddd; padding: 1rem; box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.1);">
                             <div class="rz-card-title">
-                                <h5>@plan.Name</h5>
+                                <h3>@plan.Name</h3>
                                 <small>Data utworzenia: @(plan.CreatedDate.ToString("yyyy-MM-dd") ?? "Brak danych")</small>
                             </div>
                             <div class="rz-card-content">
                                 <p>@(plan.Description ?? "Brak opisu")</p>
-                                <h6>Æwiczenia:</h6>
+                                <h4>Æwiczenia:</h4>
                                 @if (plan.WorkoutExercises != null && plan.WorkoutExercises.Any())
                                 {
                                     <ul>
@@ -89,6 +89,8 @@ else if (AuthorizationService.IsClient)
                                 }
                             </div>
                             <div class="rz-card-actions">
+                                <RadzenButton Icon="add" Text="Dodaj Æwiczenie" Style="margin-right: 10px;"
+                                              Click="@(() => AddExerciseToPlan(plan.Id))"  />
                                 <RadzenButton Icon="edit" Text="Edytuj" Style="margin-right: 10px;"
                                               Click="@(() => EditClientWorkoutPlan(plan.Id))" />
                                 <RadzenButton Icon="delete" Text="Usuñ" ButtonStyle="ButtonStyle.Danger"
@@ -103,6 +105,6 @@ else if (AuthorizationService.IsClient)
 }
 else
 {
-    <RadzenAlert Text="Brak dostêpu" Severity="Severity.Warning" />
+    <RadzenAlert Text="Musisz posiadaæ wykupiony karnet" Severity="Severity.Warning" />
 }
 

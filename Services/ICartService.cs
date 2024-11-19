@@ -1,4 +1,5 @@
 ﻿using FISTNESSGYM.Models.database;
+using FISTNESSGYM.Models.Database;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -31,6 +32,17 @@ namespace FISTNESSGYM.Services
         Task AddToCartAsync(string userId, CartItem item);
 
         Task PlaceOrderAsync(Order order, List<CartItem> cartItems);
+        Task<int> GetTotalSoldTodayAsync();
+        Task<List<SalesData>> GetSalesDataForLastDaysAsync(int days = 7);
+        Task<List<OrderItem>> GetOrderItemsSoldTodayAsync();
+        Task<List<SalesData>> GetSalesDataForWeekAsync();
+        Task<List<SalesData>> GetSalesDataForPeriodAsync(DateTime startDate, DateTime endDate);
+        Task<List<SalesData>> GetSalesDataForMonthAsync(int year, int month);
+        Task<List<TopProduct>> GetTopProductsForMonthAsync(int year, int month);
+        Task<int> GetTotalSoldForMonthAsync(int year, int month);
+        Task<decimal> GetTotalRevenueForMonthAsync(int year, int month);
+
+
 
     }
 }

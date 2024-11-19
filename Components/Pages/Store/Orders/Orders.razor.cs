@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Radzen;
 using Radzen.Blazor;
+using FISTNESSGYM.Services;
 
 namespace FISTNESSGYM.Components.Pages.Store.Orders
 {
@@ -33,18 +34,35 @@ namespace FISTNESSGYM.Components.Pages.Store.Orders
         [Inject]
         public databaseService databaseService { get; set; }
 
+        [Inject]
+        protected AuthorizationService AuthorizationService { get; set; }
+
+
+
         protected IEnumerable<FISTNESSGYM.Models.database.Order> orders;
 
         protected RadzenDataGrid<FISTNESSGYM.Models.database.Order> grid0;
         protected bool isEdit = true;
         protected override async Task OnInitializedAsync()
         {
-            orders = await databaseService.GetOrders(new Query { Expand = "AspNetUser,OrderStatus" });
+            if (AuthorizationService.IsAdmin || AuthorizationService.IsTrainer || AuthorizationService.IsWorker)
+            {
+                orders = await databaseService.GetOrders(new Query { Expand = "AspNetUser,OrderStatus" });
+            }
+            else if (AuthorizationService.IsClient)
+            {
+                string userId = Security.User?.Id;
+
+                if (!string.IsNullOrEmpty(userId))
+                {
+                    orders = await databaseService.GetOrdersForUser(userId);
+                }
+            }
 
             aspNetUsersForUserId = await databaseService.GetAspNetUsers();
-
             orderStatusesForOrderStatusId = await databaseService.GetOrderStatuses();
         }
+
 
         protected async Task AddButtonClick(MouseEventArgs args)
         {

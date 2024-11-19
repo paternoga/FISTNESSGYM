@@ -5,15 +5,18 @@
 @inject NavigationManager NavigationManager
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject NotificationService NotificationService
+@inject AuthorizationService AuthorizationService
 @using FISTNESSGYM.Models.database
 @using System.Security.Claims
 @using Radzen
 @using Radzen.Blazor
 @inherits LayoutComponentBase
 
+@attribute [Authorize]
+
 <PageTitle>KATALOG PRODUKTÓW</PageTitle>
 
-<h3 class="catalog-title">Katalog Produktów</h3>
+
 <link href="css/store/productcatalog.css" rel="stylesheet" />
 
 
@@ -56,22 +59,44 @@
         {
             <div class="product-item">
                 <h4 class="product-name">@product.Name</h4>
-                <p class="product-description">@product.Description</p>
+                <h5 class="product-category">@product.Category</h5>
+                @* <p class="product-description">@product.Description</p> *@
                 <p class="product-price">@product.Price zł</p>
-
-                <div class="button-group">
-                    <RadzenButton Text="Szczegóły"
-                                  Click="() => NavigateToDetails(product.Id)"
-                                  ButtonStyle="ButtonStyle.Primary"
-                                  Style="width: 60%; height: 36px;"
-                                  class="rz-button rz-button-md rz-variant-filled rz-primary rz-shade-default filter-button" />
-
+                <p class="product-quantity">@product.StockQuantity szt.</p>
+                @if (AuthorizationService.IsClient)
+                {
+                    @if (product.StockQuantity == 0)
+                    {
+                        <RadzenButton Icon="shopping_cart"
+                                      Click="() => AddToCart(product)"
+                                      ButtonStyle="ButtonStyle.Danger"
+                                      Disabled="true"
+                                      Style="width: 50%; height: 36px; background-color: red;"
+                                      class="add-to-cart-button" />
+                    }
+                    else
+                    {
+                    <div class="button-group">
                     <RadzenButton Icon="shopping_cart"
                                   Click="() => AddToCart(product)"
                                   ButtonStyle="ButtonStyle.Warning"
-                                  Style="width: 25%; height: 36px; background-color: #ffc107;"
+                                  Style="width: 50%; height: 36px; background-color: #ffc107;"
                                   class="add-to-cart-button" />
-                </div>
+                    </div>
+                    }
+                }
+                else
+                {
+
+                    <div class="button-group">
+                        <RadzenButton Icon="shopping_cart"
+                                      Click="() => AddToCart(product)"
+                                      ButtonStyle="ButtonStyle.Danger"
+                                      Disabled="true"
+                                      Style="width: 50%; height: 36px; background-color: red;"
+                                      class="add-to-cart-button" />
+                    </div>
+                }
             </div>
         }
     }
@@ -92,7 +117,7 @@
     private bool sortAscending = true;
 
     private int currentPage = 1;
-    private int itemsPerPage = 10;
+    private int itemsPerPage = 15;
     private string successMessage = "";
 
     private int totalPages => (int)Math.Ceiling((double)filteredProducts.Count / itemsPerPage);
@@ -134,7 +159,7 @@
             .Where(p => string.IsNullOrEmpty(selectedCategory) || p.Category == selectedCategory)
             .ToList();
 
-        currentPage = 1; // Resetuj do pierwszej strony po filtrowaniu
+        currentPage = 1;
     }
 
     private void NavigateToDetails(int productId)
@@ -177,12 +202,12 @@
                         cartItem.Quantity++;
                         await CartService.UpdateCartItemAsync(cartItem);
                         message = $"{product.Name} został zwiększony w koszyku.";
-                        severity = NotificationSeverity.Success; // Ustawienie na sukces
+                        severity = NotificationSeverity.Success; 
                     }
                     else
                     {
                         message = $"{product.Name} nie może być dodany do koszyka, ponieważ dostępna ilość w magazynie to tylko {stockQuantity}.";
-                        severity = NotificationSeverity.Error; // Ustawienie na błąd
+                        severity = NotificationSeverity.Error;
                     }
                 }
                 else
@@ -191,16 +216,15 @@
                     {
                         await CartService.AddToCart(userId, product, 1);
                         message = $"{product.Name} został dodany do koszyka!";
-                        severity = NotificationSeverity.Success; // Ustawienie na sukces
+                        severity = NotificationSeverity.Success; 
                     }
                     else
                     {
                         message = $"{product.Name} jest obecnie niedostępny w magazynie.";
-                        severity = NotificationSeverity.Error; // Ustawienie na błąd
+                        severity = NotificationSeverity.Error; 
                     }
                 }
 
-                // Wyświetl powiadomienie tylko raz
                 ShowNotification(message, severity);
 
                 StateHasChanged();

@@ -1,0 +1,223 @@
+@page "/sales-dashboard"
+@inject ICartService CartService
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@using FISTNESSGYM.Models.database
+@using FISTNESSGYM.Models.Database
+@using FISTNESSGYM.Services
+@using Radzen
+
+@attribute [Authorize]
+
+<div style="display: flex; gap: 20px;">
+    <!-- Wybór Miesi¹ca i Roku -->
+    <RadzenDropDown @bind-Value="selectedMonth" Data="@monthList" TextProperty="Text" ValueProperty="Value" Style="width: 150px;" />
+    <RadzenDropDown @bind-Value="selectedYear" Data="@yearList" TextProperty="Text" ValueProperty="Value" Style="width: 150px;" />
+    <RadzenButton Text="Filtruj" Click="@OnFilterClick" Style="height: 36px; width: 100px;" />
+</div>
+
+<div style="display: flex; gap: 20px;">
+    <!-- Widget Sprzedane Produkty Dzisiaj -->
+    <RadzenCard Style="padding: 20px; border-radius: 8px; border: 1px solid #e0e0e0; width: 340px; height: 160px;">
+        <h4 style="color: #3a3a3a; font-weight: 600; margin-top: 0px;">Sprzedane produkty</h4>
+
+        <!-- Sprzedane Produkty Dzisiaj -->
+        <div style="margin-bottom: 10px;">
+            @if (totalSoldToday > 0)
+            {
+                <div style="display: flex; align-items: center; justify-content: space-between;">
+                    <span style="color: #3a3a3a; font-weight: 500;">Dzisiaj</span>
+                    <span style="font-size: 20px; color: #085786; font-weight: 600;">@totalSoldToday</span>
+                </div>
+            }
+            else
+            {
+                <p style="color: #757575;">Brak sprzedanych produktów dzisiaj.</p>
+            }
+        </div>
+
+        <!-- Sprzedane Produkty w Tym Miesi¹cu -->
+        <div>
+            @if (totalSoldThisMonth > 0)
+            {
+                <div style="display: flex; align-items: center; justify-content: space-between;">
+                    <span style="color: #3a3a3a; font-weight: 500;">W tym miesi¹cu</span>
+                    <span style="font-size: 20px; color: #085786; font-weight: 600;">@totalSoldThisMonth</span>
+                </div>
+            }
+            else
+            {
+                <p style="color: #757575;">Brak sprzedanych produktów w tym miesi¹cu.</p>
+            }
+        </div>
+    </RadzenCard>
+
+    <!-- Widget Obrót -->
+    <RadzenCard Style="padding: 20px; border-radius: 8px; border: 1px solid #e0e0e0; width: 340px; height: 160px;">
+        <h4 style="color: #3a3a3a; font-weight: 600; margin-top: 0px;">Obrót:</h4>
+
+        <div style="margin-bottom: 10px;">
+            @if (totalRevenueToday > 0)
+            {
+                <div style="display: flex; align-items: center; justify-content: space-between;">
+                    <span style="color: #3a3a3a; font-weight: 500;">Dzisiaj</span>
+                    <span style="font-size: 20px; color: #085786; font-weight: 600;">@totalRevenueToday</span>
+                </div>
+            }
+            else
+            {
+                <p style="color: #757575;">Brak obrotu pieniêdzmi dzisiaj.</p>
+            }
+        </div>
+
+        <div style="margin-bottom: 10px;">
+            @if (totalRevenueThisMonth > 0)
+            {
+                <div style="display: flex; align-items: center; justify-content: space-between;">
+                    <span style="color: #3a3a3a; font-weight: 500;">W tym miesi¹cu</span>
+                    <span style="font-size: 20px; color: #085786; font-weight: 600;">@totalRevenueThisMonth.ToString("F2")</span>
+                </div>
+            }
+            else
+            {
+                <p style="color: #757575;">Brak obrotu pieniêdzmi w tym miesi¹cu.</p>
+            }
+        </div>
+    </RadzenCard>
+</div>
+
+<RadzenStack>
+    <!-- Widget Wykres -->
+    <RadzenCard>
+        <RadzenChart>
+            <RadzenColumnSeries Data="@salesData" CategoryProperty="Date" ValueProperty="Quantity" Title="Sprzedane produkty">
+                <RadzenSeriesDataLabels Visible="true" />
+            </RadzenColumnSeries>
+
+            <RadzenCategoryAxis>
+                <RadzenAxisTitle Text="Data" />
+            </RadzenCategoryAxis>
+
+            <RadzenValueAxis>
+                <RadzenAxisTitle Text="Iloœæ sprzedanych produktów" />
+            </RadzenValueAxis>
+        </RadzenChart>
+    </RadzenCard>
+</RadzenStack>
+
+<!-- Widget Top 5 produktów -->
+<RadzenCard Style="padding: 20px; border-radius: 8px; border: 1px solid #e0e0e0; width: 340px; height: auto;">
+    <h4 style="color: #3a3a3a; font-weight: 600; margin-top: 0px;">Top 5 produktów miesi¹ca</h4>
+
+    @if (topProducts != null && topProducts.Any())
+    {
+        <ul style="list-style: none; padding-left: 0;">
+            @foreach (var product in topProducts)
+            {
+                <li style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                    <span style="color: #3a3a3a; font-weight: 500;">@product.ProductName:</span>
+                    <span style="font-size: 18px; color: #085786; font-weight: 600;">@product.TotalQuantity</span>
+                </li>
+            }
+        </ul>
+    }
+    else
+    {
+        <p style="color: #757575;">Brak danych dla wybranego miesi¹ca.</p>
+    }
+</RadzenCard>
+
+@code {
+    private decimal totalRevenueToday;
+    private int totalSoldToday;
+    private List<SalesData> salesData = new List<SalesData>();
+
+    private int selectedMonth = DateTime.Today.Month;
+    private int selectedYear = DateTime.Today.Year;
+    private int totalSoldForMonth;
+    private int totalSoldThisMonth;
+    private decimal totalRevenueThisMonth;
+
+
+    private List<TopProduct> topProducts;
+
+    private List<DropDownItem> monthList = new List<DropDownItem>
+    {
+        new DropDownItem { Text = "Styczeñ", Value = 1 },
+        new DropDownItem { Text = "Luty", Value = 2 },
+        new DropDownItem { Text = "Marzec", Value = 3 },
+        new DropDownItem { Text = "Kwiecieñ", Value = 4 },
+        new DropDownItem { Text = "Maj", Value = 5 },
+        new DropDownItem { Text = "Czerwiec", Value = 6 },
+        new DropDownItem { Text = "Lipiec", Value = 7 },
+        new DropDownItem { Text = "Sierpieñ", Value = 8 },
+        new DropDownItem { Text = "Wrzesieñ", Value = 9 },
+        new DropDownItem { Text = "PaŸdziernik", Value = 10 },
+        new DropDownItem { Text = "Listopad", Value = 11 },
+        new DropDownItem { Text = "Grudzieñ", Value = 12 }
+    };
+
+    private List<DropDownItem> yearList = new List<DropDownItem>
+    {
+        new DropDownItem { Text = (DateTime.Today.Year - 1).ToString(), Value = DateTime.Today.Year - 1 },
+        new DropDownItem { Text = DateTime.Today.Year.ToString(), Value = DateTime.Today.Year },
+        new DropDownItem { Text = (DateTime.Today.Year + 1).ToString(), Value = DateTime.Today.Year + 1 }
+    };
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadSalesData();
+        await LoadTotalSoldToday();
+        await LoadTotalRevenueToday();
+        await LoadTopProducts();
+        await LoadTotalSoldThisMonth();
+        await LoadTotalRevenueThisMonth();
+    }
+
+    private async Task OnFilterClick()
+    {
+        await LoadSalesData();
+        await LoadTotalSoldToday();
+        await LoadTotalRevenueToday();
+        await LoadTopProducts();
+        await LoadTotalSoldThisMonth();
+        await LoadTotalRevenueThisMonth();
+    }
+
+    private async Task LoadSalesData()
+    {
+        salesData = await CartService.GetSalesDataForMonthAsync(selectedYear, selectedMonth);
+    }
+
+    private async Task LoadTotalSoldToday()
+    {
+        totalSoldToday = await CartService.GetTotalSoldTodayAsync();
+    }
+
+    private async Task LoadTotalRevenueToday()
+    {
+        var orderItems = await CartService.GetOrderItemsSoldTodayAsync();
+        totalRevenueToday = orderItems
+            .Where(item => item.CreationDate.Date == DateTime.Today)
+            .Sum(item => item.Quantity * item.UnitPrice);
+    }
+
+    private async Task LoadTopProducts()
+    {
+        topProducts = await CartService.GetTopProductsForMonthAsync(selectedYear, selectedMonth);
+    }
+    private async Task LoadTotalSoldThisMonth()
+    {
+        totalSoldThisMonth = await CartService.GetTotalSoldForMonthAsync(selectedYear, selectedMonth);
+    }
+
+    private async Task LoadTotalRevenueThisMonth()
+    {
+        totalRevenueThisMonth = await CartService.GetTotalRevenueForMonthAsync(selectedYear, selectedMonth);
+    }
+
+    public class DropDownItem
+    {
+        public string Text { get; set; }
+        public int Value { get; set; }
+    }
+}
