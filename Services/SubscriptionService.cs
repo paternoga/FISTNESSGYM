@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using FISTNESSGYM.Data;
+using FISTNESSGYM.Models;
 using FISTNESSGYM.Models.database;
 using FISTNESSGYM.Services;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
@@ -13,11 +15,13 @@ namespace FISTNESSGYM.Services
     {
         private readonly databaseContext _context;
         private readonly ILogger<SubscriptionService> _logger;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public SubscriptionService(databaseContext context, ILogger<SubscriptionService> logger)
+        public SubscriptionService(databaseContext context, ILogger<SubscriptionService> logger, UserManager<ApplicationUser> userManager)
         {
             _context = context;
             _logger = logger;
+            _userManager = userManager;
         }
 
         public async Task<List<SubscriptionType>> GetSubscriptionTypesAsync()
@@ -107,21 +111,33 @@ namespace FISTNESSGYM.Services
                     EndDate = subscriptionTypeId == 1
                         ? DateTime.UtcNow.AddMonths(1)
                         : DateTime.UtcNow.AddYears(1),
-                    SubscriptionStatusId = 1, 
+                    SubscriptionStatusId = 1,
                     Price = price
                 };
 
                 _context.Subscriptions.Add(subscription);
                 await _context.SaveChangesAsync();
+
+                var user = await _userManager.FindByIdAsync(userId);
+                if (user != null)
+                {
+                    if (await _userManager.IsInRoleAsync(user, "Użytkownik"))
+                    {
+                        await _userManager.RemoveFromRoleAsync(user, "Użytkownik");
+                    }
+
+                    if (!await _userManager.IsInRoleAsync(user, "Klient"))
+                    {
+                        await _userManager.AddToRoleAsync(user, "Klient");
+                    }
+                }
             }
             catch (DbUpdateException dbEx)
             {
-                // Log or handle database update exceptions
                 throw new Exception("There was a problem saving the subscription to the database.", dbEx);
             }
             catch (Exception ex)
             {
-                // Log or handle general exceptions
                 throw new Exception("An error occurred while purchasing the subscription.", ex);
             }
         }
@@ -135,23 +151,33 @@ namespace FISTNESSGYM.Services
                 throw new Exception("Subskrypcja nie została znaleziona.");
             }
 
-            subscription.SubscriptionStatusId = 2; 
+            subscription.SubscriptionStatusId = 2;
 
             try
             {
                 await _context.SaveChangesAsync();
+
+                var user = await _userManager.FindByIdAsync(subscription.UserId);
+                if (user != null)
+                {
+                    if (await _userManager.IsInRoleAsync(user, "Klient"))
+                    {
+                        await _userManager.RemoveFromRoleAsync(user, "Klient");
+                        await _userManager.AddToRoleAsync(user, "Użytkownik");
+                    }
+
+                }
             }
             catch (DbUpdateException dbEx)
             {
-                // Logowanie lub obsługa wyjątku
                 throw new Exception("Wystąpił problem podczas anulowania subskrypcji.", dbEx);
             }
             catch (Exception ex)
             {
-                // Logowanie lub obsługa ogólnych wyjątków
                 throw new Exception("Wystąpił błąd podczas anulowania subskrypcji.", ex);
             }
         }
+
 
         public async Task<List<Subscription>> GetSubscriptionsByUserIdAsync(string userId)
         {

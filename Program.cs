@@ -34,17 +34,23 @@ builder.Services.AddAuthorization();
 
 builder.Services.AddScoped<SecurityService>();
 builder.Services.AddScoped<IProductService, ProductService>();
-builder.Services.AddScoped<SubscriptionService>();
+builder.Services.AddScoped<ISubscriptionService, SubscriptionService>();
 builder.Services.AddScoped<ICartService, CartService>();
 builder.Services.AddScoped<MeasurementService>();   
 
 builder.Services.AddScoped<AuthorizationService>();
 
+builder.Services.AddScoped<UserManager<ApplicationUser>>();
+
+
 builder.Services.AddDbContext<ApplicationIdentityDbContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("databaseConnection"));
 });
-builder.Services.AddIdentity<ApplicationUser, ApplicationRole>().AddEntityFrameworkStores<ApplicationIdentityDbContext>().AddDefaultTokenProviders();
+builder.Services.AddIdentity<ApplicationUser, ApplicationRole>()
+    .AddEntityFrameworkStores<ApplicationIdentityDbContext>()
+    .AddDefaultTokenProviders();
+
 builder.Services.AddControllers().AddOData(o =>
 {
     var oDataBuilder = new ODataConventionModelBuilder();

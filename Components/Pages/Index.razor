@@ -3,7 +3,7 @@
 @using FISTNESSGYM.Models.database
 @using FISTNESSGYM.Services
 @using System.Security.Claims
-@inject SubscriptionService SubscriptionService
+@inject ISubscriptionService SubscriptionService
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject AuthorizationService AuthorizationService
 
@@ -133,13 +133,5 @@
 
 @code {
     private string userId;
-
-    protected override async Task OnInitializedAsync()
-    {
-        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-        var user = authState.User;
-
-        userId = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-    }
 
 }
