@@ -4,15 +4,15 @@
 @attribute [Authorize]
 @if (AuthorizationService.IsWorker || AuthorizationService.IsTrainer || AuthorizationService.IsAdmin)
 {
-    <PageTitle>MOJE �WICZENIA</PageTitle>
+    <PageTitle>MOJE ĆWICZENIA</PageTitle>
     <RadzenStack>
         <RadzenRow AlignItems="AlignItems.Center">
             <RadzenColumn Size="12" SizeMD="6">
-                <RadzenText Text="Moje �wiczenia" TextStyle="TextStyle.H3" TagName="TagName.H1" style="margin: 0" />
+                <RadzenText Text="Moje ćwiczenia" TextStyle="TextStyle.H3" TagName="TagName.H1" style="margin: 0" />
             </RadzenColumn>
             <RadzenColumn Size="12" SizeMD="6">
                 <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.End" Gap="0.5rem">
-                    <RadzenButton Icon="add_circle_outline" Text="Add" Click="@AddButtonClick" Variant="Variant.Flat" />
+                    <RadzenButton Icon="add_circle_outline" Text="Dodaj" Click="@AddButtonClick" Variant="Variant.Flat" />
                 </RadzenStack>
             </RadzenColumn>
         </RadzenRow>

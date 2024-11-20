@@ -119,15 +119,29 @@
                 {
                     <RadzenPanelMenuItem Path="store/products" Icon="add_business" Text="Zarządzanie produktami" />
                     <RadzenPanelMenuItem Path="store/product-categories" Icon="loyalty" Text="Kategorie" />
-                    <RadzenPanelMenuItem Path="sales-dashboard" Icon="monitoring" Text="Analityka Sklepu" />
                 }
             </RadzenPanelMenuItem>
         </RadzenPanelMenu>
 
         <RadzenPanelMenu>
-            @if (AuthorizationService.IsClient || AuthorizationService.IsWorker || AuthorizationService.IsTrainer || AuthorizationService.IsAdmin)
+            @if (AuthorizationService.IsWorker || AuthorizationService.IsAdmin)
             {
-                <RadzenPanelMenuItem Text="Analityka" Icon="monitoring" Path="/analytics" />
+                <RadzenPanelMenuItem Text="Analityka" Icon="monitoring" Path="">
+                    <RadzenPanelMenuItem Path="analytics/sales-dashboard" Icon="price_check" Text="Analityka sklepu" />
+                    <RadzenPanelMenuItem Path="analytics/training-dashboard" Icon="trending_up" Text="Analityka treningu" />
+                    <RadzenPanelMenuItem Path="analytics/gym-dashboard" Icon="query_stats" Text="Analityka siłowni" />
+                </RadzenPanelMenuItem>
+            }
+            @if (AuthorizationService.IsClient)
+            {
+                <RadzenPanelMenuItem Text="Analityka" Icon="monitoring" Path="">
+                    <RadzenPanelMenuItem Path="analytics/account-dashboard" Icon="monitoring" Text="Analityka konta" />
+                    <RadzenPanelMenuItem Path="analytics/training-dashboard" Icon="trending_up" Text="Analityka treningu" />
+                </RadzenPanelMenuItem>
+            }
+            @if (AuthorizationService.IsTrainer)
+            {
+                <RadzenPanelMenuItem Path="analytics/training-dashboard" Icon="trending_up" Text="Analityka treningu" />
             }
         </RadzenPanelMenu>
 
