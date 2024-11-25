@@ -88,7 +88,7 @@ namespace FISTNESSGYM.Components.Pages.Training.Events
                         {
                             UserId = userToRemove.Id,
                             Title = $"Administarator wypisa³ Ciê z zajêæ: {_event.EventName}",
-                            CreatedAt = DateTime.UtcNow
+                            CreatedAt = DateTime.UtcNow.AddHours(1) 
                         };
                         await databaseService.CreateNotificationAsync(notification);
                     }
