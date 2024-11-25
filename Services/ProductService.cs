@@ -65,5 +65,13 @@ namespace FISTNESSGYM.Services
             var product = await _context.Products.FindAsync(productId);
             return product?.StockQuantity ?? 0; // Zwróć ilość zapasów lub 0, jeśli produkt nie został znaleziony
         }
+
+        public async Task<int> GetOutOfStockCountAsync()
+        {
+            return await _context.Products
+                .Where(p => p.StockQuantity == 0)
+                .CountAsync();
+        }
+
     }
 }

@@ -11,6 +11,8 @@ namespace FISTNESSGYM.Services
         Task<List<Product>> GetFilteredProductsAsync(string searchTerm, string category, bool sortAscending);
         Task<List<string>> GetAllCategoriesAsync();
         Task<int> GetProductStockQuantityAsync(int productId);
+        Task<int> GetOutOfStockCountAsync();
+
 
     }
 }

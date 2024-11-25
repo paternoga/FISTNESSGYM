@@ -328,6 +328,35 @@ namespace FISTNESSGYM.Services
             return totalSoldMonth;
         }
 
+        public async Task<List<CategorySalesData>> GetCategoryRankingForMonthAsync(int year, int month)
+        {
+            var startDate = new DateTime(year, month, 1);
+            var endDate = startDate.AddMonths(1).AddSeconds(-1);
+
+            var ranking = await _context.OrderItems
+                .Where(o => o.CreationDate >= startDate && o.CreationDate <= endDate)
+                .Join(_context.Products,
+                      orderItem => orderItem.ProductId,
+                      product => product.Id,
+                      (orderItem, product) => new { orderItem.Quantity, product.Category })
+                .GroupBy(x => x.Category)
+                .Select(group => new CategorySalesData
+                {
+                    CategoryName = group.Key,
+                    TotalQuantity = group.Sum(x => x.Quantity)
+                })
+                .OrderByDescending(data => data.TotalQuantity)
+                .ToListAsync();
+
+            return ranking;
+        }
+
+        public async Task<List<OrderItem>> GetOrderItemsSoldForMonthAsync(int year, int month)
+        {
+            return await _context.OrderItems
+                .Where(oi => oi.CreationDate.Year == year && oi.CreationDate.Month == month)
+                .ToListAsync();
+        }
 
 
 
