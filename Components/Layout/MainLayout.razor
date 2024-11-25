@@ -15,6 +15,43 @@
             <RadzenColumn Size="7">
                 <RadzenStack AlignItems="AlignItems.Center" Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End" Gap="0.5rem" class="">
                     <RadzenAppearanceToggle @bind-Value="@isDarkMode" />
+                    <RadzenButton Icon="notifications" Click="@ToggleNotificationsPanel" />
+                    @if (showNotificationsPanel)
+                    {
+                        <div class="rz-panel rz-shadow-md" style="position: fixed; top: 60px; right: 20px; width: 600px; max-height: 500px; overflow-y: auto;">
+                            <div class="rz-panel-title" style="text-align: center; padding: 5px;">
+                                <RadzenText Text="Powiadomienia" TextStyle="TextStyle.H5" TagName="TagName.H4" />
+                            </div>
+                            @if (notifications.Any())
+                            {
+                                @foreach (var notification in notifications)
+                                {
+                                    <div class="rz-panel-content rz-border-bottom" style="display: flex; align-items: center; padding: 10px;">
+                                        <RadzenIcon Icon="notifications" Style="margin-right: 10px; flex-shrink: 0; font-size: 24px; color: gray;" />
+                                        <div style="flex-grow: 1; display: flex; flex-direction: column; justify-content: center;">
+                                            <!-- Wyświetlanie tytułu jako treści -->
+                                            <RadzenText Text="@notification.Title" TextStyle="TextStyle.Body1" />
+                                            <!-- Wyświetlanie daty utworzenia -->
+                                            <RadzenText Text="@notification.CreatedAt.ToString("dd.MM.yyyy HH:mm")" TextStyle="TextStyle.Caption" />
+                                        </div>
+                                        <RadzenIcon Icon="close"
+                                                    Style="cursor: pointer; color: gray; font-size: 20px;"
+                                                    @onclick="(() => RemoveNotification(notification))" />
+                                    </div>
+                                }
+                            }
+                            else
+                            {
+                                <div class="rz-panel-content rz-text-center">
+                                    <RadzenText Text="Brak powiadomień" TextStyle="TextStyle.Body1" />
+                                </div>
+                            }
+                        </div>
+                    }
+
+
+
+
                     <RadzenProfileMenu Visible="@Security.IsAuthenticated()" Click="@ProfileMenuClick" Style="background-color: #000000" >
                         <ChildContent> 
                             @if (AuthorizationService.IsUser || AuthorizationService.IsClient || AuthorizationService.IsWorker || AuthorizationService.IsTrainer)

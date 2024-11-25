@@ -83,6 +83,14 @@ namespace FISTNESSGYM.Components.Pages.Training.Events
                         });
 
                         await databaseService.UpdateEvent(Id, _event);
+                        // Dodanie powiadomienia dla u¿ytkownika w bazie danych
+                        var notification = new Notification
+                        {
+                            UserId = userToRemove.Id,
+                            Title = $"Administarator wypisa³ Ciê z zajêæ: {_event.EventName}",
+                            CreatedAt = DateTime.UtcNow
+                        };
+                        await databaseService.CreateNotificationAsync(notification);
                     }
                 }
             }

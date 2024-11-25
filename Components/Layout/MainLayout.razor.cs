@@ -1,4 +1,6 @@
 using System.Net.Http;
+using FISTNESSGYM.Models.database;
+using FISTNESSGYM.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
@@ -34,6 +36,9 @@ namespace FISTNESSGYM.Components.Layout
 
         [Inject]
         protected SecurityService Security { get; set; }
+        [Inject]
+        protected databaseService DatabaseService { get; set; }
+
 
         private bool sidebarExpanded = true;
         private bool isDarkMode = true;
@@ -76,8 +81,55 @@ namespace FISTNESSGYM.Components.Layout
                 isAdmin = SecurityService.IsInRole("Administrator");
                 // Retrieve the logged-in user's ID
                 currentUserId = SecurityService.User.Id;
+
             }
 
+
+
+        }
+
+        private bool showNotificationsPanel = false;
+        private List<Notification> notifications = new();
+
+
+        private async Task ToggleNotificationsPanel()
+        {
+            showNotificationsPanel = !showNotificationsPanel;
+
+            if (showNotificationsPanel)
+            {
+                // £adowanie powiadomieñ tylko przy pierwszym otwarciu panelu
+                await LoadNotifications();
+            }
+        }
+
+
+        private async Task LoadNotifications()
+        {
+            if (!string.IsNullOrEmpty(currentUserId))
+            {
+                // Pobierz powiadomienia u¿ytkownika z serwisu bazy danych
+                notifications = await DatabaseService.GetNotificationsForUserAsync(currentUserId);
+            }
+        }
+
+        private async Task RemoveNotification(Notification notification)
+        {
+            if (notification != null)
+            {
+                // Usuñ powiadomienie z bazy danych
+                await DatabaseService.DeleteNotificationAsync(notification.Id);
+
+                // Usuñ powiadomienie z listy w interfejsie
+                notifications.Remove(notification);
+
+                // Zaktualizuj interfejs
+                StateHasChanged();
+            }
+        }
+        private void TestClick()
+        {
+            Console.WriteLine("Button clicked!");
         }
     }
 }

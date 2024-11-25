@@ -3565,6 +3565,71 @@ namespace FISTNESSGYM
                 .Select(r => r.AspNetUser) // Zak³adaj¹c, ¿e AspNetUser jest powi¹zany z Reservation przez UserId
                 .ToListAsync();
         }
-        
+        //notyfikajce
+
+        // Pobieranie powiadomieñ dla u¿ytkownika
+        public async Task<List<Notification>> GetNotificationsForUserAsync(string userId)
+        {
+            if (string.IsNullOrEmpty(userId))
+            {
+                throw new ArgumentException("UserId cannot be null or empty.");
+            }
+
+            var items = Context.Notifications
+                               .AsNoTracking()
+                               .Where(n => n.UserId == userId)
+                               .OrderByDescending(n => n.CreatedAt)
+                               .ToListAsync();
+
+            return await items;
+        }
+
+        // Tworzenie powiadomienia
+        public async Task<Notification> CreateNotificationAsync(Notification notification)
+        {
+            if (notification == null)
+            {
+                throw new ArgumentException("Notification cannot be null.");
+            }
+
+            try
+            {
+                Context.Notifications.Add(notification);
+                await Context.SaveChangesAsync();
+                return notification;
+            }
+            catch (Exception ex)
+            {
+                Context.Entry(notification).State = EntityState.Detached;
+                throw new Exception("Error creating notification", ex);
+            }
+        }
+
+        // Usuwanie powiadomienia
+        public async Task<Notification> DeleteNotificationAsync(int id)
+        {
+            var itemToDelete = await Context.Notifications
+                                           .Where(n => n.Id == id)
+                                           .FirstOrDefaultAsync();
+
+            if (itemToDelete == null)
+            {
+                throw new Exception("Notification not found.");
+            }
+
+            Context.Notifications.Remove(itemToDelete);
+
+            try
+            {
+                await Context.SaveChangesAsync();
+                return itemToDelete;
+            }
+            catch (Exception ex)
+            {
+                Context.Entry(itemToDelete).State = EntityState.Unchanged;
+                throw new Exception("Error deleting notification", ex);
+            }
+        }
+
     }
 }
