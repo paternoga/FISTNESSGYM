@@ -241,6 +241,10 @@
                 {
                     <RadzenPanelMenuItem Path="settings/logs" Icon="code" Text="Logi" />
                 }
+                @if (AuthorizationService.IsWorker || AuthorizationService.IsAdmin)
+                {
+                    <RadzenPanelMenuItem Path="notifications/notificationspanel" Icon="notifications" Text="Panel powiadomień" />
+                }
             </RadzenPanelMenuItem>
         </RadzenPanelMenu>
     </RadzenSidebar>

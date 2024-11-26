@@ -3663,6 +3663,11 @@ namespace FISTNESSGYM
 
             return true; // Zwrócenie sukcesu
         }
+        public async Task<List<AspNetUser>> GetAllUsersAsync()
+        {
+            return await Context.AspNetUsers.AsNoTracking().ToListAsync();
+        }
+
 
     }
 }

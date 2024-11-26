@@ -1,0 +1,102 @@
+﻿@page "/notifications/notificationspanel"
+@using FISTNESSGYM.Models.database
+@inject databaseService databaseService
+@inject NotificationService NotificationService
+
+<PageTitle>Panel powiadomień</PageTitle>
+
+<RadzenCard Style="padding: 20px;">
+    <h3 style="margin-bottom: 20px;">Panel powiadomień</h3>
+
+    <div style="margin-bottom: 20px;">
+        <RadzenDropDown AllowClear="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                        Placeholder="Wybierz użytkowników..." TValue="List<string>" Multiple="true"
+                        TextProperty="Email" ValueProperty="Id" Data="@users" @bind-Value="selectedUserIds"
+                        Style="width: 100%;" />
+    </div>
+
+    <div style="margin-bottom: 20px; display: flex; align-items: center;">
+        <RadzenCheckBox @bind-Value="sendToAll" TriState="false" />
+        <label style="margin-left: 10px;">Wyślij do wszystkich użytkowników</label>
+    </div>
+
+    <div style="margin-bottom: 20px;">
+        <RadzenTextBox Style="width: 100%" Placeholder="Wpisz treść powiadomienia..." @bind-Value="notificationTitle" />
+    </div>
+
+    <div style="margin-bottom: 20px;">
+        <RadzenButton Text="Wyślij powiadomienie" Click="@SendNotifications" Style="margin-right: 10px;" />
+    </div>
+</RadzenCard>
+
+<RadzenCard Style="margin-top: 20px;">
+    <RadzenDataGrid TItem="AspNetUser" Data="@users" PageSize="10" ShowPagination="true">
+        <Columns>
+            <RadzenDataGridColumn TItem="AspNetUser" Property="Email" Title="Email" />
+            <RadzenDataGridColumn TItem="AspNetUser" Property="UserName" Title="Nazwa użytkownika" />
+        </Columns>
+    </RadzenDataGrid>
+</RadzenCard>
+
+@code {
+    List<AspNetUser> users = new();
+    List<string> selectedUserIds = new();
+    bool sendToAll = false; 
+    string notificationTitle;
+
+    protected override async Task OnInitializedAsync()
+    {
+        users = await databaseService.GetAllUsersAsync();
+    }
+
+    async Task SendNotifications()
+    {
+        if (string.IsNullOrEmpty(notificationTitle))
+        {
+            NotificationService.Notify(new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Warning,
+                    Summary = "Błąd",
+                    Detail = "Wpisz treść powiadomienia."
+                });
+            return;
+        }
+
+
+        List<string> targetUserIds = sendToAll ? users.Select(u => u.Id).ToList() : selectedUserIds;
+
+        if (targetUserIds == null || !targetUserIds.Any())
+        {
+            NotificationService.Notify(new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Warning,
+                    Summary = "Błąd",
+                    Detail = "Nie wybrano użytkowników do powiadomienia."
+                });
+            return;
+        }
+
+        foreach (var userId in targetUserIds)
+        {
+            var notification = new Notification
+                {
+                    UserId = userId,
+                    Title = notificationTitle,
+                    CreatedAt = DateTime.UtcNow.AddHours(1)
+                };
+            await databaseService.CreateNotificationAsync(notification);
+        }
+
+        NotificationService.Notify(new NotificationMessage
+            {
+                Severity = NotificationSeverity.Success,
+                Summary = "Powiadomienia wysłane",
+                Detail = $"Powiadomienia zostały wysłane do {targetUserIds.Count} użytkowników."
+            });
+
+
+        selectedUserIds.Clear();
+        sendToAll = false;
+        notificationTitle = string.Empty;
+    }
+}
