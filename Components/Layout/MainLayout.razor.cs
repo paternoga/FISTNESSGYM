@@ -127,9 +127,6 @@ namespace FISTNESSGYM.Components.Layout
                 StateHasChanged();
             }
         }
-        private void TestClick()
-        {
-            Console.WriteLine("Button clicked!");
-        }
+
     }
 }
