@@ -6,7 +6,7 @@
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @using FISTNESSGYM.Models.database
 
-<PageTitle>Logi</PageTitle>
+<PageTitle>LOGI</PageTitle>
 
 @if (AuthorizationService.IsAdmin)
 {
@@ -17,7 +17,6 @@
             </RadzenColumn>
         </RadzenRow>
 
-        <!-- Tabela logów -->
         <RadzenDataGrid @ref="dataGrid" AllowFiltering="true" AllowPaging="true" ShowPagingSummary="true" PageSizeOptions=@(new int[]{5, 10, 20, 30}) AllowSorting="true" Data="@logList" TItem="FISTNESSGYM.Models.database.Log">
             <Columns>
                 <RadzenDataGridColumn TItem="Log" Property="Id" Width="90px" Title="Id" />
@@ -39,7 +38,6 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        // Jeśli użytkownik jest administratorem, pobierz logi z bazy danych
         if (AuthorizationService.IsAdmin)
         {
             logList = await LogService.GetLogsAsync();
