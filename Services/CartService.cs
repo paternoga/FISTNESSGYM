@@ -358,7 +358,82 @@ namespace FISTNESSGYM.Services
                 .ToListAsync();
         }
 
+        public async Task<List<TopBuyer>> GetTopBuyersForMonthAsync(int year, int month)
+        {
+            var startDate = new DateTime(year, month, 1);
+            var endDate = startDate.AddMonths(1).AddDays(-1);
 
+            var topBuyers = await _context.Orders
+                .Where(o => o.OrderDate >= startDate && o.OrderDate <= endDate)
+                .GroupBy(o => o.UserId)
+                .Select(g => new
+                {
+                    UserId = g.Key,
+                    TotalSpent = g.Sum(o => o.TotalAmount),
+                    OrdersCount = g.Count()
+                })
+                .OrderByDescending(g => g.TotalSpent)
+                .Take(5)
+                .ToListAsync();
+
+            // Pobierz dane użytkowników
+            var userIds = topBuyers.Select(b => b.UserId).ToList();
+            var users = await _context.AspNetUsers
+                .Where(u => userIds.Contains(u.Id))
+                .Select(u => new { u.Id, u.UserName, u.Email })
+                .ToDictionaryAsync(u => u.Id);
+
+            // Połącz dane
+            return topBuyers.Select(b => new TopBuyer
+            {
+                UserName = users[b.UserId]?.UserName ?? "Nieznany użytkownik",
+                Email = users[b.UserId]?.Email ?? "Brak e-maila",
+                TotalSpent = b.TotalSpent,
+                OrdersCount = b.OrdersCount
+            }).ToList();
+        }
+
+
+        public async Task<LastPurchasedProduct> GetLastPurchasedProductAsync()
+        {
+            var lastOrderItem = await _context.OrderItems
+                .OrderByDescending(oi => oi.CreationDate)
+                .FirstOrDefaultAsync();
+
+            if (lastOrderItem == null)
+                return null;
+
+            var productName = _context.Products
+                .Where(p => p.Id == lastOrderItem.ProductId)
+                .Select(p => p.Name)
+                .FirstOrDefault();
+
+            return new LastPurchasedProduct
+            {
+                ProductName = productName,
+                Quantity = lastOrderItem.Quantity,
+                UnitPrice = lastOrderItem.UnitPrice,
+                CreationDate = lastOrderItem.CreationDate
+            };
+        }
+
+        public async Task<List<TopProduct>> GetLeastSoldProductsForMonthAsync(int year, int month)
+        {
+            var leastSoldProducts = await _context.OrderItems
+                .Where(o => o.CreationDate.Year == year && o.CreationDate.Month == month)  // Filtracja po roku i miesiącu
+                .GroupBy(o => new { o.ProductId, o.Product.Name })  // Grupowanie po ID produktu oraz nazwie
+                .Select(g => new TopProduct
+                {
+                    ProductId = g.Key.ProductId,
+                    ProductName = g.Key.Name,
+                    TotalQuantity = g.Sum(o => o.Quantity)  // Liczenie sumy zamówionych produktów
+                })
+                .OrderBy(p => p.TotalQuantity)  // Sortowanie po najmniejszej ilości
+                .Take(5)  // Wybieranie 5 najrzadziej kupowanych
+                .ToListAsync();
+
+            return leastSoldProducts;
+        }
 
 
 
