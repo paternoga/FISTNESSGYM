@@ -63,8 +63,8 @@ namespace FISTNESSGYM.Services
             try
             {
                 var subscription = await _context.Subscriptions
-                    .Include(s => s.SubscriptionType) 
-                    .FirstOrDefaultAsync(s => s.UserId == userId && s.SubscriptionStatusId == 1);
+                    .Include(s => s.SubscriptionType)
+                    .FirstOrDefaultAsync(s => s.UserId == userId && (s.SubscriptionStatusId == 1 || s.SubscriptionStatusId == 2)); 
 
                 if (subscription == null)
                 {
@@ -76,9 +76,10 @@ namespace FISTNESSGYM.Services
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Wystąpił błąd podczas pobierania subskrypcji dla użytkownika: {UserId}", userId);
-                throw; 
+                throw;
             }
         }
+
 
         public async Task PurchaseSubscriptionAsync(string userId, int subscriptionTypeId)
         {
