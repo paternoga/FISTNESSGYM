@@ -13,6 +13,7 @@ using Radzen;
 using FISTNESSGYM.Data;
 using FISTNESSGYM.Components.Pages.Calendar;
 using FISTNESSGYM.Models.database;
+using DocumentFormat.OpenXml.InkML;
 
 namespace FISTNESSGYM
 {
@@ -3629,6 +3630,38 @@ namespace FISTNESSGYM
                 Context.Entry(itemToDelete).State = EntityState.Unchanged;
                 throw new Exception("Error deleting notification", ex);
             }
+        }
+
+        public async Task<bool> PayOrder(int orderId)
+        {
+            // Znalezienie zamówienia
+            var order = await Context.Set<Order>().FindAsync(orderId);
+
+            if (order == null)
+            {
+                return false; // Jeœli zamówienie nie istnieje
+            }
+
+            // Znalezienie ID statusu "Op³acone" (sta³a wartoœæ lub zapytanie do bazy)
+            int paidStatusId = await Context.Set<OrderStatus>()
+                .Where(status => status.Name == "Oplacone")
+                .Select(status => status.Id)
+                .FirstOrDefaultAsync();
+
+            if (paidStatusId == 0)
+            {
+                return false; // Jeœli status "Op³acone" nie istnieje
+            }
+
+            // Aktualizacja statusu zamówienia
+            order.OrderStatusId = paidStatusId;
+            order.OrderStatusName = "Oplacone";
+
+            // Zapis zmian
+            Context.Set<Order>().Update(order);
+            await Context.SaveChangesAsync();
+
+            return true; // Zwrócenie sukcesu
         }
 
     }

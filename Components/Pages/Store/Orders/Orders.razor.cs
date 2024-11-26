@@ -116,6 +116,25 @@ namespace FISTNESSGYM.Components.Pages.Store.Orders
             {
                 var result = isEdit ? await databaseService.UpdateOrder(order.Id, order) : await databaseService.CreateOrder(order);
 
+                if (isEdit)
+                {
+                    NotificationService.Notify(new NotificationMessage
+                    {
+                        Severity = NotificationSeverity.Success,
+                        Summary = "Zamówienie zaktualizowane",
+                        Detail = "Zamówienie zosta³o pomyœlnie zaktualizowane."
+                    });
+                }
+                else
+                {
+                    NotificationService.Notify(new NotificationMessage
+                    {
+                        Severity = NotificationSeverity.Success,
+                        Summary = "Zamówienie dodane",
+                        Detail = "Nowe zamówienie zosta³o pomyœlnie dodane."
+                    });
+                }
+
             }
             catch (Exception ex)
             {
@@ -127,5 +146,44 @@ namespace FISTNESSGYM.Components.Pages.Store.Orders
         {
 
         }
+
+        protected async Task PayOrder(FISTNESSGYM.Models.database.Order order)
+        {
+            try
+            {
+                var success = await databaseService.PayOrder(order.Id); // Upewnij siê, ¿e PayOrder zwraca wynik
+
+                if (success)
+                {
+                    NotificationService.Notify(new NotificationMessage
+                    {
+                        Severity = NotificationSeverity.Success,
+                        Summary = "Sukces",
+                        Detail = "Zamówienie zosta³o op³acone"
+                    });
+
+                    await grid0.Reload(); // Odœwie¿ siatkê danych, aby pokazaæ zmieniony status
+                }
+                else
+                {
+                    NotificationService.Notify(new NotificationMessage
+                    {
+                        Severity = NotificationSeverity.Warning,
+                        Summary = "B³¹d",
+                        Detail = "Nie uda³o siê op³aciæ zamówienia"
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                NotificationService.Notify(new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Error,
+                    Summary = "B³¹d",
+                    Detail = $"Nie uda³o siê op³aciæ zamówienia: {ex.Message}"
+                });
+            }
+        }
+
     }
 }
