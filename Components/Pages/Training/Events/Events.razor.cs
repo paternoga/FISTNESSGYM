@@ -114,8 +114,16 @@ namespace FISTNESSGYM.Components.Pages.Training.Events
                         Detail = "Zosta³eœ wypisany z wydarzenia."
                     });
 
+                    var notification = new Notification
+                    {
+                        UserId = currentUserId,
+                        Title = $"Zosta³eœ wypisany z wydarzenia: {_event.EventName}",
+                        CreatedAt = DateTime.UtcNow.AddHours(1)
+                    };
+                    await databaseService.CreateNotificationAsync(notification);
 
-                   if (AuthorizationService.IsClient)
+
+                    if (AuthorizationService.IsClient)
                     {
                         events = await databaseService.GetUserRegisteredEventsAsync(currentUserId);
                     }

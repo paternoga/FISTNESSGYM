@@ -1,5 +1,6 @@
 ﻿@page "/event-details-dialog"
 @using FISTNESSGYM.Models
+@using FISTNESSGYM.Models.database
 @using FISTNESSGYM.Components.Pages.Calendar
 @inject DialogService DialogService
 @inject databaseService databaseService
@@ -121,6 +122,14 @@
         currentParticipants += 1;
         alreadyRegistered = true;
         infoMessage = "Zostałeś zapisany na wydarzenie!";
+
+        var notification = new Notification
+            {
+                UserId = CurrentUserId,
+                Title = $"Zostałeś zapisany na wydarzenie: {EventItem.Title}",
+                CreatedAt = DateTime.UtcNow.AddHours(1) 
+            };
+        await databaseService.CreateNotificationAsync(notification);
     }
 
 
@@ -148,6 +157,14 @@
             currentParticipants -= 1;
             alreadyRegistered = false;
             infoMessage = "Zostałeś wypisany z wydarzenia!";
+            var notification = new Notification
+                {
+                    UserId = CurrentUserId,
+                    Title = $"Zostałeś wypisany z wydarzenia: {EventItem.Title}",
+                    CreatedAt = DateTime.UtcNow.AddHours(1)
+                };
+            await databaseService.CreateNotificationAsync(notification);
         }
+        
     }
 }

@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Components.Web;
 using Radzen;
 using Radzen.Blazor;
 using FISTNESSGYM.Services;
+using FISTNESSGYM.Models.database;
 
 namespace FISTNESSGYM.Components.Pages.Store.Orders
 {
@@ -161,6 +162,14 @@ namespace FISTNESSGYM.Components.Pages.Store.Orders
                         Summary = "Sukces",
                         Detail = "Zamówienie zosta³o op³acone"
                     });
+
+                    var notification = new Notification
+                    {
+                        UserId = Security.User?.Id,
+                        Title = $"Twoje zamówienie zosta³o pomyœlnie op³acone.",
+                        CreatedAt = DateTime.UtcNow.AddHours(1)
+                    };
+                    await databaseService.CreateNotificationAsync(notification);
 
                     await grid0.Reload(); // Odœwie¿ siatkê danych, aby pokazaæ zmieniony status
                 }

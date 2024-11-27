@@ -2,6 +2,7 @@
 @inject ICartService CartService
 @inject NavigationManager NavigationManager
 @inject AuthenticationStateProvider AuthenticationStateProvider
+@inject databaseService databaseService
 @using System.Security.Claims
 @using FISTNESSGYM.Models.database
 @using FISTNESSGYM.Services
@@ -147,6 +148,13 @@ else
                     await CartService.ClearCartAsync(userId);
                     await LoadCartItems();
                     NavigationManager.NavigateTo("/store/order-success");
+                    var notification = new Notification
+                        {
+                            UserId = userId,
+                            Title = $"Twoje zamówienie zostało pomyślnie złożone. Pamiętaj, aby je opłacić, aby proces realizacji mógł przebiegać bez opóźnień.",
+                            CreatedAt = DateTime.UtcNow.AddHours(1)
+                        };
+                    await databaseService.CreateNotificationAsync(notification);
                 }
                 catch (InvalidOperationException ex)
                 {
