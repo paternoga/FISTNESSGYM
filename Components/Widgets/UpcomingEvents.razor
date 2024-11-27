@@ -1,0 +1,34 @@
+﻿@page "/upcoming-events"
+@using FISTNESSGYM.Services
+@using FISTNESSGYM.Models.database
+@inject databaseService databaseService
+
+<RadzenCard Style="padding: 20px; border-radius: 8px; border: 1px solid #e0e0e0;">
+    <h4 style="color: #3a3a3a; font-weight: 600; margin-top: 0px;">Nadchodzące zajęcia:</h4>
+
+    @if (UpcomingEventList != null && UpcomingEventList.Any())
+    {
+        @foreach (var evt in UpcomingEventList)
+        {
+            <div style="margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px solid #e0e0e0;">
+                <h4 style="font-weight: 600; margin: 0;">@evt.EventName</h4>
+                <p style="margin: 4px 0; color: #3a3a3a;">Instruktor: @evt.InstructorName</p>
+                <p style="margin: 4px 0; color: #3a3a3a;">Data: @evt.EventStartDate.ToString("dd.MM.yyyy HH:mm")</p>
+                <p style="margin: 4px 0; color: #3a3a3a;">Zapisanych: @evt.Participants/@evt.MaxParticipants</p>
+            </div>
+        }
+    }
+    else
+    {
+        <p style="color: #757575;">Brak zaplanowanych wydarzeń.</p>
+    }
+</RadzenCard>
+
+@code {
+    private List<Event> UpcomingEventList;
+
+    protected override async Task OnInitializedAsync()
+    {
+        UpcomingEventList = await databaseService.GetUpcomingEventsAsync();
+    }
+}

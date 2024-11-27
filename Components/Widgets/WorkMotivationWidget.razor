@@ -1,0 +1,168 @@
+﻿@page "/work-motivation-widget"
+@using System
+
+<RadzenCard Style="padding: 20px; border-radius: 8px; border: 1px solid #e0e0e0; width: 340px; height: 160px;">
+    <h4 style="color: #3a3a3a; font-weight: 600; margin-top: 0px; text-align: left;">Cytat na dziś :)</h4>
+
+    <div style="display: flex; justify-content: center; align-items: center; height: 70px;">
+        <p style="font-size: 16px; font-weight: 500; text-align: center; margin-top: 10px; overflow: hidden;">
+            @CurrentQuote
+        </p>
+    </div>
+
+</RadzenCard>
+
+@code {
+    private string CurrentQuote;
+
+    private readonly List<string> Quotes = new List<string>
+{
+    "Nie czekaj na okazje. Stwórz je.",
+    "Nie ma granic, tylko wyzwania.",
+    "Bądź najlepszą wersją siebie.",
+    "Sukces to droga, nie cel.",
+    "Nigdy nie przestawaj się uczyć.",
+    "Czas na działanie jest teraz.",
+    "Marzenia nie działają, jeśli ty nie działasz.",
+    "Twoje działanie decyduje o wyniku.",
+    "Nie ma porażek, tylko lekcje.",
+    "Działaj tak, jakby nie było jutra.",
+    "Wielki sukces pochodzi z wielkich wysiłków.",
+    "Nigdy nie przestawaj próbować.",
+    "Żyj w zgodzie z sobą.",
+    "Pokonaj swoje lęki, a one staną się Twoimi siłami.",
+    "Jeden krok dzieli cię od zmiany.",
+    "Jest tylko jedna rzecz, która może cię powstrzymać – ty sam.",
+    "Wszystko zaczyna się od myśli.",
+    "Twój sukces zależy od tego, jak bardzo jesteś gotów się starać.",
+    "Krok po kroku zbliżasz się do celu.",
+    "Twoja przyszłość zaczyna się dzisiaj.",
+    "Rób to, co kochasz.",
+    "Nigdy się nie poddawaj.",
+    "Wiara w siebie to klucz do sukcesu.",
+    "Zmiana zaczyna się od ciebie.",
+    "Chcieć to móc.",
+    "Sukces to suma małych wysiłków powtarzanych dzień po dniu.",
+    "Zrób coś dzisiaj, czego nie zrobiłeś wczoraj.",
+    "Bez ryzyka nie ma sukcesu.",
+    "Twoje możliwości są nieograniczone.",
+    "Nigdy nie jest za późno, by zacząć.",
+    "Nie ma rzeczy niemożliwych.",
+    "Praca to klucz do sukcesu.",
+    "Jeśli wierzysz, że możesz, to już połowa drogi.",
+    "Bądź odważny, bądź silny.",
+    "Nie ma nic niemożliwego.",
+    "Codziennie stawiaj sobie nowe wyzwania.",
+    "Wielkie rzeczy nigdy nie pochodzą ze strefy komfortu.",
+    "Zwycięzcy to ci, którzy nigdy się nie poddają.",
+    "Nie licz dni, spraw, aby dni się liczyły.",
+    "Błąd jest tylko krokiem do sukcesu.",
+    "Czas to najcenniejszy zasób.",
+    "Działaj, nie marudź.",
+    "Praca, którą wykonujesz dzisiaj, kształtuje twoją przyszłość.",
+    "Nigdy nie przestawaj marzyć.",
+    "Twoje działanie jest twoją wizytówką.",
+    "Zrób pierwszy krok, nawet jeśli nie widzisz całej drogi.",
+    "Czasami najmniejsze kroki prowadzą do największych osiągnięć.",
+    "Rób to, co musisz, a potem rób to, co chcesz.",
+    "Każdy dzień to nowa szansa.",
+    "Czyny mówią głośniej niż słowa.",
+    "Zaufaj procesowi.",
+    "Nigdy nie przestawaj stawiać pytań.",
+    "Życie zaczyna się tam, gdzie kończy się strefa komfortu.",
+    "Zmiana to jedyna stała rzecz.",
+    "Twoja przyszłość zależy od tego, co robisz teraz.",
+    "Sukces nie jest przypadkiem, to wynik ciężkiej pracy.",
+    "Czasami najlepsze pomysły przychodzą po prostu do głowy.",
+    "Wszystko zaczyna się w twojej głowie.",
+    "Dzień zaczyna się od myśli.",
+    "Chcę, więc działam.",
+    "Bądź zmianą, którą chcesz zobaczyć.",
+    "Twoje myśli kształtują twoje życie.",
+    "Jeden mały krok może zmienić twoje życie.",
+    "Twoja praca wypełnia część twojego życia.",
+    "Jeśli nie teraz, to kiedy?",
+    "Nie ma rzeczy niemożliwych dla tych, którzy wierzą.",
+    "Dzięki pracy nad sobą, będziesz gotowy na każdy cel.",
+    "Sukces to rezultat systematycznego działania.",
+    "Nic się nie stanie, jeśli nie zaczniesz.",
+    "Dąż do celu, nie tylko do drogi.",
+    "Zawsze rób to, co kochasz.",
+    "Motywacja to siła do działania.",
+    "Zawsze walcz o swoje marzenia.",
+    "Twoje wyzwania to twoja szansa.",
+    "Nigdy się nie poddawaj. Zawsze jest sposób.",
+    "Twoja przyszłość jest w twoich rękach.",
+    "Tylko ci, którzy się starają, osiągną sukces.",
+    "Porażka to część procesu.",
+    "Jestem gotów na wyzwania.",
+    "Jeśli chcesz czegoś, musisz działać.",
+    "Poświęcenie prowadzi do sukcesu.",
+    "Nie marnuj czasu, działaj.",
+    "Każdy krok przybliża cię do celu.",
+    "Nigdy nie bądź zadowolony z przeciętności.",
+    "Wszystko jest możliwe, jeśli wierzysz.",
+    "Kroki w stronę celu są równie ważne jak sam cel.",
+    "Praca to droga do sukcesu.",
+    "Wszystko zależy od twojego zaangażowania.",
+    "Zwyciężają ci, którzy się nie poddają.",
+    "Rób to, co kochasz, a nigdy nie będziesz pracować.",
+    "Dąż do sukcesu, ale ciesz się drogą.",
+    "Działaj, nie marudź.",
+    "Każdy dzień jest szansą na nowy początek.",
+    "Stawiaj sobie cele, a potem je realizuj.",
+    "Żadne marzenie nie jest zbyt wielkie.",
+    "Rób to, co musisz, żeby osiągnąć cel.",
+    "Twoje życie to twoja decyzja.",
+    "Nigdy się nie poddawaj, nawet gdy jest ciężko.",
+    "Krok po kroku stajesz się lepszy.",
+    "Każdy dzień to nowa okazja.",
+    "Stawiaj sobie cele, a potem je realizuj.",
+    "Życie to wybór. Zrób dobry wybór.",
+    "Nigdy nie przestawaj dążyć do przodu.",
+    "Możesz osiągnąć wszystko, jeśli nie będziesz się poddawać.",
+    "Nie licz na szczęście, licz na siebie.",
+    "Bądź odważny i rób rzeczy, które cię przerażają.",
+    "Wielki sukces pochodzi z wytrwałości.",
+    "Każdy dzień jest nową okazją, by sięgnąć po więcej.",
+    "Nie pozwól, aby strach cię powstrzymał.",
+    "Czyny są najlepszym dowodem twoich intencji.",
+    "Zrób krok naprzód, nawet jeśli się boisz.",
+    "Rób to, co cię pasjonuje, a nigdy nie będziesz pracować.",
+    "Nigdy nie przestawaj się rozwijać.",
+    "Jest tylko jedna rzecz, która może cię powstrzymać – ty sam.",
+    "Bądź dumni z postępów, które poczyniłeś.",
+    "Twój sukces zależy od twojej determinacji.",
+    "Nigdy nie jest za późno na nowy początek.",
+    "Rób więcej, niż się od ciebie oczekuje.",
+    "Bądź konsekwentny, sukces nadejdzie.",
+    "Rób to, co sprawia ci radość.",
+    "Nie ma rzeczy niemożliwych.",
+    "Każdy dzień jest krokiem do sukcesu.",
+    "Trzymaj się swojego celu.",
+    "Praca to droga do samorealizacji.",
+    "Nie marnuj czasu na wątpliwości.",
+    "Wszystko jest możliwe, jeśli wierzysz.",
+    "Każdy dzień to nowa szansa.",
+    "Ciągłe dążenie do doskonałości.",
+    "Naucz się czegoś nowego każdego dnia.",
+    "Rób to, co kochasz, a sukces przyjdzie sam.",
+    "Bądź sobą, reszta i tak będzie za tobą.",
+    "Najlepszy czas na działanie jest teraz.",
+    "Stawiaj czoła wyzwaniom, nie uciekaj od nich.",
+    "Twoja droga jest w twoich rękach.",
+    "Nie poddawaj się, idź do przodu."
+};
+
+
+    protected override void OnInitialized()
+    {
+        SetDailyQuote();
+    }
+
+    private void SetDailyQuote()
+    {
+        int dayOfYear = DateTime.Now.DayOfYear;
+        CurrentQuote = $"\"{Quotes[(dayOfYear - 1) % Quotes.Count]}\""; // Dodajemy cudzysłowy wokół cytatu
+    }
+}

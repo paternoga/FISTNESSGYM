@@ -3667,6 +3667,20 @@ namespace FISTNESSGYM
         {
             return await Context.AspNetUsers.AsNoTracking().ToListAsync();
         }
+        public async Task<List<Event>> GetUpcomingEventsAsync()
+        {
+            var now = DateTime.UtcNow;
+
+            // Pobierz maksymalnie 5 nadchodz¹cych wydarzeñ
+            var upcomingEvents = await Context.Events
+                .AsNoTracking()
+                .Where(e => e.EventStartDate >= now) // Tylko nadchodz¹ce wydarzenia
+                .OrderBy(e => e.EventStartDate) // Posortowane po dacie rozpoczêcia
+                .Take(5) // Maksymalnie 5
+                .ToListAsync();
+
+            return upcomingEvents;
+        }
 
 
     }
