@@ -10,11 +10,12 @@
             <RadzenText Text="Profil" TextStyle="TextStyle.H3" TagName="TagName.H1" style="margin: 0" />
         </RadzenColumn>
     </RadzenRow>
+
     <RadzenRow>
         <RadzenColumn SizeMD="12">
-            <RadzenTemplateForm Method="post" Submit="@FormSubmit" TItem="FISTNESSGYM.Models.ApplicationUser" Data="@user"
-                Visible="@(user != null)">
-                <RadzenAlert Size="AlertSize.Large" Shade="Shade.Light" AlertStyle="AlertStyle.Danger" Variant="Variant.Flat" Title="Nie mo¿na zmieniæ has³a" Visible="@errorVisible">@error</RadzenAlert>
+            <RadzenTemplateForm Method="post" TItem="FISTNESSGYM.Models.ApplicationUser" Data="@user"
+                                Visible="@(user != null)">
+                <RadzenAlert Size="AlertSize.Large" Shade="Shade.Light" AlertStyle="AlertStyle.Danger" Variant="Variant.Flat" Title="Nie mo¿na zmieniæ nazwy/has³a" Visible="@errorVisible">@error</RadzenAlert>
                 <RadzenAlert Size="AlertSize.Large" Shade="Shade.Light" AlertStyle="AlertStyle.Success" Variant="Variant.Flat" Visible="@successVisible">
                     Twoje has³o zosta³o zmienione.
                 </RadzenAlert>
@@ -27,15 +28,14 @@
                         <RadzenLabel Component="NewName" style="width: 100%" Text="Nowa nazwa" />
                     </RadzenColumn>
                     <RadzenColumn SizeMD="9">
-                        <RadzenTextBox @bind-Value="@newUsername" style="display: block; width: 100%"
-                                        Name="NewName" />
+                        <RadzenTextBox @bind-Value="@newUsername" style="display: block; width: 100%" Name="NewName" />
                     </RadzenColumn>
                 </RadzenRow>
 
                 <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.End">
-                    <RadzenButton ButtonType="ButtonType.Submit" Text="Zmieñ nazwê" Variant="Variant.Flat" />
+                    <RadzenButton ButtonType="ButtonType.Button" Text="Zmieñ nazwê" Variant="Variant.Flat"
+                                  Click="@ChangeUsername" />
                 </RadzenStack>
-
 
                 <RadzenRow style="margin-bottom: 1rem">
                     <RadzenColumn SizeMD="12">
@@ -45,48 +45,39 @@
                         <RadzenLabel Component="OldPassword" style="width: 100%" Text="Stare has³o" />
                     </RadzenColumn>
                     <RadzenColumn SizeMD="9">
-                        <RadzenPassword @bind-Value="@oldPassword" style="display: block; width: 100%"
-                            Name="OldPassword" />
+                        <RadzenPassword @bind-Value="@oldPassword" style="display: block; width: 100%" Name="OldPassword" />
                         <RadzenRequiredValidator Component="OldPassword" Text="Wpisz swoje stare has³o" />
                     </RadzenColumn>
                 </RadzenRow>
+
                 <RadzenRow style="margin-bottom: 1rem">
                     <RadzenColumn SizeMD="3">
                         <RadzenLabel Component="NewPassword" style="width: 100%" Text="Nowe has³o" />
                     </RadzenColumn>
                     <RadzenColumn SizeMD="9">
-                        <RadzenPassword @bind-Value="@newPassword" style="display: block; width: 100%"
-                            Name="NewPassword" />
+                        <RadzenPassword @bind-Value="@newPassword" style="display: block; width: 100%" Name="NewPassword" />
                         <RadzenRequiredValidator Component="NewPassword" Text="Wpisz swoje nowe has³o" />
                     </RadzenColumn>
                 </RadzenRow>
+
                 <RadzenRow style="margin-bottom: 1rem">
                     <RadzenColumn SizeMD="3">
                         <RadzenLabel Component="ConfirmPassword" style="width: 100%" Text="PotwierdŸ nowe has³o" />
                     </RadzenColumn>
                     <RadzenColumn SizeMD="9">
-                        <RadzenPassword @bind-Value="@confirmPassword" style="display: block; width: 100%"
-                            Name="ConfirmPassword" />
+                        <RadzenPassword @bind-Value="@confirmPassword" style="display: block; width: 100%" Name="ConfirmPassword" />
                         <RadzenRequiredValidator Component="ConfirmPassword" Text="PotwierdŸ twoje nowe has³o" />
                         <RadzenCompareValidator Component="ConfirmPassword" Text="Has³a powinny byæ takie same" Value="@newPassword" />
                     </RadzenColumn>
                 </RadzenRow>
+
                 <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.End">
-                        <RadzenButton ButtonType="ButtonType.Submit" Text="Zmieñ has³o" Variant="Variant.Flat" />
+                    <RadzenButton ButtonType="ButtonType.Button" Text="Zmieñ has³o" Variant="Variant.Flat"
+                                  Click="@ChangePassword" />
                 </RadzenStack>
-
-
-
             </RadzenTemplateForm>
         </RadzenColumn>
     </RadzenRow>
 </RadzenStack>
 
-@code {
-    private string newUsername { get; set; }
 
-    private async Task ChangeUsername()
-    {
-
-    }
-}

@@ -217,6 +217,25 @@ namespace FISTNESSGYM
             }
         }
 
+        public async Task ChangeUsername(string newUsername)
+        {
+            var uri = new Uri($"{navigationManager.BaseUri}Account/ChangeUsername"); 
+
+            var content = new FormUrlEncodedContent(new Dictionary<string, string>
+            {
+                { "newUsername", newUsername }
+            });
+
+            var response = await httpClient.PostAsync(uri, content); 
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var message = await response.Content.ReadAsStringAsync(); 
+                throw new ApplicationException(message);
+            }
+        }
+
+
         public async Task Register(string userName, string password)
         {
             var uri =  new Uri($"{navigationManager.BaseUri}Account/Register");

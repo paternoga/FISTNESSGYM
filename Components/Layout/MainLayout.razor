@@ -57,11 +57,11 @@
                                 {
                                     <RadzenProfileMenuItem Path="settings/profile" Icon="person" Text="Profil" />
                                     <RadzenProfileMenuItem Path="settings/subscription/status" Icon="universal_currency" Text="Subskrypcja" />
-                                    <RadzenProfileMenuItem Icon="notifications" Text="Powiadomienia" />
+                                    @* <RadzenProfileMenuItem Icon="notifications" Text="Powiadomienia" /> *@
 
                                     @if (AuthorizationService.IsClient)
                                     {
-                                        <RadzenProfileMenuItem Icon="shopping_cart" Text="Koszyk" />
+                                        <RadzenProfileMenuItem Icon="shopping_cart" Text="Koszyk" Path="/store/cart"/>
                                     }
                                     
                                 }

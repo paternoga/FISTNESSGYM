@@ -36,7 +36,12 @@ namespace FISTNESSGYM.Components.Pages.Settings.Profile
         protected string oldPassword = "";
         protected string newPassword = "";
         protected string confirmPassword = "";
+
+        protected string newUsername = "";
+        protected string currentUsername = "";
+
         protected FISTNESSGYM.Models.ApplicationUser user;
+
         protected string error;
         protected bool errorVisible;
         protected bool successVisible;
@@ -47,13 +52,28 @@ namespace FISTNESSGYM.Components.Pages.Settings.Profile
         protected override async Task OnInitializedAsync()
         {
             user = await Security.GetUserById($"{Security.User.Id}");
+            currentUsername = user.UserName;    
         }
 
-        protected async Task FormSubmit()
+        private async Task ChangeUsername()
         {
             try
             {
-                await Security.ChangePassword(oldPassword, newPassword);
+                await Security.ChangeUsername(newUsername); 
+                successVisible = true;
+            }
+            catch (Exception ex)
+            {
+                errorVisible = true;
+                error = ex.Message;
+            }
+        }
+
+        private async Task ChangePassword()
+        {
+            try
+            {
+                await Security.ChangePassword(oldPassword, newPassword); 
                 successVisible = true;
             }
             catch (Exception ex)
