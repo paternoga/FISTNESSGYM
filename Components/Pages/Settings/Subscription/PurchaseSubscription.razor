@@ -105,6 +105,8 @@
         {
             Console.WriteLine($"Błąd podczas zakupu subskrypcji: {ex.Message}");
         }
+
+        StateHasChanged();
     }
 
 

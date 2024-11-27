@@ -67,6 +67,9 @@ namespace FISTNESSGYM.Components.Pages.Settings.Profile
                 errorVisible = true;
                 error = ex.Message;
             }
+
+            StateHasChanged();
+
         }
 
         private async Task ChangePassword()
@@ -81,6 +84,8 @@ namespace FISTNESSGYM.Components.Pages.Settings.Profile
                 errorVisible = true;
                 error = ex.Message;
             }
+
+            StateHasChanged();
         }
     }
 }
