@@ -24,13 +24,15 @@ builder.Services.AddRadzenCookieThemeService(options =>
 builder.Services.AddHttpClient();
 builder.Services.AddScoped<databaseService>();
 builder.Services.AddDbContext<databaseContext>(options =>
-{
-    options.UseSqlServer(builder.Configuration.GetConnectionString("databaseConnection"));
-});
+    options.UseSqlServer(builder.Configuration.GetConnectionString("databaseConnection")),
+    ServiceLifetime.Scoped);
+
 builder.Services.AddHttpClient("FISTNESSGYM").ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler { UseCookies = false }).AddHeaderPropagation(o => o.Headers.Add("Cookie"));
 builder.Services.AddHeaderPropagation(o => o.Headers.Add("Cookie"));
 builder.Services.AddAuthentication();
 builder.Services.AddAuthorization();
+
+builder.Services.AddScoped<DbLogger>();
 
 builder.Services.AddScoped<SecurityService>();
 builder.Services.AddScoped<IProductService, ProductService>();

@@ -1,12 +1,14 @@
 ﻿@page "/settings/logs"
 @using FISTNESSGYM.Services
+@inject DbLogger LogService
 @inject AuthorizationService AuthorizationService
 @inject NavigationManager NavigationManager
 @inject AuthenticationStateProvider AuthenticationStateProvider
+@using FISTNESSGYM.Models.database
 
 <PageTitle>LOGI</PageTitle>
 
-@if (AuthorizationService.IsAdmin) 
+@if (AuthorizationService.IsAdmin)
 {
     <RadzenStack>
         <RadzenRow AlignItems="AlignItems.Center">
@@ -14,14 +16,35 @@
                 <RadzenText Text="Logi" TextStyle="TextStyle.H3" TagName="TagName.H1" style="margin: 0" />
             </RadzenColumn>
         </RadzenRow>
+
+        <RadzenDataGrid @ref="dataGrid" AllowFiltering="true" AllowPaging="true" ShowPagingSummary="true" PageSizeOptions=@(new int[]{5, 10, 20, 30}) AllowSorting="true" Data="@logList" TItem="FISTNESSGYM.Models.database.Log">
+            <Columns>
+                <RadzenDataGridColumn TItem="Log" Property="Id" Width="90px" Title="Id" />
+                <RadzenDataGridColumn TItem="Log" Property="LogLevel" Width="160px" Title="Poziom Logu" />
+                <RadzenDataGridColumn TItem="Log" Property="Message" Title="Wiadomość" />
+                <RadzenDataGridColumn TItem="Log" Property="CreatedAt" Width="160px" Title="Czas" />
+            </Columns>
+        </RadzenDataGrid>
     </RadzenStack>
 }
 else
 {
     NavigationManager.NavigateTo("/");
-    //<RadzenText Text="Brak dostępu. Tylko administratorzy mogą przeglądać logi." TextStyle="TextStyle.H4" style="color: red;" />
 }
 
 @code {
+    private List<Log> logList = new List<Log>();
+    protected RadzenDataGrid<FISTNESSGYM.Models.database.Log> dataGrid;
 
+    protected override async Task OnInitializedAsync()
+    {
+        if (AuthorizationService.IsAdmin)
+        {
+            logList = await LogService.GetLogsAsync();
+        }
+        else
+        {
+            NavigationManager.NavigateTo("/");
+        }
+    }
 }

@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Threading.Tasks;
 using FISTNESSGYM.Data;
 using FISTNESSGYM.Models;
 using FISTNESSGYM.Models.database;
+using FISTNESSGYM.Models.Database.ModelsDTO;
 using FISTNESSGYM.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -16,12 +18,14 @@ namespace FISTNESSGYM.Services
         private readonly databaseContext _context;
         private readonly ILogger<SubscriptionService> _logger;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly DbLogger _dbLogger;
 
-        public SubscriptionService(databaseContext context, ILogger<SubscriptionService> logger, UserManager<ApplicationUser> userManager)
+        public SubscriptionService(databaseContext context, ILogger<SubscriptionService> logger, UserManager<ApplicationUser> userManager, DbLogger dbLogger)
         {
             _context = context;
             _logger = logger;
             _userManager = userManager;
+            _dbLogger = dbLogger;
         }
 
         public async Task<List<SubscriptionType>> GetSubscriptionTypesAsync()
@@ -64,7 +68,7 @@ namespace FISTNESSGYM.Services
             {
                 var subscription = await _context.Subscriptions
                     .Include(s => s.SubscriptionType)
-                    .FirstOrDefaultAsync(s => s.UserId == userId && (s.SubscriptionStatusId == 1 || s.SubscriptionStatusId == 2)); 
+                    .FirstOrDefaultAsync(s => s.UserId == userId && s.SubscriptionStatusId == 1); 
 
                 if (subscription == null)
                 {
@@ -132,6 +136,12 @@ namespace FISTNESSGYM.Services
                         await _userManager.AddToRoleAsync(user, "Klient");
                     }
                 }
+
+                var logMessage = $"Użytkownik {subscription.UserId} zakupił subskrypcję {subscription.SubscriptionType.TypeName} w dniu {subscription.StartDate}.";
+                _logger.LogInformation(logMessage);  
+
+                await _dbLogger.LogToDatabaseAsync(LogLevel.Information, logMessage);
+
             }
             catch (DbUpdateException dbEx)
             {
@@ -177,6 +187,11 @@ namespace FISTNESSGYM.Services
             {
                 throw new Exception("Wystąpił błąd podczas anulowania subskrypcji.", ex);
             }
+
+            var logMessage = $"Użytkownik {subscription.UserId} anulował subskrypcję {subscription.SubscriptionType.TypeName} w dniu {subscription.StartDate}.";
+            _logger.LogInformation(logMessage);
+
+            await _dbLogger.LogToDatabaseAsync(LogLevel.Information, logMessage);
         }
 
 
@@ -187,5 +202,7 @@ namespace FISTNESSGYM.Services
                 .Where(s => s.UserId == userId)
                 .ToListAsync();
         }
+
+
     }
 }
