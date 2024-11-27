@@ -124,6 +124,37 @@ namespace FISTNESSGYM.Controllers
         }
 
         [HttpPost]
+        [Authorize]
+        public async Task<IActionResult> ChangeUsername(string newUsername)
+        {
+            if (string.IsNullOrEmpty(newUsername))
+            {
+                return BadRequest("Nieprawid³owa nazwa u¿ytkownika.");
+            }
+
+            var id = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var user = await userManager.FindByIdAsync(id);
+
+            if (user == null)
+            {
+                return BadRequest("U¿ytkownik nie zosta³ znaleziony.");
+            }
+
+            user.UserName = newUsername;
+            user.NormalizedUserName = newUsername.ToUpper();
+
+            var result = await userManager.UpdateAsync(user);
+
+            if (result.Succeeded)
+            {
+                return Ok();
+            }
+
+            var message = string.Join(", ", result.Errors.Select(error => error.Description));
+            return BadRequest(message);
+        }
+
+        [HttpPost]
         public ApplicationAuthenticationState CurrentUser()
         {
             return new ApplicationAuthenticationState

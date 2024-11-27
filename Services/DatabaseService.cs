@@ -14,6 +14,7 @@ using FISTNESSGYM.Data;
 using FISTNESSGYM.Components.Pages.Calendar;
 using FISTNESSGYM.Models.database;
 using DocumentFormat.OpenXml.InkML;
+using Microsoft.AspNetCore.Mvc;
 
 namespace FISTNESSGYM
 {
@@ -3681,6 +3682,35 @@ namespace FISTNESSGYM
 
             return upcomingEvents;
         }
+
+
+
+        public async Task<List<FISTNESSGYM.Models.database.Measurement>> GetMeasurementsAsync(string searchQuery = null)
+        {
+            var query = Context.Measurement
+
+                        .AsQueryable(); 
+
+            if (!string.IsNullOrEmpty(searchQuery))
+            {
+                query = query.Where(m => m.Weight.ToString().Contains(searchQuery) ||
+                                         m.WaistCircumference.ToString().Contains(searchQuery) ||
+                                         m.ChestCircumference.ToString().Contains(searchQuery) ||
+                                         m.ArmCircumference.ToString().Contains(searchQuery) ||
+                                         m.LegCircumference.ToString().Contains(searchQuery) ||
+                                         m.HipCircumference.ToString().Contains(searchQuery) ||
+                                         m.BodyFat.ToString().Contains(searchQuery) ||
+                                         m.MeasurementDate.ToString().Contains(searchQuery) ||
+                                         m.Notes.Contains(searchQuery));  
+            }
+
+            
+            return await query.ToListAsync(); 
+        }
+
+
+
+
 
 
     }

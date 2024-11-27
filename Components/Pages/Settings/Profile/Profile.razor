@@ -15,9 +15,9 @@
         <RadzenColumn SizeMD="12">
             <RadzenTemplateForm Method="post" TItem="FISTNESSGYM.Models.ApplicationUser" Data="@user"
                                 Visible="@(user != null)">
-                <RadzenAlert Size="AlertSize.Large" Shade="Shade.Light" AlertStyle="AlertStyle.Danger" Variant="Variant.Flat" Title="Nie mo¿na zmieniæ nazwy/has³a" Visible="@errorVisible">@error</RadzenAlert>
+                <RadzenAlert Size="AlertSize.Large" Shade="Shade.Light" AlertStyle="AlertStyle.Danger" Variant="Variant.Flat" Title="Nie mo¿na zmieniæ danych" Visible="@errorVisible">@error</RadzenAlert>
                 <RadzenAlert Size="AlertSize.Large" Shade="Shade.Light" AlertStyle="AlertStyle.Success" Variant="Variant.Flat" Visible="@successVisible">
-                    Twoje has³o zosta³o zmienione.
+                    Twoje dane zosta³y zmienione.
                 </RadzenAlert>
 
                 <RadzenRow style="margin-bottom: 1rem">
