@@ -15,6 +15,8 @@ using FISTNESSGYM.Components.Pages.Calendar;
 using FISTNESSGYM.Models.database;
 using DocumentFormat.OpenXml.InkML;
 using Microsoft.AspNetCore.Mvc;
+using FISTNESSGYM.Models.Database.ModelsDTO;
+using Microsoft.EntityFrameworkCore.Internal;
 
 namespace FISTNESSGYM
 {
@@ -3668,22 +3670,6 @@ namespace FISTNESSGYM
         {
             return await Context.AspNetUsers.AsNoTracking().ToListAsync();
         }
-        public async Task<List<Event>> GetUpcomingEventsAsync()
-        {
-            var now = DateTime.UtcNow;
-
-            // Pobierz maksymalnie 5 nadchodz¹cych wydarzeñ
-            var upcomingEvents = await Context.Events
-                .AsNoTracking()
-                .Where(e => e.EventStartDate >= now) // Tylko nadchodz¹ce wydarzenia
-                .OrderBy(e => e.EventStartDate) // Posortowane po dacie rozpoczêcia
-                .Take(5) // Maksymalnie 5
-                .ToListAsync();
-
-            return upcomingEvents;
-        }
-
-
 
         public async Task<List<FISTNESSGYM.Models.database.Measurement>> GetMeasurementsAsync(string searchQuery = null)
         {
@@ -3707,8 +3693,42 @@ namespace FISTNESSGYM
             
             return await query.ToListAsync(); 
         }
+        public async Task<List<Event>> GetUpcomingEventsAsync()
+        {
+                var now = DateTime.UtcNow;
 
+                var upcomingEvents = await Context.Events
+                    .AsNoTracking()
+                    .Where(e => e.EventStartDate >= now)
+                    .OrderBy(e => e.EventStartDate)
+                    .Take(5)
+                    .ToListAsync();
 
+                return upcomingEvents;
+        }
+
+        public async Task<Dictionary<int, int>> GetRegistrationCountsByDayAsync(int year, int month)
+        {
+            var daysInMonth = DateTime.DaysInMonth(year, month);
+
+            // Pobierz dane rejestracji i grupuj po dniu
+            var data = await Context.Reservations
+                .Where(r => r.Event.EventStartDate.Year == year && r.Event.EventStartDate.Month == month)
+                .GroupBy(r => r.Event.EventStartDate.Day)
+                .Select(g => new { Day = g.Key, Count = g.Count() })
+                .ToListAsync();
+
+            // Zainicjuj s³ownik z dniami od 1 do ostatniego dnia miesi¹ca
+            var result = Enumerable.Range(1, daysInMonth).ToDictionary(day => day, day => 0);
+
+            // Uzupe³nij s³ownik wartoœciami z bazy danych
+            foreach (var item in data)
+            {
+                result[item.Day] = item.Count;
+            }
+
+            return result;
+        }
 
 
 

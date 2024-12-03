@@ -1,34 +1,170 @@
 ﻿@page "/upcoming-events"
 @using FISTNESSGYM.Services
 @using FISTNESSGYM.Models.database
+@using FISTNESSGYM.Models.Database.ModelsDTO
 @inject databaseService databaseService
+<RadzenRow>
+    <!-- Kolumna z trzema widgetami -->
+    <RadzenColumn Size="9">
+        <RadzenRow>
+            <RadzenColumn Size="4">
+                <GymOccupancy />
+            </RadzenColumn>
+            <RadzenColumn Size="4">
+                <Weather />
+            </RadzenColumn>
+            <RadzenColumn Size="4">
+                <WorkMotivationWidget />
+            </RadzenColumn>
+        </RadzenRow>
 
-<RadzenCard Style="padding: 20px; border-radius: 8px; border: 1px solid #e0e0e0;">
-    <h4 style="color: #3a3a3a; font-weight: 600; margin-top: 0px;">Nadchodzące zajęcia:</h4>
-
-    @if (UpcomingEventList != null && UpcomingEventList.Any())
-    {
-        @foreach (var evt in UpcomingEventList)
+        @if (chartData != null && chartData.Values.Any(value => value > 0))
         {
-            <div style="margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px solid #e0e0e0;">
-                <h4 style="font-weight: 600; margin: 0;">@evt.EventName</h4>
-                <p style="margin: 4px 0; color: #3a3a3a;">Instruktor: @evt.InstructorName</p>
-                <p style="margin: 4px 0; color: #3a3a3a;">Data: @evt.EventStartDate.ToString("dd.MM.yyyy HH:mm")</p>
-                <p style="margin: 4px 0; color: #3a3a3a;">Zapisanych: @evt.Participants/@evt.MaxParticipants</p>
-            </div>
+            <RadzenCard Style="padding: 20px; border-radius: 8px; border: 1px solid #e0e0e0; margin-top: 20px;">
+                <h4 style="color: #3a3a3a; font-weight: 600; margin-top: 0px;">Rejestracje na zajęcia w poszczególne dni</h4>
+
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <RadzenButton Icon="chevron_left" Click="OnPreviousMonthClick" Style="width: 40px; height: 40px;" />
+                    <h4 style="margin: 0;">@currentMonthName @currentYear</h4>
+                    <RadzenButton Icon="chevron_right" Click="OnNextMonthClick" Style="width: 40px; height: 40px;" />
+                </div>
+
+                <RadzenChart>
+                    <RadzenColumnSeries Data="@chartData"
+                                        CategoryProperty="Key"
+                                        ValueProperty="Value"
+                                        Title="Ilość osób">
+                        <RadzenSeriesDataLabels Visible="true" />
+                        <RadzenLegend Visible="false" />
+                    </RadzenColumnSeries>
+
+                    <RadzenCategoryAxis Min="0" Max="@daysInMonthForChart" Step="1">
+                        <RadzenAxisTitle Text="Dzień miesiąca" />
+                        <RadzenGridLines Visible="true" />
+                    </RadzenCategoryAxis>
+
+                    <RadzenValueAxis Min="0">
+                        <RadzenAxisTitle Text="Ilość zapisanych osób" />
+                        <RadzenGridLines Visible="true" />
+                    </RadzenValueAxis>
+                </RadzenChart>
+            </RadzenCard>
         }
-    }
-    else
-    {
-        <p style="color: #757575;">Brak zaplanowanych wydarzeń.</p>
-    }
-</RadzenCard>
+        else
+        {
+            <RadzenCard Style="padding: 20px; border-radius: 8px; border: 1px solid #e0e0e0; margin-top: 20px;">
+                <h4 style="color: #3a3a3a; font-weight: 600; margin-top: 0px;">Rejestracje na zajęcia w poszczególne dni</h4>
+
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <RadzenButton Icon="chevron_left" Click="OnPreviousMonthClick" Style="width: 40px; height: 40px;" />
+                    <h4 style="margin: 0;">@currentMonthName @currentYear</h4>
+                    <RadzenButton Icon="chevron_right" Click="OnNextMonthClick" Style="width: 40px; height: 40px;" />
+                </div>
+
+                <div style="text-align: center; padding: 20px;">
+                    <p style="font-size: 16px; color: #757575;">Brak danych na ten miesiąc.</p>
+                </div>
+            </RadzenCard>
+        }
+
+
+    </RadzenColumn>
+
+    <!-- Kolumna z nadchodzącymi zajęciami -->
+    <RadzenColumn Size="3">
+        <RadzenCard Style="padding: 20px; border-radius: 8px; border: 1px solid #e0e0e0; height: 720px;">
+            <h4 style="color: #3a3a3a; font-weight: 600; margin-top: 0px;">Nadchodzące zajęcia:</h4>
+
+            @if (UpcomingEventList != null && UpcomingEventList.Any())
+            {
+                @foreach (var evt in UpcomingEventList)
+                {
+                    <div style="margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px solid #e0e0e0;">
+                        <h4 style="font-weight: 600; margin: 0;">@evt.EventName</h4>
+                        <p style="margin: 4px 0; color: #3a3a3a;">Instruktor: @evt.InstructorName</p>
+                        <p style="margin: 4px 0; color: #3a3a3a;">Data: @evt.EventStartDate.ToString("dd.MM.yyyy HH:mm")</p>
+                        <p style="margin: 4px 0; color: #3a3a3a;">Zapisanych: @evt.Participants/@evt.MaxParticipants</p>
+                    </div>
+                }
+            }
+            else
+            {
+                <div style="display: flex; justify-content: center; align-items: center; height: 100%;">
+                    <p style="color: #757575; font-size: 16px;">Brak zaplanowanych wydarzeń.</p>
+                </div>
+            }
+        </RadzenCard>
+    </RadzenColumn>
+</RadzenRow>
 
 @code {
     private List<Event> UpcomingEventList;
-
+    private int daysInMonth;
+    private double daysInMonthForChart;
     protected override async Task OnInitializedAsync()
     {
         UpcomingEventList = await databaseService.GetUpcomingEventsAsync();
+        await LoadChartData();
     }
+
+    private Dictionary<int, int> chartData = new();
+    private int currentMonth = DateTime.Today.Month;
+    private int currentYear = DateTime.Today.Year;
+
+    private string currentMonthName => new DateTime(currentYear, currentMonth, 1).ToString("MMMM");
+
+
+    private async Task LoadChartData()
+    {
+        daysInMonth = DateTime.DaysInMonth(currentYear, currentMonth);
+        daysInMonthForChart = daysInMonth + 0.9;
+        // Pobierz dane z bazy danych
+        var data = await databaseService.GetRegistrationCountsByDayAsync(currentYear, currentMonth);
+
+        // Jeśli dane są puste, zainicjuj wartości zerowe
+        if (data == null || !data.Any())
+        {
+            chartData = Enumerable.Range(1, daysInMonth).ToDictionary(day => day, day => 0);
+        }
+        else
+        {
+            // Wypełnij brakujące dni zerowymi wartościami
+            chartData = Enumerable.Range(1, daysInMonth).ToDictionary(day => day, day => data.ContainsKey(day) ? data[day] : 0);
+        }
+    }
+
+
+
+    private async Task OnPreviousMonthClick()
+    {
+        if (currentMonth == 1)
+        {
+            currentMonth = 12;
+            currentYear -= 1;
+        }
+        else
+        {
+            currentMonth -= 1;
+        }
+
+        await LoadChartData();
+    }
+
+    private async Task OnNextMonthClick()
+    {
+        if (currentMonth == 12)
+        {
+            currentMonth = 1;
+            currentYear += 1;
+        }
+        else
+        {
+            currentMonth += 1;
+        }
+
+        await LoadChartData();
+    }
+
+
+
 }
