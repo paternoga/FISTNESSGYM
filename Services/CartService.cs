@@ -436,9 +436,263 @@ namespace FISTNESSGYM.Services
         }
 
 
+        public async Task<int> GetTotalSoldForYearAsync(int year)
+        {
+            var totalSoldForYear = await _context.OrderItems
+                .Where(oi => oi.CreationDate.Year == year)
+                .SumAsync(oi => oi.Quantity);
+
+            return totalSoldForYear;
+        }
+
+        public async Task<List<SalesData>> GetSalesDataForYearAsync(int year)
+        {
+            var salesData = await _context.OrderItems
+                .Where(oi => oi.CreationDate.Year == year)
+                .GroupBy(oi => oi.CreationDate.Month)
+                .Select(g => new SalesData
+                {
+                    Date = g.Key.ToString(), // Miesiąc jako numer
+                    Quantity = g.Sum(oi => oi.Quantity)
+                })
+                .OrderBy(s => s.Date)
+                .ToListAsync();
+
+            // Wypełnienie brakujących miesięcy (jeśli są)
+            var allMonthsInYear = Enumerable.Range(1, 12)
+                .Select(month => new SalesData
+                {
+                    Date = month.ToString(),
+                    Quantity = 0
+                })
+                .ToList();
+
+            foreach (var monthData in salesData)
+            {
+                var month = int.Parse(monthData.Date);
+                var existingMonth = allMonthsInYear.FirstOrDefault(d => d.Date == month.ToString());
+                if (existingMonth != null)
+                {
+                    existingMonth.Quantity = monthData.Quantity;
+                }
+            }
+
+            return allMonthsInYear;
+        }
 
 
+        public async Task<List<SalesData>> GetSalesDataForQuarterAsync(int year, int quarter)
+        {
+            // Obliczanie zakresu daty dla danego kwartału
+            var startMonth = (quarter - 1) * 3 + 1;
+            var endMonth = startMonth + 2;
+            var startDate = new DateTime(year, startMonth, 1);
+            var endDate = new DateTime(year, endMonth, DateTime.DaysInMonth(year, endMonth));
 
+            // Pobieranie danych z bazy
+            var salesData = await _context.OrderItems
+                .Where(oi => oi.CreationDate >= startDate && oi.CreationDate <= endDate)
+                .GroupBy(oi => oi.CreationDate.Date)
+                .Select(g => new SalesData
+                {
+                    Date = g.Key.ToString("yyyy-MM-dd"),
+                    Quantity = g.Sum(oi => oi.Quantity)
+                })
+                .OrderBy(s => s.Date)
+                .ToListAsync();
+
+            // Obsługuje brakujące dni
+            var missingDays = Enumerable.Range(1, (endDate - startDate).Days)
+                .Where(d => !salesData.Any(s => s.Date == startDate.AddDays(d - 1).ToString("yyyy-MM-dd")))
+                .Select(d => new SalesData
+                {
+                    Date = startDate.AddDays(d - 1).ToString("yyyy-MM-dd"),
+                    Quantity = 0
+                }).ToList();
+
+            // Dodanie brakujących dni (jeśli istnieją)
+            salesData.AddRange(missingDays);
+
+            return salesData.OrderBy(s => s.Date).ToList();
+        }
+
+
+        public async Task<List<TopProduct>> GetTopProductsForYearAsync(int year)
+        {
+            return await _context.OrderItems
+                .Where(item => item.CreationDate.Year == year)
+                .GroupBy(item => new { item.ProductId, item.Product.Name })
+                .Select(group => new TopProduct
+                {
+                    ProductId = group.Key.ProductId,
+                    ProductName = group.Key.Name,
+                    TotalQuantity = group.Sum(item => item.Quantity)
+                })
+                .OrderByDescending(product => product.TotalQuantity)
+                .Take(5)
+                .ToListAsync();
+        }
+
+        public async Task<decimal> GetTotalRevenueForYearAsync(int year)
+        {
+            var totalRevenueForYear = await _context.OrderItems
+                .Where(oi => oi.CreationDate.Year == year)
+                .SumAsync(oi => oi.Quantity * oi.UnitPrice);
+
+            return totalRevenueForYear;
+        }
+
+        public async Task<List<CategorySalesData>> GetCategoryRankingForYearAsync(int year)
+        {
+            var ranking = await _context.OrderItems
+                .Where(o => o.CreationDate.Year == year)
+                .Join(_context.Products,
+                      orderItem => orderItem.ProductId,
+                      product => product.Id,
+                      (orderItem, product) => new { orderItem.Quantity, product.Category })
+                .GroupBy(x => x.Category)
+                .Select(group => new CategorySalesData
+                {
+                    CategoryName = group.Key,
+                    TotalQuantity = group.Sum(x => x.Quantity)
+                })
+                .OrderByDescending(data => data.TotalQuantity)
+                .ToListAsync();
+
+            return ranking;
+        }
+
+        
+
+        public async Task<List<OrderItem>> GetOrderItemsSoldForYearAsync(int year)
+        {
+            return await _context.OrderItems
+                .Where(oi => oi.CreationDate.Year == year)
+                .ToListAsync();
+        }
+
+        public async Task<List<TopProduct>> GetLeastSoldProductsForYearAsync(int year)
+        {
+            var leastSoldProducts = await _context.OrderItems
+                .Where(o => o.CreationDate.Year == year)
+                .GroupBy(o => new { o.ProductId, o.Product.Name })
+                .Select(g => new TopProduct
+                {
+                    ProductId = g.Key.ProductId,
+                    ProductName = g.Key.Name,
+                    TotalQuantity = g.Sum(o => o.Quantity)
+                })
+                .OrderBy(p => p.TotalQuantity)
+                .Take(5)
+                .ToListAsync();
+
+            return leastSoldProducts;
+        }
+
+        public async Task<List<OrderItem>> GetOrderItemsForYearAsync(int year)
+        {
+            return await _context.OrderItems
+                .Where(o => o.CreationDate.Year == year)
+                .ToListAsync();
+        }
+
+        public async Task<List<TopBuyer>> GetTopBuyersForYearAsync(int year)
+        {
+            var startDate = new DateTime(year, 1, 1);
+            var endDate = new DateTime(year, 12, 31);
+
+            var topBuyersYear = await _context.Orders
+                .Where(o => o.OrderDate >= startDate && o.OrderDate <= endDate)
+                .GroupBy(o => o.UserId)
+                .Select(g => new
+                {
+                    UserId = g.Key,
+                    TotalSpent = g.Sum(o => o.TotalAmount),
+                    OrdersCount = g.Count()
+                })
+                .OrderByDescending(g => g.TotalSpent)
+                .Take(5)
+                .ToListAsync();
+
+            // Pobierz dane użytkowników
+            var userIds = topBuyersYear.Select(b => b.UserId).ToList();
+            var users = await _context.AspNetUsers
+                .Where(u => userIds.Contains(u.Id))
+                .Select(u => new { u.Id, u.UserName, u.Email })
+                .ToDictionaryAsync(u => u.Id);
+
+            // Połącz dane
+            return topBuyersYear.Select(b => new TopBuyer
+            {
+                UserName = users[b.UserId]?.UserName ?? "Nieznany użytkownik",
+                Email = users[b.UserId]?.Email ?? "Brak e-maila",
+                TotalSpent = b.TotalSpent,
+                OrdersCount = b.OrdersCount
+            }).ToList();
+        }
+
+        public async Task<Dictionary<string, List<TopBuyer>>> GetTopBuyersWithQuartersAsync(int year)
+        {
+            // Pobieramy zamówienia z bazy danych, filtrowane po roku
+            var orders = await _context.Orders
+                .Where(o => o.OrderDate.Year == year)
+                .Include(o => o.UserId)
+                .ToListAsync();
+
+            // Grupowanie po kwartale i użytkowniku
+            var groupedByQuarter = orders
+                .GroupBy(o => new { o.UserId, Quarter = (o.OrderDate.Month - 1) / 3 + 1 }) // Kwartał obliczany na podstawie miesiąca
+                .Select(g => new
+                {
+                    UserId = g.Key.UserId,
+                    Quarter = $"Q{g.Key.Quarter}",
+                    TotalSpent = g.Sum(o => o.TotalAmount),
+                    OrdersCount = g.Count()
+                })
+                .ToList();
+
+            // Pobieramy dane użytkowników (e-mail, nazwa użytkownika)
+            var userIds = groupedByQuarter.Select(g => g.UserId).Distinct().ToList();
+            var users = await _context.AspNetUsers
+                .Where(u => userIds.Contains(u.Id))
+                .Select(u => new { u.Id, u.UserName, u.Email })
+                .ToDictionaryAsync(u => u.Id);
+
+            // Grupowanie danych według kwartalu
+            var topBuyersByQuarter = groupedByQuarter
+                .GroupBy(g => g.Quarter)
+                .ToDictionary(g => g.Key, g =>
+                    g.GroupBy(x => x.UserId)
+                    .Select(x => new TopBuyer
+                    {
+                        UserName = users[x.Key]?.UserName ?? "Nieznany użytkownik",
+                        Email = users[x.Key]?.Email ?? "Brak e-maila",
+                        TotalSpent = x.Sum(s => s.TotalSpent),
+                        OrdersCount = x.Sum(s => s.OrdersCount)
+                    })
+                    .OrderByDescending(b => b.TotalSpent)
+                    .Take(5)
+                    .ToList());
+
+            // Top 5 za cały rok
+            var topBuyersYearly = groupedByQuarter
+                .GroupBy(g => g.UserId)
+                .Select(g => new TopBuyer
+                {
+                    UserName = users[g.Key]?.UserName ?? "Nieznany użytkownik",
+                    Email = users[g.Key]?.Email ?? "Brak e-maila",
+                    TotalSpent = g.Sum(o => o.TotalSpent),
+                    OrdersCount = g.Sum(o => o.OrdersCount)
+                })
+                .OrderByDescending(b => b.TotalSpent)
+                .Take(5)
+                .ToList();
+
+            // Dodajemy do wyników kwartalnych top 5 za cały rok
+            topBuyersByQuarter.Add("Roczny", topBuyersYearly);
+
+            return topBuyersByQuarter;
+        }
 
 
 

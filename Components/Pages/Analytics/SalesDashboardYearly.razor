@@ -1,0 +1,131 @@
+﻿@page "/analytics/yearly-dashboard"
+@inject ICartService CartService
+@using System.Globalization
+@using FISTNESSGYM.Services
+@using FISTNESSGYM.Models
+@using FISTNESSGYM.Models.Database
+@using FISTNESSGYM.Models.database
+
+<div style="display: flex; gap: 20px; flex-wrap: wrap; justify-content: space-between; margin-bottom: 20px;">
+    <!-- Wybór Roku -->
+    <div style="flex: 1 1 200px;">
+        <RadzenDropDown @bind-Value="selectedYear" Data="@yearList" TextProperty="Text" ValueProperty="Value" Style="width: 100%;" />
+    </div>
+    <div style="flex: 1 1 200px;">
+        <RadzenButton Text="Filtruj" Click="@LoadQuarterlyData" Style="height: 36px; width: 100%;" />
+    </div>
+    <div style="flex: 1 1 200px;">
+        <RadzenButton Text="Miesięczny" Click="@NavigateToMonthlyDashboard" Style="height: 36px; width: 100%;" />
+    </div>
+</div>
+
+<!-- Widgety z danymi kwartalnymi i rocznymi -->
+<div style="display: flex; flex-wrap: wrap; gap: 20px; justify-content: space-between;">
+    <!-- Widget Sprzedane Produkty -->
+    <RadzenCard Style="padding: 20px; border-radius: 8px; width: 48%;">
+        <h4>Sprzedane Produkty - Kwartalne i Roczne</h4>
+        <ul>
+            @foreach (var sold in productsSoldByQuarter)
+            {
+                <li><strong>@sold.Key:</strong> @sold.Value szt.</li>
+            }
+            <li><strong>Cały rok:</strong> @totalSoldYear szt.</li>
+        </ul>
+    </RadzenCard>
+
+    <!-- Widget Obrót -->
+    <RadzenCard Style="padding: 20px; border-radius: 8px; width: 48%;">
+        <h4>Obrót - Kwartalne i Roczne</h4>
+        <ul>
+            @foreach (var revenue in revenueByQuarter)
+            {
+                <li><strong>@revenue.Key:</strong> @revenue.Value.ToString("C", CultureInfo.CurrentCulture)</li>
+            }
+            <li><strong>Cały rok:</strong> @totalRevenueYear.ToString("C", CultureInfo.CurrentCulture)</li>
+        </ul>
+    </RadzenCard>
+</div>
+
+<!-- Widget Top 5 Kupujących -->
+<div style="display: flex; flex-wrap: wrap; gap: 20px; justify-content: space-between;">
+    <RadzenCard Style="padding: 20px; border-radius: 8px; width: 48%;">
+        <h4>Top 5 Kupujących - Roczne</h4>
+        @if (topBuyers != null && topBuyers.Any())
+        {
+            <ul>
+                @foreach (var buyer in topBuyers)
+                {
+                    <li>@buyer.UserName - @buyer.TotalSpent.ToString("C")</li>
+                }
+            </ul>
+        }
+        else
+        {
+            <p>Brak danych dla wybranego roku.</p>
+        }
+    </RadzenCard>
+</div>
+
+
+
+@code {
+    [Inject]
+    public NavigationManager NavigationManager { get; set; }
+    private int selectedYear = DateTime.Today.Year;
+    private decimal totalRevenueYear;
+    private List<FISTNESSGYM.Models.Database.TopBuyer> topBuyers = new();
+
+    private int totalSoldYear;
+    private Dictionary<string, decimal> revenueByQuarter = new();
+    private Dictionary<string, int> productsSoldByQuarter = new();
+    private List<DropDownItem> yearList = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Generowanie listy lat
+        yearList = Enumerable.Range(DateTime.Today.Year - 5, 6)
+                             .Select(y => new DropDownItem { Text = y.ToString(), Value = y })
+                             .ToList();
+        await LoadQuarterlyData();
+        await LoadTopBuyers();
+    }
+
+    private async Task LoadQuarterlyData()
+    {
+        var salesData = await CartService.GetOrderItemsForYearAsync(selectedYear);
+
+        // Sprzedaż kwartalna i roczna
+        totalSoldYear = salesData.Sum(x => x.Quantity);
+        totalRevenueYear = salesData.Sum(x => x.Quantity * x.UnitPrice);
+
+        productsSoldByQuarter = salesData
+            .GroupBy(x => $"Q{(x.CreationDate.Month - 1) / 3 + 1}")
+            .ToDictionary(g => g.Key, g => g.Sum(x => x.Quantity));
+
+        revenueByQuarter = salesData
+            .GroupBy(x => $"Q{(x.CreationDate.Month - 1) / 3 + 1}")
+            .ToDictionary(g => g.Key, g => g.Sum(x => x.Quantity * x.UnitPrice));
+    }
+
+    private async Task LoadTopBuyers()
+    {
+        topBuyers = await CartService.GetTopBuyersForYearAsync(selectedYear);
+    }
+    private void NavigateToMonthlyDashboard()
+    {
+        NavigationManager.NavigateTo("/analytics/sales-dashboard");
+    }
+
+        
+    public class DropDownItem
+    {
+        public string Text { get; set; }
+        public int Value { get; set; }
+    }
+
+    public class TopBuyer
+    {
+        public string UserName { get; set; }
+        public decimal TotalSpent { get; set; }
+    }
+}

@@ -20,6 +20,9 @@
     <div style="flex: 1 1 200px;">
         <RadzenButton Text="Filtruj" Click="@OnFilterClick" Style="height: 36px; width: 100%;" />
     </div>
+    <div style="flex: 1 1 200px;">
+        <RadzenButton Text="Roczny" Click="@NavigateToYearlyDashboard" Style="height: 36px; width: 100%;" />
+    </div>
 </div>
 
 <div style="display: flex; gap: 20px; flex-wrap: wrap; justify-content: space-between; margin-top: 20px;">
@@ -223,6 +226,8 @@
 
 
 @code {
+    [Inject]
+    public NavigationManager NavigationManager { get; set; }
     private decimal totalRevenueToday;
     private int totalSoldToday;
     private List<SalesData> salesData = new List<SalesData>();
@@ -361,7 +366,10 @@
         leastSoldProducts = await CartService.GetLeastSoldProductsForMonthAsync(selectedYear, selectedMonth);
     }
 
-
+    private void NavigateToYearlyDashboard()
+    {
+        NavigationManager.NavigateTo("/analytics/yearly-dashboard");
+    }
 
 
     public class DropDownItem

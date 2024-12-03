@@ -47,10 +47,17 @@ namespace FISTNESSGYM.Services
         Task<List<TopBuyer>> GetTopBuyersForMonthAsync(int year, int month);
         Task<LastPurchasedProduct> GetLastPurchasedProductAsync();
         Task<List<TopProduct>> GetLeastSoldProductsForMonthAsync(int year, int month);
-
-
-
-
+        Task<int> GetTotalSoldForYearAsync(int year);
+        Task<List<SalesData>> GetSalesDataForYearAsync(int year);
+        Task<List<SalesData>> GetSalesDataForQuarterAsync(int year, int quarter);
+        Task<List<TopProduct>> GetTopProductsForYearAsync(int year);
+        Task<decimal> GetTotalRevenueForYearAsync(int year);
+        Task<List<CategorySalesData>> GetCategoryRankingForYearAsync(int year);
+        Task<List<TopBuyer>> GetTopBuyersForYearAsync(int year);
+        Task<List<OrderItem>> GetOrderItemsSoldForYearAsync(int year);
+        Task<List<TopProduct>> GetLeastSoldProductsForYearAsync(int year);
+        Task<List<OrderItem>> GetOrderItemsForYearAsync(int year);
+        Task<Dictionary<string, List<TopBuyer>>> GetTopBuyersWithQuartersAsync(int year);
 
 
     }
