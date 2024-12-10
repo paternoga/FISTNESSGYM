@@ -44,48 +44,75 @@
             <li><strong>Cały rok:</strong> @totalRevenueYear.ToString("C", CultureInfo.CurrentCulture)</li>
         </ul>
     </RadzenCard>
+
+    <!-- Widget Top 5 Kupujących -->
+    
+        <RadzenCard Style="padding: 20px; border-radius: 8px; width: 48%;">
+            <h4>Top 5 Kupujących - Roczne</h4>
+            @if (topBuyers != null && topBuyers.Any())
+            {
+                <ul>
+                    @foreach (var buyer in topBuyers)
+                    {
+                        <li>@buyer.UserName - @buyer.TotalSpent.ToString("C")</li>
+                    }
+                </ul>
+            }
+            else
+            {
+                <p>Brak danych dla wybranego roku.</p>
+            }
+        </RadzenCard>
+   
+
+    <!-- Widget Top Produktów -->
+   
+        <RadzenCard Style="padding: 20px; border-radius: 8px; width: 48%;">
+            <h4>Top Produktów - Kwartalne i Roczne</h4>
+            @if (topProductsByQuarter != null && topProductsByQuarter.Any())
+            {
+                <ul>
+                    @foreach (var quarter in topProductsByQuarter)
+                    {
+                        <li><strong>@quarter.Key:</strong> @quarter.Value.FirstOrDefault()?.ProductName - @quarter.Value.FirstOrDefault()?.TotalQuantity szt.</li>
+                    }
+                    <li><strong>Cały rok:</strong> @topProductsYear.FirstOrDefault()?.ProductName - @topProductsYear.FirstOrDefault()?.TotalQuantity szt.</li>
+                </ul>
+            }
+            else
+            {
+                <p>Brak danych dla wybranego roku.</p>
+            }
+        </RadzenCard>
+ 
+
+
+
+    <!-- Widget: Top Kategorie -->
+    
+        <RadzenCard Style="padding: 20px; border-radius: 8px; width: 48%;">
+            <h4>Top Kategorie</h4>
+            @if (categorySales != null && categorySales.Any())
+            {
+                @foreach (var quarter in categorySales)
+                {
+                    <div>
+                        <strong>. <span style="font-weight: bold;">@quarter.Key</span>:</strong>
+                        <!-- Wyświetlanie nazwy kategorii i liczby sztuk -->
+                        <span>@quarter.Value.FirstOrDefault()?.CategoryName - @quarter.Value.FirstOrDefault()?.TotalQuantity szt.</span>
+                    </div>
+                }
+            }
+            else
+            {
+                <p>Brak danych dla wybranego roku.</p>
+            }
+        </RadzenCard>
+    
 </div>
 
-<!-- Widget Top 5 Kupujących -->
-<div style="display: flex; flex-wrap: wrap; gap: 20px; justify-content: space-between;">
-    <RadzenCard Style="padding: 20px; border-radius: 8px; width: 48%;">
-        <h4>Top 5 Kupujących - Roczne</h4>
-        @if (topBuyers != null && topBuyers.Any())
-        {
-            <ul>
-                @foreach (var buyer in topBuyers)
-                {
-                    <li>@buyer.UserName - @buyer.TotalSpent.ToString("C")</li>
-                }
-            </ul>
-        }
-        else
-        {
-            <p>Brak danych dla wybranego roku.</p>
-        }
-    </RadzenCard>
-</div>
 
-<!-- Widget Top Produktów -->
-<div style="display: flex; flex-wrap: wrap; gap: 20px; justify-content: space-between;">
-    <RadzenCard Style="padding: 20px; border-radius: 8px; width: 48%;">
-        <h4>Top Produktów - Kwartalne i Roczne</h4>
-        @if (topProductsByQuarter != null && topProductsByQuarter.Any())
-        {
-            <ul>
-                @foreach (var quarter in topProductsByQuarter)
-                {
-                    <li><strong>@quarter.Key:</strong> @quarter.Value.FirstOrDefault()?.ProductName - @quarter.Value.FirstOrDefault()?.TotalQuantity szt.</li>
-                }
-                <li><strong>Cały rok:</strong> @topProductsYear.FirstOrDefault()?.ProductName - @topProductsYear.FirstOrDefault()?.TotalQuantity szt.</li>
-            </ul>
-        }
-        else
-        {
-            <p>Brak danych dla wybranego roku.</p>
-        }
-    </RadzenCard>
-</div>
+
 
 
 
@@ -104,7 +131,7 @@
     private Dictionary<string, List<TopProduct>> topProductsByQuarter = new();
     private List<TopProduct> topProductsYear = new();
     private List<DropDownItem> yearList = new();
-    
+    private Dictionary<string, List<CategorySalesData>> categorySales = new();
 
 
 
@@ -118,6 +145,7 @@
         await LoadQuarterlyData();
         await LoadTopBuyers();
         await LoadTopProducts();
+        await LoadCategorySalesData();
         
     }
 
@@ -145,6 +173,10 @@
     private void NavigateToMonthlyDashboard()
     {
         NavigationManager.NavigateTo("/analytics/sales-dashboard");
+    }
+    private async Task LoadCategorySalesData()
+    {
+        categorySales = await CartService.GetCategorySalesForYearAsync(selectedYear);
     }
 
     private async Task LoadTopProducts()

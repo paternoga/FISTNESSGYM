@@ -728,6 +728,87 @@ namespace FISTNESSGYM.Services
                 .ToListAsync();
         }
 
-        
+        //public async Task<Dictionary<string, List<CategorySalesData>>> GetCategorySalesForYearAsync(int year)
+        //{
+        //    // Pobieramy wszystkie dane o sprzedaży w danym roku
+        //    var salesData = await _context.OrderItems
+        //        .Where(o => o.CreationDate.Year == year)
+        //        .Join(_context.Products, oi => oi.ProductId, p => p.Id, (oi, p) => new { oi.Quantity, p.Category, oi.CreationDate })
+        //        .ToListAsync();
+
+        //    // Grupowanie danych po kwartale (Q1, Q2, Q3, Q4)
+        //    var categorySalesByQuarter = salesData
+        //        .GroupBy(x => new { Quarter = $"Q{(x.CreationDate.Month - 1) / 3 + 1}", x.Category })
+        //        .Select(g => new CategorySalesData
+        //        {
+        //            CategoryName = g.Key.Category,
+        //            TotalQuantity = g.Sum(x => x.Quantity),
+        //            Quarter = g.Key.Quarter
+        //        })
+        //        .ToList();
+
+        //    // Grupowanie danych rocznych po kategorii
+        //    var categorySalesYear = salesData
+        //        .GroupBy(x => x.Category)
+        //        .Select(g => new CategorySalesData
+        //        {
+        //            CategoryName = g.Key,
+        //            TotalQuantity = g.Sum(x => x.Quantity),
+        //            Quarter = "Roczny" // "Roczny" dla całego roku
+        //        })
+        //        .ToList();
+
+        //    // Łączenie danych kwartalnych i rocznych
+        //    var categorySales = categorySalesByQuarter
+        //        .GroupBy(c => c.Quarter)
+        //        .ToDictionary(g => g.Key, g => g.OrderByDescending(c => c.TotalQuantity).Take(5).ToList());
+
+        //    // Dodanie danych rocznych do słownika
+        //    categorySales.Add("Roczny", categorySalesYear.OrderByDescending(c => c.TotalQuantity).Take(5).ToList());
+
+        //    return categorySales;
+        //}
+
+        public async Task<Dictionary<string, List<CategorySalesData>>> GetCategorySalesForYearAsync(int year)
+        {
+            // Pobieramy wszystkie dane o sprzedaży w danym roku
+            var salesData = await _context.OrderItems
+                .Where(o => o.CreationDate.Year == year)
+                .Join(_context.Products, oi => oi.ProductId, p => p.Id, (oi, p) => new { oi.Quantity, p.Category, oi.CreationDate })
+                .ToListAsync();
+
+            // Grupowanie danych po kwartale (Q1, Q2, Q3, Q4)
+            var categorySalesByQuarter = salesData
+                .GroupBy(x => new { Quarter = $"Q{(x.CreationDate.Month - 1) / 3 + 1}", x.Category })
+                .Select(g => new CategorySalesData
+                {
+                    CategoryName = g.Key.Category,
+                    TotalQuantity = g.Sum(x => x.Quantity),
+                    Quarter = g.Key.Quarter
+                })
+                .ToList();
+
+            // Grupowanie danych rocznych po kategorii
+            var categorySalesYear = salesData
+                .GroupBy(x => x.Category)
+                .Select(g => new CategorySalesData
+                {
+                    CategoryName = g.Key,
+                    TotalQuantity = g.Sum(x => x.Quantity),
+                    Quarter = "Roczny" // "Roczny" dla całego roku
+                })
+                .ToList();
+
+            // Grupowanie danych według kwartałów
+            var categorySales = categorySalesByQuarter
+                .GroupBy(c => c.Quarter)
+                .ToDictionary(g => g.Key, g => g.OrderByDescending(c => c.TotalQuantity).Take(1).ToList());
+
+            // Dodanie danych rocznych do słownika (tylko 1 najlepsza kategoria)
+            categorySales.Add("Roczny", categorySalesYear.OrderByDescending(c => c.TotalQuantity).Take(1).ToList());
+
+            return categorySales;
+        }
+
     }
 }

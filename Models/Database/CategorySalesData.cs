@@ -4,6 +4,8 @@
     {
         public string CategoryName { get; set; }
         public int TotalQuantity { get; set; }
+        public string Quarter { get; set; }
     }
+
 
 }

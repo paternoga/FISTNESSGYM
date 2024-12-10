@@ -60,7 +60,7 @@ namespace FISTNESSGYM.Services
         Task<Dictionary<string, List<TopBuyer>>> GetTopBuyersWithQuartersAsync(int year);
         Task<List<OrderItemWithProduct>> GetOrderItemsWithProductsForYearAsync(int year);
         Task<List<OrderItemWithCategory>> GetOrderItemsWithCategoriesForYearAsync(int year);
-        
+        Task<Dictionary<string, List<CategorySalesData>>> GetCategorySalesForYearAsync(int year);
 
 
     }
