@@ -66,6 +66,29 @@
     </RadzenCard>
 </div>
 
+<!-- Widget Top Produktów -->
+<div style="display: flex; flex-wrap: wrap; gap: 20px; justify-content: space-between;">
+    <RadzenCard Style="padding: 20px; border-radius: 8px; width: 48%;">
+        <h4>Top Produktów - Kwartalne i Roczne</h4>
+        @if (topProductsByQuarter != null && topProductsByQuarter.Any())
+        {
+            <ul>
+                @foreach (var quarter in topProductsByQuarter)
+                {
+                    <li><strong>@quarter.Key:</strong> @quarter.Value.FirstOrDefault()?.ProductName - @quarter.Value.FirstOrDefault()?.TotalQuantity szt.</li>
+                }
+                <li><strong>Cały rok:</strong> @topProductsYear.FirstOrDefault()?.ProductName - @topProductsYear.FirstOrDefault()?.TotalQuantity szt.</li>
+            </ul>
+        }
+        else
+        {
+            <p>Brak danych dla wybranego roku.</p>
+        }
+    </RadzenCard>
+</div>
+
+
+
 
 
 @code {
@@ -78,7 +101,13 @@
     private int totalSoldYear;
     private Dictionary<string, decimal> revenueByQuarter = new();
     private Dictionary<string, int> productsSoldByQuarter = new();
+    private Dictionary<string, List<TopProduct>> topProductsByQuarter = new();
+    private List<TopProduct> topProductsYear = new();
     private List<DropDownItem> yearList = new();
+    
+
+
+
 
     protected override async Task OnInitializedAsync()
     {
@@ -88,6 +117,8 @@
                              .ToList();
         await LoadQuarterlyData();
         await LoadTopBuyers();
+        await LoadTopProducts();
+        
     }
 
     private async Task LoadQuarterlyData()
@@ -116,6 +147,39 @@
         NavigationManager.NavigateTo("/analytics/sales-dashboard");
     }
 
+    private async Task LoadTopProducts()
+    {
+        var salesData = await CartService.GetOrderItemsWithProductsForYearAsync(selectedYear);
+
+        topProductsByQuarter = salesData
+            .GroupBy(x => $"Q{(x.CreationDate.Month - 1) / 3 + 1}")
+            .ToDictionary(
+                g => g.Key,
+                g => g.GroupBy(p => p.ProductName)
+                      .Select(pg => new TopProduct
+                          {
+                              ProductName = pg.Key,
+                              TotalQuantity = pg.Sum(p => p.Quantity)
+                          })
+                      .OrderByDescending(p => p.TotalQuantity)
+                      .Take(1)
+                      .ToList()
+            );
+
+        topProductsYear = salesData
+            .GroupBy(p => p.ProductName)
+            .Select(pg => new TopProduct
+                {
+                    ProductName = pg.Key,
+                    TotalQuantity = pg.Sum(p => p.Quantity)
+                })
+            .OrderByDescending(p => p.TotalQuantity)
+            .Take(1)
+            .ToList();
+    }
+
+    
+
         
     public class DropDownItem
     {
@@ -128,4 +192,6 @@
         public string UserName { get; set; }
         public decimal TotalSpent { get; set; }
     }
+
+    
 }

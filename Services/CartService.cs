@@ -694,7 +694,40 @@ namespace FISTNESSGYM.Services
             return topBuyersByQuarter;
         }
 
+        public async Task<List<OrderItemWithProduct>> GetOrderItemsWithProductsForYearAsync(int year)
+        {
+            return await _context.OrderItems
+                .Where(o => o.CreationDate.Year == year)
+                .Join(_context.Products,
+                    orderItem => orderItem.ProductId,
+                    product => product.Id,
+                    (orderItem, product) => new OrderItemWithProduct
+                    {
+                        ProductId = product.Id,
+                        ProductName = product.Name,
+                        Quantity = orderItem.Quantity,
+                        UnitPrice = orderItem.UnitPrice,
+                        CreationDate = orderItem.CreationDate
+                    })
+                .ToListAsync();
+        }
 
+        public async Task<List<OrderItemWithCategory>> GetOrderItemsWithCategoriesForYearAsync(int year)
+        {
+            // Przykład implementacji - dostosuj do Twojej logiki dostępu do bazy danych
+            return await _context.OrderItems
+                .Include(oi => oi.Product)
+                .ThenInclude(p => p.Category)
+                .Where(oi => oi.CreationDate.Year == year)
+                .Select(oi => new OrderItemWithCategory
+                {
+                    CategoryName = oi.Product.Category,
+                    Quantity = oi.Quantity,
+                    CreationDate = oi.CreationDate
+                })
+                .ToListAsync();
+        }
 
+        
     }
 }
