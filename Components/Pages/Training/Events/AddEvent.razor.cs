@@ -32,15 +32,16 @@ namespace FISTNESSGYM.Components.Pages.Training.Events
         [Inject]
         public databaseService databaseService { get; set; }
 
+        protected bool errorVisible;
+        protected FISTNESSGYM.Models.database.Event _event;
+        List<string> instructorEmails = new List<string>();
+
         protected override async Task OnInitializedAsync()
         {
             _event = new FISTNESSGYM.Models.database.Event();
+            // Wczytujemy emaile instruktorów od razu po za³adowaniu strony, tak jak w event-dialog
+            instructorEmails = await databaseService.GetTrainerEmailsAsync();
         }
-        protected bool errorVisible;
-        protected FISTNESSGYM.Models.database.Event _event;
-
-        [Inject]
-        protected SecurityService Security { get; set; }
 
         protected async Task FormSubmit()
         {

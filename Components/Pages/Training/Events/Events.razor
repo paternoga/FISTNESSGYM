@@ -37,6 +37,10 @@ else
                     }
                     <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.Event" Property="EventName" Title="Nazwa zajêcia" />
                     <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.Event" Property="InstructorName" Title="Instruktor" />
+                    @if (AuthorizationService.IsWorker || AuthorizationService.IsTrainer || AuthorizationService.IsAdmin)
+                    {
+                        <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.Event" Property="InstructorEmail" Title="Email instruktora" />
+                    }
                     <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.Event" Property="EventStartDate" Title="Czas startu" FormatString="{0:yyyy-MM-dd HH:mm}" />
                     <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.Event" Property="EventEndDate" Title="Czas koñca" FormatString="{0:yyyy-MM-dd HH:mm}" />
                     <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.Event" Property="MaxParticipants" Title="Maks. liczba uczestników" />

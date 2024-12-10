@@ -17,6 +17,8 @@ namespace FISTNESSGYM.Models.database
 
         public string InstructorName { get; set; }
 
+        public string InstructorEmail { get; set; }
+
         [Required]
         public DateTime EventStartDate { get; set; }
 

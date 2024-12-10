@@ -3,6 +3,8 @@
 @using FISTNESSGYM.Services
 @inject AuthorizationService AuthorizationService
 @inject DialogService DialogService
+@inject databaseService DatabaseService
+
 @if (AuthorizationService.IsWorker || AuthorizationService.IsTrainer || AuthorizationService.IsAdmin)
 {
     <PageTitle>KALENDARZ</PageTitle>
@@ -23,6 +25,17 @@
                 <RadzenRequiredValidator Component="InstructorName" Text="Imię instruktora jest wymagane" />
             </RadzenStack>
 
+            <!-- Dropdown for Instructor Email -->
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap">
+                <RadzenLabel Text="Email instruktora" Style="width: 8rem;" />
+                <RadzenDropDown Name="InstructorEmail"
+                                @bind-Value="model.InstructorEmail"
+                                Data="@instructorEmails"
+                                Style="width: 25rem;"
+                                Placeholder="Wybierz email instruktora" />
+                <RadzenRequiredValidator Component="InstructorEmail" Text="Email instruktora jest wymagany" />
+            </RadzenStack>
+
             <!-- Field for Start Date and Time -->
             <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap">
                 <RadzenLabel Text="Początek" Style="width: 8rem;" />
@@ -41,15 +54,9 @@
             <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap">
                 <RadzenLabel Text="Liczba uczestników" Style="width: 8rem;" />
                 <RadzenNumeric @bind-Value="model.MaxParticipants" Name="MaxParticipants" Style="width: 25rem;" />
-
-                <!-- Validator to ensure the field is required -->
                 <RadzenRequiredValidator Component="MaxParticipants" Text="Maksymalna liczba uczestników jest wymagana" />
-
-                <!-- Validator to ensure the value is at least 1 -->
                 <RadzenNumericRangeValidator Component="MaxParticipants" Min="1" Text="Liczba uczestników nie może być mniejsza niż 1" />
             </RadzenStack>
-
-
 
             <!-- Save Button -->
             <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End">
@@ -69,6 +76,7 @@
     public SchedulerEvent EventItem { get; set; }
 
     SchedulerEvent model = new SchedulerEvent();
+    List<string> instructorEmails = new List<string>();
 
     protected override void OnParametersSet()
     {
@@ -85,6 +93,12 @@
         }
     }
 
+    protected override async Task OnInitializedAsync()
+    {
+        // Pobierz adresy email trenerów zaraz po załadowaniu komponentu
+        instructorEmails = await DatabaseService.GetTrainerEmailsAsync();
+    }
+
     void OnSubmit()
     {
         // Close the dialog and return the modified event
@@ -97,4 +111,3 @@ else
     <RadzenText>Próba nieautoryzowanego dostępu zostaje zgłoszona na policję!</RadzenText>
     <PageTitle>Próba nieautoryzowanego dostępu zostaje zgłoszona na policję!</PageTitle>
 }
-

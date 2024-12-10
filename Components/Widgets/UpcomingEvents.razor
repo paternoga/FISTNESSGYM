@@ -3,6 +3,7 @@
 @using FISTNESSGYM.Models.database
 @using FISTNESSGYM.Models.Database.ModelsDTO
 @inject databaseService databaseService
+@inject SecurityService Security
 <RadzenRow>
     <!-- Kolumna z trzema widgetami -->
     <RadzenColumn Size="9">
@@ -103,7 +104,10 @@
     private double daysInMonthForChart;
     protected override async Task OnInitializedAsync()
     {
-        UpcomingEventList = await databaseService.GetUpcomingEventsAsync();
+        var user = Security.User;
+        var userEmail = user.Email; 
+
+        UpcomingEventList = await databaseService.GetUpcomingEventsForTrainerAsync(userEmail);
         await LoadChartData();
     }
 

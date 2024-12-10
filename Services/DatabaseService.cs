@@ -2712,6 +2712,7 @@ namespace FISTNESSGYM
                     Start = e.EventStartDate,
                     End = e.EventEndDate,
                     InstructorName = e.InstructorName,
+                    InstructorEmail = e.InstructorEmail,
                     MaxParticipants = e.MaxParticipants
                 })
                 .ToListAsync();
@@ -2724,6 +2725,7 @@ namespace FISTNESSGYM
             {
                 EventName = schedulerEvent.Title,
                 InstructorName = schedulerEvent.InstructorName,
+                InstructorEmail = schedulerEvent.InstructorEmail, 
                 EventStartDate = schedulerEvent.Start,
                 EventEndDate = schedulerEvent.End,
                 MaxParticipants = schedulerEvent.MaxParticipants,
@@ -2746,6 +2748,7 @@ namespace FISTNESSGYM
                 // Update the event details without modifying `Participants`
                 eventToUpdate.EventName = schedulerEvent.Title;
                 eventToUpdate.InstructorName = schedulerEvent.InstructorName;
+                eventToUpdate.InstructorEmail = schedulerEvent.InstructorEmail;
                 eventToUpdate.EventStartDate = schedulerEvent.Start;
                 eventToUpdate.EventEndDate = schedulerEvent.End;
                 eventToUpdate.MaxParticipants = schedulerEvent.MaxParticipants;
@@ -3693,18 +3696,18 @@ namespace FISTNESSGYM
             
             return await query.ToListAsync(); 
         }
-        public async Task<List<Event>> GetUpcomingEventsAsync()
+        public async Task<List<Event>> GetUpcomingEventsForTrainerAsync(string instructorEmail)
         {
-                var now = DateTime.UtcNow;
+            var now = DateTime.UtcNow;
 
-                var upcomingEvents = await Context.Events
-                    .AsNoTracking()
-                    .Where(e => e.EventStartDate >= now)
-                    .OrderBy(e => e.EventStartDate)
-                    .Take(5)
-                    .ToListAsync();
+            var upcomingEvents = await Context.Events
+                .AsNoTracking()
+                .Where(e => e.EventStartDate >= now && e.InstructorEmail == instructorEmail)
+                .OrderBy(e => e.EventStartDate)
+                .Take(5)
+                .ToListAsync();
 
-                return upcomingEvents;
+            return upcomingEvents;
         }
 
         public async Task<Dictionary<int, int>> GetRegistrationCountsByDayAsync(int year, int month)
@@ -3730,7 +3733,29 @@ namespace FISTNESSGYM
             return result;
         }
 
+        public async Task<List<string>> GetTrainerEmailsAsync()
+        {
+            // ZnajdŸ ID roli "Trener"
+            var trainerRoleId = await (from r in Context.AspNetRoles
+                                       where r.Name == "Trener"
+                                       select r.Id).FirstOrDefaultAsync();
 
+            // Jeœli nie ma roli "Trener", zwróæ pust¹ listê
+            if (string.IsNullOrEmpty(trainerRoleId))
+            {
+                return new List<string>();
+            }
+
+            // Pobierz emaile u¿ytkowników przypisanych do roli "Trener"
+            var trainerEmails = await (from ur in Context.AspNetUserRoles
+                                       join u in Context.AspNetUsers on ur.UserId equals u.Id
+                                       where ur.RoleId == trainerRoleId && !string.IsNullOrEmpty(u.Email)
+                                       select u.Email)
+                                      .Distinct()
+                                      .ToListAsync();
+
+            return trainerEmails;
+        }
 
 
     }

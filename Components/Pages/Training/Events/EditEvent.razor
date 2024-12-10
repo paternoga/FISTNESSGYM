@@ -30,6 +30,19 @@
             </RadzenRow>
             <RadzenRow style="margin-bottom: 1rem">
                 <RadzenColumn SizeMD="3">
+                    <RadzenLabel Text="Email instruktora" Component="InstructorEmail" style="width: 100%" />
+                </RadzenColumn>
+                <RadzenColumn SizeMD="9">
+                    <RadzenDropDown Name="InstructorEmail"
+                                    @bind-Value="@_event.InstructorEmail"
+                                    Data="@instructorEmails"
+                                    Style="width: 100%;"
+                                    Placeholder="Wybierz email instruktora" />
+                    <RadzenRequiredValidator Component="InstructorEmail" Text="Email instruktora jest wymagany" />
+                </RadzenColumn>
+            </RadzenRow>
+            <RadzenRow style="margin-bottom: 1rem">
+                <RadzenColumn SizeMD="3">
                     <RadzenLabel Text="Data rozpoczêcia" Component="EventStartDate" style="width: 100%" />
                 </RadzenColumn>
                 <RadzenColumn SizeMD="9">

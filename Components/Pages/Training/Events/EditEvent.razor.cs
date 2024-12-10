@@ -23,6 +23,7 @@ namespace FISTNESSGYM.Components.Pages.Training.Events
         protected List<AspNetUser> registeredUsers = new List<AspNetUser>(); // List of users registered to the event
         protected string selectedUserId; // Selected user for removal
 
+        private List<string> instructorEmails = new List<string>();
         protected override async Task OnInitializedAsync()
         {
             // Load event details
@@ -30,6 +31,8 @@ namespace FISTNESSGYM.Components.Pages.Training.Events
 
             // Load users registered to this event
             registeredUsers = await databaseService.GetUsersRegisteredForEventAsync(Id);
+            // Pobierz listê emaili instruktorów
+            instructorEmails = await databaseService.GetTrainerEmailsAsync();
         }
 
         protected async Task FormSubmit()
