@@ -3862,7 +3862,30 @@ namespace FISTNESSGYM
                 .FirstOrDefaultAsync();  // Pobranie pierwszego (najnowszego) wydarzenia
         }
 
+        public async Task<int> GetTotalTrainersCountAsync()
+        {
+            // Zliczamy liczbê wyst¹pieñ roli trenera
+            var trainerRoleId = "4e725749-f918-4e09-8782-6cf4e0b66878";
 
-       
+            var trainerCount = await Context.AspNetUserRoles
+                                              .Where(ur => ur.RoleId == trainerRoleId)
+                                              .CountAsync();
+
+            return trainerCount;
+        }
+
+        // Metoda do pobierania liczby pracowników
+        public async Task<int> GetTotalEmployeesCountAsync()
+        {
+            // Zliczamy liczbê wyst¹pieñ roli pracownika
+            var employeeRoleId = "6710a4a7-48cb-4ffb-96be-a710f32fe47d";
+
+            var employeeCount = await Context.AspNetUserRoles
+                                               .Where(ur => ur.RoleId == employeeRoleId)
+                                               .CountAsync();
+
+            return employeeCount;
+        }
+
     }
 }

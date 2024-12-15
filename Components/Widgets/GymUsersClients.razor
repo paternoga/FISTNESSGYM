@@ -130,6 +130,36 @@
         </RadzenCard>
 
     </RadzenColumn>
+
+    <RadzenColumn Size="3">
+        <RadzenCard Style="padding: 20px; border-radius: 8px; border: 1px solid #e0e0e0; width: 100%; height: auto;">
+            <h4 style="color: #3a3a3a; font-weight: 600; margin-top: 0px">Liczba trenerów</h4>
+            <RadzenRow>
+                <RadzenColumn Size="12">
+                    <div style="display: flex; flex-direction: column; align-items: start;">
+                        <h4 style="margin: 0; color: #007acc; font-weight: 600;">Trenerzy</h4>
+                        <strong style="font-size: 24px; color: #3a3a3a;">@TotalTrainers</strong>
+                        <p style="margin-top: 5px; color: #757575; font-size: 14px;">osoby</p>
+                    </div>
+                </RadzenColumn>
+            </RadzenRow>
+        </RadzenCard>
+    </RadzenColumn>
+
+    <RadzenColumn Size="3">
+        <RadzenCard Style="padding: 20px; border-radius: 8px; border: 1px solid #e0e0e0; width: 100%; height: auto;">
+            <h4 style="color: #3a3a3a; font-weight: 600; margin-top: 0px">Liczba pracowników</h4>
+            <RadzenRow>
+                <RadzenColumn Size="12">
+                    <div style="display: flex; flex-direction: column; align-items: start;">
+                        <h4 style="margin: 0; color: #007acc; font-weight: 600;">Pracownicy</h4>
+                        <strong style="font-size: 24px; color: #3a3a3a;">@TotalEmployees</strong>
+                        <p style="margin-top: 5px; color: #757575; font-size: 14px;">osoby</p>
+                    </div>
+                </RadzenColumn>
+            </RadzenRow>
+        </RadzenCard>
+    </RadzenColumn>
 </RadzenRow>
 
 
@@ -145,6 +175,9 @@
     private decimal? subscriptionProfit;
     private string LastSubscriptionEmail;
     private Event latestEvent;
+    private int TotalTrainers;
+    private int TotalEmployees;
+
 
     protected override async Task OnInitializedAsync()
     {
@@ -174,6 +207,9 @@
             }
 
             latestEvent = await DatabaseService.GetLatestEventAsync();
+
+            TotalTrainers = await DatabaseService.GetTotalTrainersCountAsync();
+            TotalEmployees = await DatabaseService.GetTotalEmployeesCountAsync();
 
         }
         catch (Exception ex)
