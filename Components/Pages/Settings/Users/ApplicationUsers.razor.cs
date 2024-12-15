@@ -45,14 +45,14 @@ namespace FISTNESSGYM.Components.Pages.Settings.Users
 
         protected async Task AddClick()
         {
-            await DialogService.OpenAsync<AddApplicationUser>("Add Application User");
+            await DialogService.OpenAsync<AddApplicationUser>("Dodaj u¿ytkownika");
 
             users = await Security.GetUsers();
         }
 
         protected async Task RowSelect(FISTNESSGYM.Models.ApplicationUser user)
         {
-            await DialogService.OpenAsync<EditApplicationUser>("Edit Application User", new Dictionary<string, object>{ {"Id", user.Id} });
+            await DialogService.OpenAsync<EditApplicationUser>("Edytuj u¿ytkownika", new Dictionary<string, object>{ {"Id", user.Id} });
 
             users = await Security.GetUsers();
         }
@@ -61,7 +61,7 @@ namespace FISTNESSGYM.Components.Pages.Settings.Users
         {
             try
             {
-                if (await DialogService.Confirm("Are you sure you want to delete this user?") == true)
+                if (await DialogService.Confirm("Jesteœ pewny, ¿e chcesz usun¹æ ten rekord?") == true)
                 {
                     await Security.DeleteUser($"{user.Id}");
 

@@ -84,7 +84,7 @@ namespace FISTNESSGYM.Components.Pages.Training.TrainingPlans.WorkoutExercises
 
         protected async Task AddButtonClick(MouseEventArgs args)
         {
-            var result = await DialogService.OpenAsync<AddWorkoutExercise>("Add WorkoutExercise", null);
+            var result = await DialogService.OpenAsync<AddWorkoutExercise>("Dodaj twoje ćwiczenie", null);
 
             if (result != null) // Sprawdzamy, czy dodanie �wiczenia si� powiod�o
             {
@@ -104,14 +104,14 @@ namespace FISTNESSGYM.Components.Pages.Training.TrainingPlans.WorkoutExercises
 
         protected async Task EditRow(FISTNESSGYM.Models.database.WorkoutExercise args)
         {
-            await DialogService.OpenAsync<EditWorkoutExercise>("Edit WorkoutExercise", new Dictionary<string, object> { {"Id", args.Id} });
+            await DialogService.OpenAsync<EditWorkoutExercise>("Edytuj twoje ćwiczenie", new Dictionary<string, object> { {"Id", args.Id} });
         }
 
         protected async Task GridDeleteButtonClick(MouseEventArgs args, FISTNESSGYM.Models.database.WorkoutExercise workoutExercise)
         {
             try
             {
-                if (await DialogService.Confirm("Are you sure you want to delete this record?") == true)
+                if (await DialogService.Confirm("Jesteś pewny, że chcesz usunąć ten rekord?") == true)
                 {
                     var deleteResult = await databaseService.DeleteWorkoutExercise(workoutExercise.Id);
 

@@ -8,7 +8,7 @@
     <PageTitle>EDYTUJ PLAN</PageTitle>
 
     <RadzenColumn SizeMD=12>
-        <RadzenAlert Shade="Shade.Lighter" Variant="Variant.Flat" Size="AlertSize.Small" AlertStyle="AlertStyle.Danger" Visible="@errorVisible">Cannot save WorkoutPlan</RadzenAlert>
+        <RadzenAlert Shade="Shade.Lighter" Variant="Variant.Flat" Size="AlertSize.Small" AlertStyle="AlertStyle.Danger" Visible="@errorVisible">Nie mo¿na zapisaæ planu</RadzenAlert>
         <RadzenTemplateForm TItem="FISTNESSGYM.Models.database.WorkoutPlan" Data="@workoutPlan" Visible="@(workoutPlan != null)" Submit="@FormSubmit">
             <RadzenRow style="margin-bottom: 1rem">
                 <RadzenColumn SizeMD="3">
@@ -45,8 +45,8 @@
                 </RadzenColumn>
             </RadzenRow>
             <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.End" Gap="0.5rem">
-                <RadzenButton ButtonStyle="ButtonStyle.Primary" ButtonType="ButtonType.Submit" Icon="save" Text="Save" Variant="Variant.Flat" />
-                <RadzenButton ButtonStyle="ButtonStyle.Light" Text="Cancel" Variant="Variant.Flat" Click="@CancelButtonClick" />
+                <RadzenButton ButtonStyle="ButtonStyle.Primary" ButtonType="ButtonType.Submit" Icon="save" Text="Zapisz" Variant="Variant.Flat" />
+                <RadzenButton ButtonStyle="ButtonStyle.Light" Text="Anuluj" Variant="Variant.Flat" Click="@CancelButtonClick" />
             </RadzenStack>
         </RadzenTemplateForm>
     </RadzenColumn>
@@ -56,7 +56,7 @@ else if (AuthorizationService.IsClient)
     <PageTitle>EDYTUJ PLAN</PageTitle>
 
     <RadzenColumn SizeMD=12>
-        <RadzenAlert Shade="Shade.Lighter" Variant="Variant.Flat" Size="AlertSize.Small" AlertStyle="AlertStyle.Danger" Visible="@errorVisible">Cannot save WorkoutPlan</RadzenAlert>
+        <RadzenAlert Shade="Shade.Lighter" Variant="Variant.Flat" Size="AlertSize.Small" AlertStyle="AlertStyle.Danger" Visible="@errorVisible">Nie mo¿na zapisaæ planu</RadzenAlert>
 
         <RadzenTemplateForm TItem="FISTNESSGYM.Models.database.WorkoutPlan" Data="@workoutPlan" Visible="@(workoutPlan != null)" Submit="@FormSubmit">
             <RadzenRow style="margin-bottom: 1rem">
@@ -79,8 +79,8 @@ else if (AuthorizationService.IsClient)
             </RadzenRow>
 
             <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.End" Gap="0.5rem">
-                <RadzenButton ButtonStyle="ButtonStyle.Primary" ButtonType="ButtonType.Submit" Icon="save" Text="Save" Variant="Variant.Flat" />
-                <RadzenButton ButtonStyle="ButtonStyle.Light" Text="Cancel" Variant="Variant.Flat" Click="@CancelButtonClick" />
+                <RadzenButton ButtonStyle="ButtonStyle.Primary" ButtonType="ButtonType.Submit" Icon="save" Text="Zapisz" Variant="Variant.Flat" />
+                <RadzenButton ButtonStyle="ButtonStyle.Light" Text="Anuluj" Variant="Variant.Flat" Click="@CancelButtonClick" />
             </RadzenStack>
         </RadzenTemplateForm>
     </RadzenColumn>

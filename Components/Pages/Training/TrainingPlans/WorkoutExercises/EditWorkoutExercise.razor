@@ -11,7 +11,7 @@
                     <RadzenLabel Text="Ćwiczenie" Component="Exercise" style="width: 100%" />
                 </RadzenColumn>
                 <RadzenColumn SizeMD="9">
-                    <RadzenDropDown Data="@exercisesForExerciseId" TextProperty="Category" ValueProperty="Id" AllowClear=true
+                    <RadzenDropDown Data="@exercisesForExerciseId" TextProperty="Name" ValueProperty="Id" AllowClear=true
                          Placeholder="Wybierz ćwiczenie" style="display: block; width: 100%" @bind-Value="@workoutExercise.ExerciseId" Name="ExerciseId"
                            />
                 </RadzenColumn>

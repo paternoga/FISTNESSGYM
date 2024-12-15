@@ -58,20 +58,20 @@ namespace FISTNESSGYM.Components.Pages.Settings.Users
 
         protected async Task AddButtonClick(MouseEventArgs args)
         {
-            await DialogService.OpenAsync<AddAspNetUser>("Add AspNetUser", null);
+            await DialogService.OpenAsync<AddAspNetUser>("Dodaj u¿ytkownika", null);
             await grid0.Reload();
         }
 
         protected async Task EditRow(FISTNESSGYM.Models.database.AspNetUser args)
         {
-            await DialogService.OpenAsync<EditAspNetUser>("Edit AspNetUser", new Dictionary<string, object> { {"Id", args.Id} });
+            await DialogService.OpenAsync<EditAspNetUser>("Edytuj u¿ytkownika", new Dictionary<string, object> { {"Id", args.Id} });
         }
 
         protected async Task GridDeleteButtonClick(MouseEventArgs args, FISTNESSGYM.Models.database.AspNetUser aspNetUser)
         {
             try
             {
-                if (await DialogService.Confirm("Are you sure you want to delete this record?") == true)
+                if (await DialogService.Confirm("Jesteœ pewny, ¿e chcesz usun¹æ ten rekord?") == true)
                 {
                     var deleteResult = await databaseService.DeleteAspNetUser(aspNetUser.Id);
 
