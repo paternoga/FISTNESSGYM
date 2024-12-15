@@ -3640,15 +3640,13 @@ namespace FISTNESSGYM
 
         public async Task<bool> PayOrder(int orderId)
         {
-            // Znalezienie zamówienia
             var order = await Context.Set<Order>().FindAsync(orderId);
 
             if (order == null)
             {
-                return false; // Jeœli zamówienie nie istnieje
+                return false; 
             }
 
-            // Znalezienie ID statusu "Op³acone" (sta³a wartoœæ lub zapytanie do bazy)
             int paidStatusId = await Context.Set<OrderStatus>()
                 .Where(status => status.Name == "Oplacone")
                 .Select(status => status.Id)
@@ -3656,46 +3654,44 @@ namespace FISTNESSGYM
 
             if (paidStatusId == 0)
             {
-                return false; // Jeœli status "Op³acone" nie istnieje
+                return false; 
             }
 
-            // Aktualizacja statusu zamówienia
             order.OrderStatusId = paidStatusId;
             order.OrderStatusName = "Oplacone";
 
-            // Zapis zmian
             Context.Set<Order>().Update(order);
             await Context.SaveChangesAsync();
 
-            return true; // Zwrócenie sukcesu
+            return true; 
         }
         public async Task<List<AspNetUser>> GetAllUsersAsync()
         {
             return await Context.AspNetUsers.AsNoTracking().ToListAsync();
         }
 
-        public async Task<List<FISTNESSGYM.Models.database.Measurement>> GetMeasurementsAsync(string searchQuery = null)
-        {
-            var query = Context.Measurement
+        //public async Task<List<FISTNESSGYM.Models.database.Measurement>> GetMeasurementsAsync(string searchQuery = null)
+        //{
+        //    var query = Context.Measurement
 
-                        .AsQueryable(); 
+        //                .AsQueryable(); 
 
-            if (!string.IsNullOrEmpty(searchQuery))
-            {
-                query = query.Where(m => m.Weight.ToString().Contains(searchQuery) ||
-                                         m.WaistCircumference.ToString().Contains(searchQuery) ||
-                                         m.ChestCircumference.ToString().Contains(searchQuery) ||
-                                         m.ArmCircumference.ToString().Contains(searchQuery) ||
-                                         m.LegCircumference.ToString().Contains(searchQuery) ||
-                                         m.HipCircumference.ToString().Contains(searchQuery) ||
-                                         m.BodyFat.ToString().Contains(searchQuery) ||
-                                         m.MeasurementDate.ToString().Contains(searchQuery) ||
-                                         m.Notes.Contains(searchQuery));  
-            }
+        //    if (!string.IsNullOrEmpty(searchQuery))
+        //    {
+        //        query = query.Where(m => m.Weight.ToString().Contains(searchQuery) ||
+        //                                 m.WaistCircumference.ToString().Contains(searchQuery) ||
+        //                                 m.ChestCircumference.ToString().Contains(searchQuery) ||
+        //                                 m.ArmCircumference.ToString().Contains(searchQuery) ||
+        //                                 m.LegCircumference.ToString().Contains(searchQuery) ||
+        //                                 m.HipCircumference.ToString().Contains(searchQuery) ||
+        //                                 m.BodyFat.ToString().Contains(searchQuery) ||
+        //                                 m.MeasurementDate.ToString().Contains(searchQuery) ||
+        //                                 m.Notes.Contains(searchQuery));  
+        //    }
 
             
-            return await query.ToListAsync(); 
-        }
+        //    return await query.ToListAsync(); 
+        //}
         public async Task<List<Event>> GetUpcomingEventsForTrainerAsync(string instructorEmail)
         {
             var now = DateTime.UtcNow;
@@ -3714,17 +3710,14 @@ namespace FISTNESSGYM
         {
             var daysInMonth = DateTime.DaysInMonth(year, month);
 
-            // Pobierz dane rejestracji i grupuj po dniu
             var data = await Context.Reservations
                 .Where(r => r.Event.EventStartDate.Year == year && r.Event.EventStartDate.Month == month)
                 .GroupBy(r => r.Event.EventStartDate.Day)
                 .Select(g => new { Day = g.Key, Count = g.Count() })
                 .ToListAsync();
 
-            // Zainicjuj s³ownik z dniami od 1 do ostatniego dnia miesi¹ca
             var result = Enumerable.Range(1, daysInMonth).ToDictionary(day => day, day => 0);
 
-            // Uzupe³nij s³ownik wartoœciami z bazy danych
             foreach (var item in data)
             {
                 result[item.Day] = item.Count;
@@ -3735,18 +3728,15 @@ namespace FISTNESSGYM
 
         public async Task<List<string>> GetTrainerEmailsAsync()
         {
-            // ZnajdŸ ID roli "Trener"
             var trainerRoleId = await (from r in Context.AspNetRoles
                                        where r.Name == "Trener"
                                        select r.Id).FirstOrDefaultAsync();
 
-            // Jeœli nie ma roli "Trener", zwróæ pust¹ listê
             if (string.IsNullOrEmpty(trainerRoleId))
             {
                 return new List<string>();
             }
 
-            // Pobierz emaile u¿ytkowników przypisanych do roli "Trener"
             var trainerEmails = await (from ur in Context.AspNetUserRoles
                                        join u in Context.AspNetUsers on ur.UserId equals u.Id
                                        where ur.RoleId == trainerRoleId && !string.IsNullOrEmpty(u.Email)
@@ -3756,6 +3746,38 @@ namespace FISTNESSGYM
 
             return trainerEmails;
         }
+        public async Task<IEnumerable<Measurement>> GetMeasurementsByUserAsync(string userId)
+        {
+            return await Context.Measurement
+                .Where(m => m.UserId == userId)
+                .ToListAsync();
+        }
+
+        public async Task<IEnumerable<Measurement>> GetMeasurementsByUserAsync(string userId, string search = "")
+        {
+            var query = Context.Measurement.Where(m => m.UserId == userId);
+
+            if (!string.IsNullOrEmpty(search))
+            {
+                query = query.Where(m => m.Notes.Contains(search) || m.MeasurementDate.ToString().Contains(search));
+            }
+
+            return await query.ToListAsync();
+        }
+
+        public async Task<IEnumerable<Measurement>> GetMeasurementsAsync(string search = "")
+        {
+            var query = Context.Measurement.AsQueryable();
+
+            if (!string.IsNullOrEmpty(search))
+            {
+                query = query.Where(m => m.Notes.Contains(search) || m.MeasurementDate.ToString().Contains(search));
+            }
+
+            return await query.ToListAsync();
+        }
+
+
 
 
     }
