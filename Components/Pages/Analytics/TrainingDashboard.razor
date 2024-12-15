@@ -1,5 +1,182 @@
 ﻿@page "/analytics/training-dashboard"
+@using FISTNESSGYM.Components.Widgets
+@using FISTNESSGYM.Models.database
+@using FISTNESSGYM.Services
+@inject AuthorizationService AuthorizationService
+@inject databaseService DatabaseService
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+@attribute [Authorize]
+<PageTitle>DASHBOARD ANALITYKI</PageTitle>
+
+@if (AuthorizationService.IsClient)
+{
+    <RadzenRow>
+        <RadzenColumn Size="9">
+            <Progress />
+
+            <!-- Rząd z widgetami i dodanym marginesem -->
+            <RadzenRow Style="margin-top: 20px;">
+                <RadzenColumn Size="4">
+                    <RadzenCard Style="padding: 20px; border-radius: 8px; border: 1px solid #e0e0e0; width: 340px; height: 160px;">
+                        <h4 style="color: #3a3a3a; font-weight: 600; margin-top: 0px;">Zrealizowane treningi</h4>
+                        <p style="color: #757575; font-size: 24px; font-weight: bold;">
+                            @if (loadingTrainingCount)
+                            {
+                                <span>Ładowanie...</span>
+                            }
+                            else
+                            {
+                                @trainingCount
+                            }
+                        </p>
+                    </RadzenCard>
+                </RadzenColumn>
+
+                <RadzenColumn Size="4">
+                    <RadzenCard Style="padding: 20px; border-radius: 8px; border: 1px solid #e0e0e0; width: 340px; height: 160px;">
+                        <h4 style="color: #3a3a3a; font-weight: 600; margin-top: 0px;">Najbliższy trening</h4>
+                        <p style="color: #757575;">
+                            @if (loadingNextTraining)
+                            {
+                                <span>Ładowanie...</span>
+                            }
+                            else if (nextTraining != null)
+                            {
+                                <span style="font-size: 16px; font-weight: bold;">@nextTraining.EventName</span>
+                                <br />
+                                <span style="color: #757575;">Data: @nextTraining.EventStartDate.ToString("dd.MM.yyyy HH:mm")</span>
+                            }
+                            else
+                            {
+                                <span>Brak nadchodzących treningów.</span>
+                            }
+                        </p>
+                    </RadzenCard>
+                </RadzenColumn>
+
+                <RadzenColumn Size="4">
+                    <RadzenCard Style="padding: 20px; border-radius: 8px; border: 1px solid #e0e0e0; width: 340px; height: 160px;">
+                        <h4 style="color: #3a3a3a; font-weight: 600; margin-top: 0px;">Top 3 Największe Ciężary</h4>
+                        @if (loadingTopWeights)
+                        {
+                            <p style="color: #757575;">Ładowanie...</p>
+                        }
+                        else if (topWeights != null && topWeights.Count > 0)
+                        {
+                            <ol style="margin: 10px; padding: 0; list-style-type: decimal;">
+                                @foreach (var weight in topWeights)
+                                {
+                                    <li style="margin-bottom: 10px;">
+                                        <strong>@weight.Item1</strong> - @weight.Item2 kg
+                                    </li>
+                                }
+                            </ol>
+                        }
+                        else
+                        {
+                            <p style="color: #757575;">Brak danych do wyświetlenia.</p>
+                        }
+                    </RadzenCard>
+                </RadzenColumn>
+            </RadzenRow>
+
+            <!-- Nowy widget z kalendarzem aktywności -->
+            <!-- Nowy widget z kalendarzem aktywności -->
+
+        </RadzenColumn>
+
+
+
+        <RadzenColumn Size="3">
+            <HeartRate />
+        </RadzenColumn>
+        <RadzenColumn Size="12">
+            <!-- Nowy widget z kalendarzem aktywności -->
+            <RadzenCard Style="padding: 10px; border-radius: 8px; border: 1px solid #e0e0e0; width: 100%; margin-top: 10px;">
+                <h4 style="color: #3a3a3a; font-weight: 600; margin: 0 0 10px 0; text-align: center;">Kalendarz aktywności treningowej</h4>
+                @if (allDays != null)
+                {
+                    <div style="display: grid; grid-template-columns: repeat(14, 1fr); gap: 3px; justify-items: center; align-items: center; max-width: 1200px; margin: 0 auto;">
+                        @foreach (var date in allDays)
+                        {
+                            <div style="width: 45px; height: 45px; border-radius: 3px; background-color: @(trainingDates.Contains(date) ? "green" : "gray");"
+                                 title="@date.ToString("dd.MM.yyyy")">
+                            </div>
+                        }
+                    </div>
+                    <p style="margin-top: 8px; color: #757575; font-size: 12px; text-align: center;">
+                        Zielony: zapisany na trening | Szary: brak treningu
+                    </p>
+                }
+                else
+                {
+                    <p style="color: #757575; text-align: center;">Ładowanie kalendarza...</p>
+                }
+            </RadzenCard>
+
+
+
+
+        </RadzenColumn>
+    </RadzenRow>
+}
+else
+{
+    <p>Brak uprawnień do wyświetlenia tej strony.</p>
+}
 
 @code {
+    private int trainingCount;
+    private Event nextTraining;
+    private List<(string, decimal)> topWeights;
+    private List<DateTime> trainingDates = new List<DateTime>();
+    private List<DateTime> allDays = new List<DateTime>();
+    private bool loadingTrainingCount = true;
+    private bool loadingNextTraining = true;
+    private bool loadingTopWeights = true;
 
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        if (user.Identity.IsAuthenticated)
+        {
+            var userId = user.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+
+            if (!string.IsNullOrEmpty(userId))
+            {
+                // Pobierz ilość zrealizowanych treningów
+                loadingTrainingCount = true;
+                trainingCount = await DatabaseService.GetTrainingCountByUserId(userId);
+                loadingTrainingCount = false;
+
+                // Pobierz najbliższy trening
+                loadingNextTraining = true;
+                nextTraining = await DatabaseService.GetNextTrainingForUserAsync(userId);
+                loadingNextTraining = false;
+
+                // Pobierz Top 3 Największe Ciężary
+                loadingTopWeights = true;
+                topWeights = await DatabaseService.GetTopWeightsForUser(userId, 3);
+                loadingTopWeights = false;
+
+                // Przygotuj dane dla kalendarza aktywności
+                var currentMonth = DateTime.Now;
+                allDays = Enumerable.Range(1, DateTime.DaysInMonth(currentMonth.Year, currentMonth.Month))
+                                    .Select(day => new DateTime(currentMonth.Year, currentMonth.Month, day))
+                                    .ToList();
+
+                trainingDates = await DatabaseService.GetTrainingDatesForUser(userId);
+            }
+        }
+        else
+        {
+            trainingCount = 0;
+            nextTraining = null;
+            topWeights = null;
+            allDays = new List<DateTime>();
+        }
+    }
 }

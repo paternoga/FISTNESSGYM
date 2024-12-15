@@ -3831,6 +3831,53 @@ namespace FISTNESSGYM
                 return 0;
             }
         }
+        public async Task<int> GetTrainingCountByUserId(string userId)
+        {
+            if (string.IsNullOrEmpty(userId))
+            {
+                return 0;
+            }
+
+            return await Context.Reservations
+                .Where(r => r.UserId == userId)
+                .CountAsync();
+        }
+        public async Task<Event> GetNextTrainingForUserAsync(string userId)
+        {
+            var nextEvent = await Context.Reservations
+                .Include(r => r.Event) // Join with the Event table
+                .Where(r => r.UserId == userId && r.Event.EventStartDate > DateTime.Now) // Only future events
+                .OrderBy(r => r.Event.EventStartDate) // Sort by the closest date
+                .Select(r => r.Event) // Select the event details
+                .FirstOrDefaultAsync();
+
+            return nextEvent;
+        }
+        public async Task<List<(string, decimal)>> GetTopWeightsForUser(string userId, int topCount)
+        {
+            var topExercises = await Context.WorkoutExercises
+                .Include(we => we.Exercise)
+                .Include(we => we.WorkoutPlan)
+                .Where(we => we.WorkoutPlan.UserId == userId && we.Weights != null)
+                .OrderByDescending(we => we.Weights) // Sortowanie po ciê¿arze malej¹co
+                .Take(topCount) // Pobierz tylko okreœlon¹ liczbê wyników
+                .Select(we => new ValueTuple<string, decimal>(
+                    we.Exercise.Name,
+                    we.Weights.Value
+                ))
+                .ToListAsync();
+
+            return topExercises;
+        }
+        public async Task<List<DateTime>> GetTrainingDatesForUser(string userId)
+        {
+            return await Context.Reservations
+                .Where(r => r.UserId == userId)
+                .Select(r => r.Event.EventStartDate.Date)
+                .Distinct()
+                .ToListAsync();
+        }
+
 
         public async Task<SubscriptionUserDto> GetLastSubscriptionAsync()
         {
