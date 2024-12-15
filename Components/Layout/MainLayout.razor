@@ -14,7 +14,7 @@
             </RadzenColumn>
             <RadzenColumn Size="7">
                 <RadzenStack AlignItems="AlignItems.Center" Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End" Gap="0.5rem" class="">
-                    <RadzenAppearanceToggle @bind-Value="@isDarkMode" />
+                    @*<RadzenAppearanceToggle @bind-Value="@isDarkMode" />*@
                     @if (AuthorizationService.IsUser || AuthorizationService.IsClient)
                     {
                         <RadzenButton Icon="notifications" Click="@ToggleNotificationsPanel" />
@@ -175,31 +175,31 @@
 
         <RadzenPanelMenu>
             <RadzenPanelMenuItem Text="Ustawienia" Icon="settings">
-                @if (AuthorizationService.IsUser || AuthorizationService.IsClient || AuthorizationService.IsWorker || AuthorizationService.IsTrainer || AuthorizationService.IsAdmin)
+                @if (AuthorizationService.IsUser || AuthorizationService.IsClient || AuthorizationService.IsTrainer)
                 {
                     <RadzenPanelMenuItem Path="settings/profile" Icon="person" Text="Profil" />
                 }
 
-                @if (AuthorizationService.IsUser || AuthorizationService.IsClient || AuthorizationService.IsWorker || AuthorizationService.IsTrainer || AuthorizationService.IsAdmin)
+                @if (AuthorizationService.IsClient || AuthorizationService.IsWorker || AuthorizationService.IsTrainer || AuthorizationService.IsAdmin)
                 {
                     <RadzenPanelMenuItem Path="settings/measurement" Icon="straighten" Text="Pomiary" />
                     
                 }
+                @if (AuthorizationService.IsAdmin || AuthorizationService.IsWorker)
+                {
+                    <RadzenPanelMenuItem Path="settings/subscriptions" Icon="clear_all" Text="Lista subskrypcji" />
+                }
 
-                @if (AuthorizationService.IsUser || AuthorizationService.IsClient || AuthorizationService.IsWorker || AuthorizationService.IsAdmin)
+                @if (AuthorizationService.IsUser || AuthorizationService.IsClient || AuthorizationService.IsWorker)
                 {
                     <RadzenPanelMenuItem Icon="universal_currency" Text="Subskrypcja">
-                        @if (AuthorizationService.IsUser || AuthorizationService.IsClient || AuthorizationService.IsWorker || AuthorizationService.IsAdmin)
+                        @if (AuthorizationService.IsUser || AuthorizationService.IsClient)
                         {
                             <RadzenPanelMenuItem Path="settings/subscription/status" Icon="universal_currency" Text="Status karnetu" />
                         }
-                        @if (AuthorizationService.IsUser || AuthorizationService.IsClient || AuthorizationService.IsWorker || AuthorizationService.IsAdmin)
+                        @if (AuthorizationService.IsUser || AuthorizationService.IsClient)
                         {
                             <RadzenPanelMenuItem Path="settings/subscription/purchase" Icon="settings_accessibility" Text="Pakiety" />
-                        }
-                        @if (AuthorizationService.IsWorker || AuthorizationService.IsAdmin)
-                        {
-                            <RadzenPanelMenuItem Path="settings/subscriptions" Icon="clear_all" Text="Lista subskrypcji" />
                         }
                     </RadzenPanelMenuItem>
                 }

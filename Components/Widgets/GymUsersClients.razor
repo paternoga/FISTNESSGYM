@@ -70,14 +70,14 @@
                 <RadzenColumn Size="6">
                     <div style="display: flex; flex-direction: column; align-items: start;">
                         <h4 style="margin: 0; color: #007acc; font-weight: 600;">Użytkownicy</h4>
-                        <strong style="font-size: 24px; color: #3a3a3a;">@CurrentOccupancy</strong>
+                        <strong style="font-size: 24px; color: #3a3a3a;">@TotalUsers</strong>
                         <p style="margin-top: 5px; color: #757575; font-size: 14px;">osób</p>
                     </div>
                 </RadzenColumn>
                 <RadzenColumn Size="6">
                     <div style="display: flex; flex-direction: column; align-items: end;">
                         <h4 style="margin: 0; color: #007acc; font-weight: 600;">Klienci</h4>
-                        <strong style="font-size: 24px; color: #3a3a3a;">@PreviousOccupancy</strong>
+                        <strong style="font-size: 24px; color: #3a3a3a;">@TotalClients</strong>
                         <p style="margin-top: 5px; color: #757575; font-size: 14px;">osób</p>
                     </div>
                 </RadzenColumn>
@@ -136,6 +136,8 @@
 @code {
     private int CurrentOccupancy;
     private int PreviousOccupancy;
+    private int TotalUsers;
+    private int TotalClients;
     private decimal? adminWidgetProfitThisMonthValue;  // Nullable decimal
     private readonly string clientRoleId = "86cb68e7-01a4-4325-a118-f39d9e8510c9";
     private static readonly Random RandomGen = new Random();
@@ -149,10 +151,14 @@
         try
         {
             // Pobierz liczbę wszystkich użytkowników
-            CurrentOccupancy = await DatabaseService.GetTotalUsersCountAsync();
+            TotalUsers = await DatabaseService.GetTotalUsersCountAsync();
 
             // Pobierz liczbę użytkowników w roli "Klient"
-            PreviousOccupancy = await DatabaseService.GetClientsCountAsync(clientRoleId);
+            TotalClients = await DatabaseService.GetClientsCountAsync(clientRoleId);
+
+            PreviousOccupancy = GenerateOccupancy(DateTime.Now.AddHours(-1).Hour);
+            CurrentOccupancy = GenerateOccupancy(DateTime.Now.Hour);
+            timer = new Timer(UpdateOccupancy, null, TimeSpan.Zero, TimeSpan.FromMinutes(1));
 
             // Pobierz zysk ze sprzedaży w bieżącym miesiącu
             adminWidgetProfitThisMonthValue = await DatabaseService.GetAdminWidgetProfitThisMonthAsync();
