@@ -1,26 +1,31 @@
 ﻿@page "/gym-admin-widget"
 @inject databaseService DatabaseService
 @using FISTNESSGYM.Services
+@using FISTNESSGYM.Models.database
 @inject IJSRuntime JSRuntime
 
 <RadzenRow>
     <!-- Pierwszy wiersz - 4 widgety obok siebie -->
     <RadzenColumn Size="3">
-        <RadzenCard Style="padding: 20px; border-radius: 8px; border: 1px solid #e0e0e0; width: 100%; height: auto;">
-            <h4 style="color: #3a3a3a; font-weight: 600; margin-top: 0px">Liczba użytkowników siłowni</h4>
+        <RadzenCard Style="padding: 20px; border-radius: 8px; border: 1px solid #e0e0e0; width: 340px; height: 160px;">
+            <h4 style="color: #3a3a3a; font-weight: 600; margin-top: 0px">Liczba osób na siłowni</h4>
             <RadzenRow>
                 <RadzenColumn Size="6">
                     <div style="display: flex; flex-direction: column; align-items: start;">
-                        <h4 style="margin: 0; color: #007acc; font-weight: 600;">Użytkownicy</h4>
+                        <h4 style="margin: 0; color: #007acc; font-weight: 600;">Aktualnie</h4>
                         <strong style="font-size: 24px; color: #3a3a3a;">@CurrentOccupancy</strong>
-                        <p style="margin-top: 5px; color: #757575; font-size: 14px;">osób</p>
+                        <p style="margin-top: 5px; color: #757575; font-size: 14px;">
+                            osób
+                        </p>
                     </div>
                 </RadzenColumn>
                 <RadzenColumn Size="6">
                     <div style="display: flex; flex-direction: column; align-items: end;">
-                        <h4 style="margin: 0; color: #007acc; font-weight: 600;">Klienci</h4>
+                        <h4 style="margin: 0; color: #007acc; font-weight: 600;">Godzinę temu</h4>
                         <strong style="font-size: 24px; color: #3a3a3a;">@PreviousOccupancy</strong>
-                        <p style="margin-top: 5px; color: #757575; font-size: 14px;">osób</p>
+                        <p style="margin-top: 5px; color: #757575; font-size: 14px;">
+                            osób
+                        </p>
                     </div>
                 </RadzenColumn>
             </RadzenRow>
@@ -81,6 +86,52 @@
     </RadzenColumn>
 </RadzenRow>
 
+<RadzenRow Style="margin-top: 20px;">
+
+    <RadzenColumn Size="3">
+        <RadzenCard Style="padding: 20px; border-radius: 8px; border: 1px solid #e0e0e0; width: 100%; height: auto;">
+            <h4 style="color: #3a3a3a; font-weight: 600; margin-top: 0px">Ostatnia osoba, która zakupiła karnet</h4>
+            <RadzenRow>
+                <RadzenColumn Size="12">
+                    <div style="display: flex; flex-direction: column; align-items: start;">
+                        <h4 style="margin: 0; color: #007acc; font-weight: 600;">Email:</h4>
+                        <strong style="font-size: 20px; color: #3a3a3a;">@LastSubscriptionEmail</strong>
+                        <p style="margin-top: 10px; color: #757575; font-size: 14px;">Dziękujemy za zakup!</p>
+                    </div>
+                </RadzenColumn>
+            </RadzenRow>
+        </RadzenCard>
+    </RadzenColumn>
+
+    <RadzenColumn Size="3">
+        <RadzenCard Style="padding: 20px; border-radius: 8px; border: 1px solid #e0e0e0; width: 100%; height: 160px;">
+            <h4 style="color: #3a3a3a; font-weight: 600; margin-top: 0px">Najnowsze Wydarzenie</h4>
+            @if (latestEvent != null)
+            {
+                <RadzenRow>
+                    <RadzenColumn Size="12">
+                        <div style="display: flex; flex-direction: column; align-items: start;">
+                            <h4 style="margin: 0; color: #007acc; font-weight: 600;">@latestEvent.EventName</h4>
+                            <p style="margin: 0; color: #757575; font-size: 14px;">Prowadzący: @latestEvent.InstructorName</p>
+                            <p style="margin: 5px 0; color: #757575; font-size: 14px;">
+                                Data: @latestEvent.EventStartDate.ToString("dd MMM yyyy, HH:mm") - @latestEvent.EventEndDate.ToString("HH:mm")
+                            </p>
+                            <p style="margin-top: 5px; color: #757575; font-size: 14px;">
+                                Liczba uczestników: @latestEvent.Participants / @latestEvent.MaxParticipants
+                            </p>
+                        </div>
+                    </RadzenColumn>
+                </RadzenRow>
+            }
+            else
+            {
+                <p>Brak dostępnych wydarzeń.</p>
+            }
+        </RadzenCard>
+
+    </RadzenColumn>
+</RadzenRow>
+
 
 @code {
     private int CurrentOccupancy;
@@ -90,6 +141,8 @@
     private static readonly Random RandomGen = new Random();
     private Timer timer;
     private decimal? subscriptionProfit;
+    private string LastSubscriptionEmail;
+    private Event latestEvent;
 
     protected override async Task OnInitializedAsync()
     {
@@ -107,6 +160,14 @@
 
             // Pobierz zysk z karnetów w bieżącym miesiącu
             subscriptionProfit = await DatabaseService.GetProfitFromSubscriptionsThisMonthAsync();
+
+            var lastSubscription = await DatabaseService.GetLastSubscriptionAsync();
+            if (lastSubscription != null)
+            {
+                LastSubscriptionEmail = lastSubscription.Email;
+            }
+
+            latestEvent = await DatabaseService.GetLatestEventAsync();
 
         }
         catch (Exception ex)

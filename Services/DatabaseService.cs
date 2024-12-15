@@ -17,6 +17,7 @@ using DocumentFormat.OpenXml.InkML;
 using Microsoft.AspNetCore.Mvc;
 using FISTNESSGYM.Models.Database.ModelsDTO;
 using Microsoft.EntityFrameworkCore.Internal;
+using FISTNESSGYM.Models.Database;
 
 namespace FISTNESSGYM
 {
@@ -3829,6 +3830,36 @@ namespace FISTNESSGYM
                 Console.WriteLine($"B³¹d podczas pobierania danych: {ex.Message}");
                 return 0;
             }
+        }
+
+        public async Task<SubscriptionUserDto> GetLastSubscriptionAsync()
+        {
+            try
+            {
+                var result = await (from subscription in Context.Subscriptions
+                                    join user in Context.AspNetUsers on subscription.UserId equals user.Id
+                                    orderby subscription.StartDate descending
+                                    select new SubscriptionUserDto
+                                    {
+                                        Email = user.Email,
+                                        Price = subscription.Price,
+                                        StartDate = subscription.StartDate,
+                                        EndDate = subscription.EndDate
+                                    }).FirstOrDefaultAsync();
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"B³¹d w GetLastSubscriptionAsync: {ex.Message}");
+                return null; 
+            }
+        }
+        public async Task<Event> GetLatestEventAsync()
+        {
+            return await Context.Events
+                .OrderByDescending(e => e.EventStartDate)  // Sortowanie po dacie pocz¹tkowej
+                .FirstOrDefaultAsync();  // Pobranie pierwszego (najnowszego) wydarzenia
         }
 
 
