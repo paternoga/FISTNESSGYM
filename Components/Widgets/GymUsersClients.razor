@@ -35,23 +35,22 @@
                     <div style="display: flex; flex-direction: column; align-items: start;">
                         <h4 style="margin: 0; color: #007acc; font-weight: 600;">Zysk w tym miesiącu</h4>
                         <strong style="font-size: 24px; color: #3a3a3a;">@adminWidgetProfitThisMonthValue?.ToString("C")</strong>
-                        <p style="margin-top: 5px; color: #757575; font-size: 14px; visibility: hidden;">zł</p>
+                        <p style="margin-top: 5px; color: #757575; font-size: 14px;">zł</p>
                     </div>
                 </RadzenColumn>
             </RadzenRow>
         </RadzenCard>
     </RadzenColumn>
 
-    <!-- Widget - Zysk z Karnetów w tym miesiącu -->
     <RadzenColumn Size="3">
         <RadzenCard Style="padding: 20px; border-radius: 8px; border: 1px solid #e0e0e0; width: 100%; height: auto;">
-            <h4 style="color: #3a3a3a; font-weight: 600; margin-top: 0px">Zysk z Karnetów w tym miesiącu</h4>
+            <h4 style="color: #3a3a3a; font-weight: 600; margin-top: 0px">Zysk ze sprzedaży</h4>
             <RadzenRow>
                 <RadzenColumn Size="12">
                     <div style="display: flex; flex-direction: column; align-items: start;">
-                        <h4 style="margin: 0; color: #007acc; font-weight: 600;">Zysk z karnetów</h4>
-                        <strong style="font-size: 24px; color: #3a3a3a;">@subscriptionProfit?.ToString("C")</strong>
-                        <p style="margin-top: 5px; color: #757575; font-size: 14px; visibility: hidden;">zł</p>
+                        <h4 style="margin: 0; color: #007acc; font-weight: 600;">Zysk w tym miesiącu</h4>
+                        <strong style="font-size: 24px; color: #3a3a3a;">@adminWidgetProfitThisMonthValue?.ToString("C")</strong>
+                        <p style="margin-top: 5px; color: #757575; font-size: 14px;">zł</p>
                     </div>
                 </RadzenColumn>
             </RadzenRow>
@@ -81,7 +80,30 @@
     </RadzenColumn>
 </RadzenRow>
 
-
+<!-- Widget - liczba osób na siłowni -->
+<RadzenRow>
+    <RadzenColumn Size="3">
+        <RadzenCard Style="padding: 20px; border-radius: 8px; border: 1px solid #e0e0e0; width: 100%; height: auto;">
+            <h4 style="color: #3a3a3a; font-weight: 600; margin-top: 0px">Liczba osób na siłowni</h4>
+            <RadzenRow>
+                <RadzenColumn Size="6">
+                    <div style="display: flex; flex-direction: column; align-items: start;">
+                        <h4 style="margin: 0; color: #007acc; font-weight: 600;">Aktualnie</h4>
+                        <strong style="font-size: 24px; color: #3a3a3a;">@CurrentOccupancy</strong>
+                        <p style="margin-top: 5px; color: #757575; font-size: 14px;">osób</p>
+                    </div>
+                </RadzenColumn>
+                <RadzenColumn Size="6">
+                    <div style="display: flex; flex-direction: column; align-items: end;">
+                        <h4 style="margin: 0; color: #007acc; font-weight: 600;">Godzinę temu</h4>
+                        <strong style="font-size: 24px; color: #3a3a3a;">@PreviousOccupancy</strong>
+                        <p style="margin-top: 5px; color: #757575; font-size: 14px;">osób</p>
+                    </div>
+                </RadzenColumn>
+            </RadzenRow>
+        </RadzenCard>
+    </RadzenColumn>
+</RadzenRow>
 @code {
     private int CurrentOccupancy;
     private int PreviousOccupancy;
@@ -89,7 +111,6 @@
     private readonly string clientRoleId = "86cb68e7-01a4-4325-a118-f39d9e8510c9";
     private static readonly Random RandomGen = new Random();
     private Timer timer;
-    private decimal? subscriptionProfit;
 
     protected override async Task OnInitializedAsync()
     {
@@ -103,11 +124,6 @@
 
             // Pobierz zysk ze sprzedaży w bieżącym miesiącu
             adminWidgetProfitThisMonthValue = await DatabaseService.GetAdminWidgetProfitThisMonthAsync();
-            
-            
-                // Pobierz zysk z karnetów w bieżącym miesiącu
-                subscriptionProfit = await DatabaseService.GetProfitFromSubscriptionsThisMonthAsync();
-
         }
         catch (Exception ex)
         {
@@ -157,9 +173,4 @@
     {
         timer?.Dispose();
     }
-
-   
-    
-
-    
 }
