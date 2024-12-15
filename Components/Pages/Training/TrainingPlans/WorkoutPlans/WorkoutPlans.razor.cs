@@ -95,12 +95,12 @@ namespace FISTNESSGYM.Components.Pages.Training.TrainingPlans.WorkoutPlans
         {
             if (AuthorizationService.IsTrainer || AuthorizationService.IsAdmin || AuthorizationService.IsWorker)
             {
-                await DialogService.OpenAsync<AddWorkoutPlan>("Add WorkoutPlan", null);
+                await DialogService.OpenAsync<AddWorkoutPlan>("Dodaj plan treningowy", null);
                 await grid0.Reload(); 
             }
             else if (AuthorizationService.IsClient)
             {
-                var result = await DialogService.OpenAsync<AddWorkoutPlan>("Add WorkoutPlan", null);
+                var result = await DialogService.OpenAsync<AddWorkoutPlan>("Dodaj plan treningowy", null);
 
                 if (result != null) 
                 {
@@ -112,14 +112,14 @@ namespace FISTNESSGYM.Components.Pages.Training.TrainingPlans.WorkoutPlans
 
         protected async Task EditRow(FISTNESSGYM.Models.database.WorkoutPlan args)
         {
-            await DialogService.OpenAsync<EditWorkoutPlan>("Edit WorkoutPlan", new Dictionary<string, object> { {"Id", args.Id} });
+            await DialogService.OpenAsync<EditWorkoutPlan>("Edytuj plan treningowy", new Dictionary<string, object> { {"Id", args.Id} });
         }
 
         protected async Task GridDeleteButtonClick(MouseEventArgs args, FISTNESSGYM.Models.database.WorkoutPlan workoutPlan)
         {
             try
             {
-                if (await DialogService.Confirm("Are you sure you want to delete this record?") == true)
+                if (await DialogService.Confirm("Jesteœ pewny, ¿e chcesz usun¹æ ten rekord?") == true)
                 {
                     var deleteResult = await databaseService.DeleteWorkoutPlan(workoutPlan.Id);
 

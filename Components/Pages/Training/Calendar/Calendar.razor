@@ -58,7 +58,7 @@
         if (AuthorizationService.IsWorker || AuthorizationService.IsTrainer || AuthorizationService.IsAdmin)
         {
             // Open the dialog to add a new event with a default duration of 1 hour
-            var newEvent = await DialogService.OpenAsync<EventDialog>("Add Event", new Dictionary<string, object>
+            var newEvent = await DialogService.OpenAsync<EventDialog>("Dodaj zajêcia", new Dictionary<string, object>
             {
             { "Start", args.Start },
             { "End", args.Start.AddHours(1) }  // Set event end time to 1 hour after the start

@@ -59,20 +59,20 @@ namespace FISTNESSGYM.Components.Pages.Settings.Subscription
 
         protected async Task AddButtonClick(MouseEventArgs args)
         {
-            await DialogService.OpenAsync<AddSubscription>("Add Subscription", null);
+            await DialogService.OpenAsync<AddSubscription>("Dodaj Subskrypcjê", null);
             await grid0.Reload();
         }
 
         protected async Task EditRow(FISTNESSGYM.Models.database.Subscription args)
         {
-            await DialogService.OpenAsync<EditSubscription>("Edit Subscription", new Dictionary<string, object> { {"Id", args.Id} });
+            await DialogService.OpenAsync<EditSubscription>("Edytuj Subskrypcjê", new Dictionary<string, object> { {"Id", args.Id} });
         }
 
         protected async Task GridDeleteButtonClick(MouseEventArgs args, FISTNESSGYM.Models.database.Subscription subscription)
         {
             try
             {
-                if (await DialogService.Confirm("Are you sure you want to delete this record?") == true)
+                if (await DialogService.Confirm("Jesteœ pewny, ¿e chcesz usun¹æ ten rekord?") == true)
                 {
                     var deleteResult = await databaseService.DeleteSubscription(subscription.Id);
 

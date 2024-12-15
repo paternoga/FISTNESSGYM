@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Radzen;
 using Radzen.Blazor;
+using FISTNESSGYM.Models.database;
 
 namespace FISTNESSGYM.Components.Pages.Settings.Subscription
 {
@@ -32,14 +33,29 @@ namespace FISTNESSGYM.Components.Pages.Settings.Subscription
         [Inject]
         public databaseService databaseService { get; set; }
 
+        private List<SubscriptionType> SubscriptionTypes;
+
         protected override async Task OnInitializedAsync()
         {
+
+            SubscriptionTypes = await LoadSubscriptionTypesAsync();
             subscription = new FISTNESSGYM.Models.database.Subscription();
 
             aspNetUsersForUserId = await databaseService.GetAspNetUsers();
 
             subscriptionStatusesForSubscriptionStatusId = await databaseService.GetSubscriptionStatuses();
         }
+
+        private async Task<List<SubscriptionType>> LoadSubscriptionTypesAsync()
+        {
+            return new List<SubscriptionType>
+            {
+                new SubscriptionType { Id = 1, TypeName = "Miesiêczna", Description = "Subskrypcja miesiêczna" },
+                new SubscriptionType { Id = 2, TypeName = "Roczna", Description = "Subskrypcja roczna" },
+                new SubscriptionType { Id = 3, TypeName = "Próbna", Description = "Subskrypcja próbna" }
+            };
+        }
+
         protected bool errorVisible;
         protected FISTNESSGYM.Models.database.Subscription subscription;
 

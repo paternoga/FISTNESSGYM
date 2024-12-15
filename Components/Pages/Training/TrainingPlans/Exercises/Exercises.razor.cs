@@ -57,20 +57,20 @@ namespace FISTNESSGYM.Components.Pages.Training.TrainingPlans.Exercises
 
         protected async Task AddButtonClick(MouseEventArgs args)
         {
-            await DialogService.OpenAsync<AddExercise>("Add Exercise", null);
+            await DialogService.OpenAsync<AddExercise>("Dodaj æwiczenie", null);
             await grid0.Reload();
         }
 
         protected async Task EditRow(FISTNESSGYM.Models.database.Exercise args)
         {
-            await DialogService.OpenAsync<EditExercise>("Edit Exercise", new Dictionary<string, object> { {"Id", args.Id} });
+            await DialogService.OpenAsync<EditExercise>("Edytuj æwiczenie", new Dictionary<string, object> { {"Id", args.Id} });
         }
 
         protected async Task GridDeleteButtonClick(MouseEventArgs args, FISTNESSGYM.Models.database.Exercise exercise)
         {
             try
             {
-                if (await DialogService.Confirm("Are you sure you want to delete this record?") == true)
+                if (await DialogService.Confirm("Jesteœ pewny, ¿e chcesz usun¹æ ten rekord?") == true)
                 {
                     var deleteResult = await databaseService.DeleteExercise(exercise.Id);
 

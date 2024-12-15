@@ -53,7 +53,7 @@ namespace FISTNESSGYM.Components.Pages.Training.Events
         {
             if (AuthorizationService.IsWorker || AuthorizationService.IsTrainer || AuthorizationService.IsAdmin) 
             {
-                await DialogService.OpenAsync<AddEvent>("Add Event", null);
+                await DialogService.OpenAsync<AddEvent>("Dodaj zajêcia", null);
                 await grid0.Reload();
             }
 
@@ -63,7 +63,7 @@ namespace FISTNESSGYM.Components.Pages.Training.Events
         {
             if (AuthorizationService.IsWorker || AuthorizationService.IsTrainer || AuthorizationService.IsAdmin)
             {
-                await DialogService.OpenAsync<EditEvent>("Edit Event", new Dictionary<string, object> { { "Id", args.Id } });
+                await DialogService.OpenAsync<EditEvent>("Edytuj zajêcia", new Dictionary<string, object> { { "Id", args.Id } });
             }
         }
 

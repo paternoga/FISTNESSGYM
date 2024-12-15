@@ -56,20 +56,20 @@ namespace FISTNESSGYM.Components.Pages.Store.Products
 
         protected async Task AddButtonClick(MouseEventArgs args)
         {
-            await DialogService.OpenAsync<AddProduct>("Add Product", null);
+            await DialogService.OpenAsync<AddProduct>("Dodaj produkt", null);
             await grid0.Reload();
         }
 
         protected async Task EditRow(FISTNESSGYM.Models.database.Product args)
         {
-            await DialogService.OpenAsync<EditProduct>("Edit Product", new Dictionary<string, object> { {"Id", args.Id} });
+            await DialogService.OpenAsync<EditProduct>("Edytuj Produkt", new Dictionary<string, object> { {"Id", args.Id} });
         }
 
         protected async Task GridDeleteButtonClick(MouseEventArgs args, FISTNESSGYM.Models.database.Product product)
         {
             try
             {
-                if (await DialogService.Confirm("Are you sure you want to delete this record?") == true)
+                if (await DialogService.Confirm("Jesteœ pewny, ¿e chcesz usun¹æ ten rekord?") == true)
                 {
                     var deleteResult = await databaseService.DeleteProduct(product.Id);
 

@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Radzen;
 using Radzen.Blazor;
+using FISTNESSGYM.Models.database;
 
 namespace FISTNESSGYM.Components.Pages.Settings.Subscription
 {
@@ -37,6 +38,8 @@ namespace FISTNESSGYM.Components.Pages.Settings.Subscription
 
         protected override async Task OnInitializedAsync()
         {
+            SubscriptionTypes = await LoadSubscriptionTypesAsync();
+
             subscription = await databaseService.GetSubscriptionById(Id);
 
             aspNetUsersForUserId = await databaseService.GetAspNetUsers();
@@ -49,6 +52,8 @@ namespace FISTNESSGYM.Components.Pages.Settings.Subscription
         protected IEnumerable<FISTNESSGYM.Models.database.AspNetUser> aspNetUsersForUserId;
 
         protected IEnumerable<FISTNESSGYM.Models.database.SubscriptionStatus> subscriptionStatusesForSubscriptionStatusId;
+
+        private List<SubscriptionType> SubscriptionTypes;
 
         [Inject]
         protected SecurityService Security { get; set; }
@@ -69,6 +74,17 @@ namespace FISTNESSGYM.Components.Pages.Settings.Subscription
         protected async Task CancelButtonClick(MouseEventArgs args)
         {
             DialogService.Close(null);
+        }
+
+        private async Task<List<SubscriptionType>> LoadSubscriptionTypesAsync()
+        {
+            return new List<SubscriptionType>
+            {
+                new SubscriptionType { Id = 1, TypeName = "Miesiêczna", Description = "Subskrypcja miesiêczna" },
+                new SubscriptionType { Id = 2, TypeName = "Roczna", Description = "Subskrypcja roczna" },
+                new SubscriptionType { Id = 3, TypeName = "Próbna", Description = "Subskrypcja próbna" }
+            };
+
         }
     }
 }

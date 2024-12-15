@@ -64,7 +64,7 @@ namespace FISTNESSGYM.Components.Pages.Store.Categories
         {
             try
             {
-                if (await DialogService.Confirm("Are you sure you want to delete this record?") == true)
+                if (await DialogService.Confirm("Jesteœ pewny, ¿e chcesz usun¹æ ten rekord?") == true)
                 {
                     var deleteResult = await databaseService.DeleteProductCategory(productCategory.Id);
 
