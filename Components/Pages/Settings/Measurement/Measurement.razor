@@ -9,7 +9,14 @@
         <RadzenColumn Size="12" SizeMD="6">
             <RadzenText Text="Pomiary ciała (cm)" TextStyle="TextStyle.H3" TagName="TagName.H1" style="margin: 0" />
         </RadzenColumn>
-        
+        @if (AuthorizationService.IsClient)
+        {
+            <RadzenColumn Size="12" SizeMD="6">
+                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.End" Gap="0.5rem">
+                <RadzenButton Icon="add" Text="Dodaj pomiar" ButtonStyle="ButtonStyle.Primary" Click="@OpenAddMeasurementDialog" />
+            </RadzenStack>
+        </RadzenColumn>
+        }
     </RadzenRow>
 
     <RadzenTextBox Placeholder="Szukaj..." style="display: block; width: 100%" @oninput="@Search" aria-label="Szukaj po wszystkich kolumnach" />
@@ -98,6 +105,17 @@
 
         await grid0.GoToPage(0);
     }
+    protected async Task OpenAddMeasurementDialog()
+    {
+        var result = await DialogService.OpenAsync<AddMeasurement>("Dodaj pomiar");
+
+        if (result != null)
+        {
+            await grid0.Reload();
+        }
+    }
+
+    
 
     protected async Task GridDeleteButtonClick(Measurement measurement)
     {

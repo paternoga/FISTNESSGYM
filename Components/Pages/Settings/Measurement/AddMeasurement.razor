@@ -1,0 +1,138 @@
+﻿@page "/add-measurement"
+@attribute [Authorize]
+
+<PageTitle>Dodaj Pomiar</PageTitle>
+
+<RadzenColumn SizeMD="12">
+    <RadzenAlert Shade="Shade.Lighter" Variant="Variant.Flat" Size="AlertSize.Small" AlertStyle="AlertStyle.Danger" Visible="@errorVisible">Nie można dodać pomiaru.</RadzenAlert>
+
+    <RadzenTemplateForm TItem="FISTNESSGYM.Models.database.Measurement" Data="@newMeasurement" Visible="@(newMeasurement != null)" Submit="@FormSubmit">
+        <RadzenRow style="margin-bottom: 1rem">
+            <RadzenColumn SizeMD="3">
+                <RadzenLabel Text="Waga" Component="Weight" style="width: 100%" />
+            </RadzenColumn>
+            <RadzenColumn SizeMD="9">
+                <RadzenNumeric style="display: block; width: 100%" @bind-Value="@newMeasurement.Weight" Name="Weight" Min="1" />
+                <RadzenRequiredValidator Component="Weight" Text="Waga jest wymagana" />
+            </RadzenColumn>
+        </RadzenRow>
+
+        <RadzenRow style="margin-bottom: 1rem">
+            <RadzenColumn SizeMD="3">
+                <RadzenLabel Text="Talia" Component="WaistCircumference" style="width: 100%" />
+            </RadzenColumn>
+            <RadzenColumn SizeMD="9">
+                <RadzenNumeric style="display: block; width: 100%" @bind-Value="@newMeasurement.WaistCircumference" Name="WaistCircumference" Min="1" />
+            </RadzenColumn>
+        </RadzenRow>
+
+        <RadzenRow style="margin-bottom: 1rem">
+            <RadzenColumn SizeMD="3">
+                <RadzenLabel Text="Klatka piersiowa" Component="ChestCircumference" style="width: 100%" />
+            </RadzenColumn>
+            <RadzenColumn SizeMD="9">
+                <RadzenNumeric style="display: block; width: 100%" @bind-Value="@newMeasurement.ChestCircumference" Name="ChestCircumference" Min="1" />
+            </RadzenColumn>
+        </RadzenRow>
+
+        <RadzenRow style="margin-bottom: 1rem">
+            <RadzenColumn SizeMD="3">
+                <RadzenLabel Text="Ramię" Component="ArmCircumference" style="width: 100%" />
+            </RadzenColumn>
+            <RadzenColumn SizeMD="9">
+                <RadzenNumeric style="display: block; width: 100%" @bind-Value="@newMeasurement.ArmCircumference" Name="ArmCircumference" Min="1" />
+            </RadzenColumn>
+        </RadzenRow>
+
+        <RadzenRow style="margin-bottom: 1rem">
+            <RadzenColumn SizeMD="3">
+                <RadzenLabel Text="Noga" Component="LegCircumference" style="width: 100%" />
+            </RadzenColumn>
+            <RadzenColumn SizeMD="9">
+                <RadzenNumeric style="display: block; width: 100%" @bind-Value="@newMeasurement.LegCircumference" Name="LegCircumference" Min="1" />
+            </RadzenColumn>
+        </RadzenRow>
+
+        <RadzenRow style="margin-bottom: 1rem">
+            <RadzenColumn SizeMD="3">
+                <RadzenLabel Text="Biodra" Component="HipCircumference" style="width: 100%" />
+            </RadzenColumn>
+            <RadzenColumn SizeMD="9">
+                <RadzenNumeric style="display: block; width: 100%" @bind-Value="@newMeasurement.HipCircumference" Name="HipCircumference" Min="1" />
+            </RadzenColumn>
+        </RadzenRow>
+
+        <RadzenRow style="margin-bottom: 1rem">
+            <RadzenColumn SizeMD="3">
+                <RadzenLabel Text="Bodyfat" Component="BodyFat" style="width: 100%" />
+            </RadzenColumn>
+            <RadzenColumn SizeMD="9">
+                <RadzenNumeric style="display: block; width: 100%" @bind-Value="@newMeasurement.BodyFat" Name="BodyFat" Min="0" Max="100" />
+            </RadzenColumn>
+        </RadzenRow>
+
+        <RadzenRow style="margin-bottom: 1rem">
+            <RadzenColumn SizeMD="3">
+                <RadzenLabel Text="Data Pomiaru" Component="MeasurementDate" style="width: 100%" />
+            </RadzenColumn>
+            <RadzenColumn SizeMD="9">
+                <RadzenDatePicker style="display: block; width: 100%" @bind-Value="@newMeasurement.MeasurementDate" Name="MeasurementDate" />
+            </RadzenColumn>
+        </RadzenRow>
+
+        <RadzenRow style="margin-bottom: 1rem">
+            <RadzenColumn SizeMD="3">
+                <RadzenLabel Text="Uwagi" Component="Notes" style="width: 100%" />
+            </RadzenColumn>
+            <RadzenColumn SizeMD="9">
+                <RadzenTextBox style="display: block; width: 100%" @bind-Value="@newMeasurement.Notes" Name="Notes" MaxLength="255" />
+            </RadzenColumn>
+        </RadzenRow>
+
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.End" Gap="0.5rem">
+            <RadzenButton ButtonStyle="ButtonStyle.Primary" ButtonType="ButtonType.Submit" Icon="save" Text="Zapisz" Variant="Variant.Flat" />
+            <RadzenButton ButtonStyle="ButtonStyle.Light" Text="Anuluj" Variant="Variant.Flat" Click="@CancelButtonClick" />
+        </RadzenStack>
+    </RadzenTemplateForm>
+</RadzenColumn>
+
+@code {
+    [Inject] protected databaseService DatabaseService { get; set; }
+    [Inject] protected DialogService DialogService { get; set; }
+    [Inject] protected NotificationService NotificationService { get; set; }
+    [Inject] protected SecurityService SecurityService { get; set; }
+
+    private FISTNESSGYM.Models.database.Measurement newMeasurement = new FISTNESSGYM.Models.database.Measurement();
+    private bool errorVisible;
+
+    protected override async Task OnInitializedAsync()
+    {
+        newMeasurement.UserId = SecurityService.User?.Id; // Pobranie UserId dla zalogowanego użytkownika
+        newMeasurement.MeasurementDate = DateTime.Now; // Ustawienie aktualnej daty
+    }
+
+    protected async Task FormSubmit()
+    {
+        try
+        {
+            await DatabaseService.AddMeasurementAsync(newMeasurement); // Dodanie nowego pomiaru do bazy danych
+            NotificationService.Notify(new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Success,
+                    Summary = "Sukces",
+                    Detail = "Pomiar został dodany"
+                });
+            DialogService.Close(newMeasurement);
+            
+        }
+        catch (Exception)
+        {
+            errorVisible = true;
+        }
+    }
+
+    protected async Task CancelButtonClick(MouseEventArgs args)
+    {
+        DialogService.Close(null);
+    }
+}

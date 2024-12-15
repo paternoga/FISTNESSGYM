@@ -3777,7 +3777,17 @@ namespace FISTNESSGYM
             return await query.ToListAsync();
         }
 
+        public async Task AddMeasurementAsync(Measurement measurement)
+        {
+            if (measurement == null)
+            {
+                throw new ArgumentNullException(nameof(measurement));
+            }
 
+            // Dodanie obiektu Measurement do bazy danych
+            Context.Measurement.Add(measurement);
+            await Context.SaveChangesAsync(); // Zapisanie zmian w bazie danych
+        }
 
 
     }
