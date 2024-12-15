@@ -34,12 +34,12 @@
 
     <RadzenColumn Size="3">
         <RadzenCard Style="padding: 20px; border-radius: 8px; border: 1px solid #e0e0e0; width: 100%; height: auto;">
-            <h4 style="color: #3a3a3a; font-weight: 600; margin-top: 0px">Zysk ze sprzedaży</h4>
+            <h4 style="color: #3a3a3a; font-weight: 600; margin-top: 0px; margin-left: 60px;">Zysk ze sprzedaży</h4>
             <RadzenRow>
                 <RadzenColumn Size="12">
                     <div style="display: flex; flex-direction: column; align-items: start;">
-                        <h4 style="margin: 0; color: #007acc; font-weight: 600;">Zysk w tym miesiącu</h4>
-                        <strong style="font-size: 24px; color: #3a3a3a;">@adminWidgetProfitThisMonthValue?.ToString("C")</strong>
+                        <h4 style="margin: 0; color: #007acc; font-weight: 600; margin-left: 50px;">Zysk w tym miesiącu</h4>
+                        <strong style="font-size: 24px; color: #3a3a3a; margin-left: 70px;">@adminWidgetProfitThisMonthValue?.ToString("C")</strong>
                         <p style="margin-top: 5px; color: #757575; font-size: 14px; visibility: hidden;">zł</p>
                     </div>
                 </RadzenColumn>
@@ -50,12 +50,12 @@
     <!-- Widget - Zysk z Karnetów w tym miesiącu -->
     <RadzenColumn Size="3">
         <RadzenCard Style="padding: 20px; border-radius: 8px; border: 1px solid #e0e0e0; width: 100%; height: auto;">
-            <h4 style="color: #3a3a3a; font-weight: 600; margin-top: 0px">Zysk z Karnetów w tym miesiącu</h4>
+            <h4 style="color: #3a3a3a; font-weight: 600; margin-top: 0px; margin-left: 20px">Zysk z Karnetów w tym miesiącu</h4>
             <RadzenRow>
                 <RadzenColumn Size="12">
                     <div style="display: flex; flex-direction: column; align-items: start;">
-                        <h4 style="margin: 0; color: #007acc; font-weight: 600;">Zysk z karnetów</h4>
-                        <strong style="font-size: 24px; color: #3a3a3a;">@subscriptionProfit?.ToString("C")</strong>
+                        <h4 style="margin: 0; color: #007acc; font-weight: 600; margin-left: 70px;">Zysk z karnetów</h4>
+                        <strong style="font-size: 24px; color: #3a3a3a; margin-left: 70px;">@subscriptionProfit?.ToString("C")</strong>
                         <p style="margin-top: 5px; color: #757575; font-size: 14px; visibility: hidden;">zł</p>
                     </div>
                 </RadzenColumn>
@@ -94,9 +94,9 @@
             <RadzenRow>
                 <RadzenColumn Size="12">
                     <div style="display: flex; flex-direction: column; align-items: start;">
-                        <h4 style="margin: 0; color: #007acc; font-weight: 600;">Email:</h4>
-                        <strong style="font-size: 20px; color: #3a3a3a;">@LastSubscriptionEmail</strong>
-                        <p style="margin-top: 10px; color: #757575; font-size: 14px;">Dziękujemy za zakup!</p>
+                        <h4 style="margin: 0; color: #007acc; font-weight: 600; margin-left: 100px;">Email:</h4>
+                        <strong style="font-size: 20px; color: #3a3a3a; margin-left: 20px;">@LastSubscriptionEmail</strong>
+                        <p style="margin-top: 10px; color: #757575; font-size: 14px; margin-left: 60px;">Dziękujemy za zakup!</p>
                     </div>
                 </RadzenColumn>
             </RadzenRow>
@@ -105,18 +105,18 @@
 
     <RadzenColumn Size="3">
         <RadzenCard Style="padding: 20px; border-radius: 8px; border: 1px solid #e0e0e0; width: 100%; height: 160px;">
-            <h4 style="color: #3a3a3a; font-weight: 600; margin-top: 0px">Najnowsze Wydarzenie</h4>
+            <h4 style="color: #3a3a3a; font-weight: 600; margin-top: 0px; margin-left: 50px;">Najnowsze Wydarzenie</h4>
             @if (latestEvent != null)
             {
                 <RadzenRow>
                     <RadzenColumn Size="12">
                         <div style="display: flex; flex-direction: column; align-items: start;">
-                            <h4 style="margin: 0; color: #007acc; font-weight: 600;">@latestEvent.EventName</h4>
-                            <p style="margin: 0; color: #757575; font-size: 14px;">Prowadzący: @latestEvent.InstructorName</p>
-                            <p style="margin: 5px 0; color: #757575; font-size: 14px;">
+                            <h4 style="margin: 0; color: #007acc; font-weight: 600; margin-left: 60px;">@latestEvent.EventName</h4>
+                            <p style="margin: 0; color: #757575; font-size: 14px; margin-left: 50px; ">Prowadzący: @latestEvent.InstructorName</p>
+                            <p style="margin: 5px 0; color: #757575; font-size: 14px; margin-left: 50px;">
                                 Data: @latestEvent.EventStartDate.ToString("dd MMM yyyy, HH:mm") - @latestEvent.EventEndDate.ToString("HH:mm")
                             </p>
-                            <p style="margin-top: 5px; color: #757575; font-size: 14px;">
+                            <p style="margin-top: 5px; color: #757575; font-size: 14px; margin-left: 60px">
                                 Liczba uczestników: @latestEvent.Participants / @latestEvent.MaxParticipants
                             </p>
                         </div>
@@ -133,13 +133,13 @@
 
     <RadzenColumn Size="3">
         <RadzenCard Style="padding: 20px; border-radius: 8px; border: 1px solid #e0e0e0; width: 100%; height: auto;">
-            <h4 style="color: #3a3a3a; font-weight: 600; margin-top: 0px">Liczba trenerów</h4>
+            <h4 style="color: #3a3a3a; font-weight: 600; margin-top: 0px; margin-left: 80px;">Liczba trenerów</h4>
             <RadzenRow>
                 <RadzenColumn Size="12">
                     <div style="display: flex; flex-direction: column; align-items: start;">
-                        <h4 style="margin: 0; color: #007acc; font-weight: 600;">Trenerzy</h4>
-                        <strong style="font-size: 24px; color: #3a3a3a;">@TotalTrainers</strong>
-                        <p style="margin-top: 5px; color: #757575; font-size: 14px;">osoby</p>
+                        <h4 style="margin: 0; color: #007acc; font-weight: 600; margin-left: 110px;">Trenerzy</h4>
+                        <strong style="font-size: 24px; color: #3a3a3a; margin-left: 130px;">@TotalTrainers</strong>
+                        <p style="margin-top: 5px; color: #757575; font-size: 14px; margin-left: 120px;">osoby</p>
                     </div>
                 </RadzenColumn>
             </RadzenRow>
@@ -148,13 +148,13 @@
 
     <RadzenColumn Size="3">
         <RadzenCard Style="padding: 20px; border-radius: 8px; border: 1px solid #e0e0e0; width: 100%; height: auto;">
-            <h4 style="color: #3a3a3a; font-weight: 600; margin-top: 0px">Liczba pracowników</h4>
+            <h4 style="color: #3a3a3a; font-weight: 600; margin-top: 0px; margin-left: 75px;">Liczba pracowników</h4>
             <RadzenRow>
                 <RadzenColumn Size="12">
                     <div style="display: flex; flex-direction: column; align-items: start;">
-                        <h4 style="margin: 0; color: #007acc; font-weight: 600;">Pracownicy</h4>
-                        <strong style="font-size: 24px; color: #3a3a3a;">@TotalEmployees</strong>
-                        <p style="margin-top: 5px; color: #757575; font-size: 14px;">osoby</p>
+                        <h4 style="margin: 0; color: #007acc; font-weight: 600; margin-left: 105px;">Pracownicy</h4>
+                        <strong style="font-size: 24px; color: #3a3a3a; margin-left: 130px;">@TotalEmployees</strong>
+                        <p style="margin-top: 5px; color: #757575; font-size: 14px; margin-left: 120px;">osoby</p>
                     </div>
                 </RadzenColumn>
             </RadzenRow>
@@ -166,13 +166,13 @@
     <!-- Widget - Godziny zmarnowane na tworzeniu -->
     <RadzenColumn Size="3">
         <RadzenCard Style="padding: 20px; border-radius: 8px; border: 1px solid #e0e0e0; width: 100%; height: auto;">
-            <h4 style="color: #3a3a3a; font-weight: 600; margin-top: 0px">Godziny zmarnowane na tworzeniu</h4>
+            <h4 style="color: #3a3a3a; font-weight: 600; margin-top: 0px; margin-left: 10px;">Godziny zmarnowane na tworzeniu</h4>
             <RadzenRow>
                 <RadzenColumn Size="12">
                     <div style="display: flex; flex-direction: column; align-items: start;">
-                        <h4 style="margin: 0; color: #007acc; font-weight: 600;">Razem:</h4>
-                        <strong style="font-size: 24px; color: #3a3a3a;">@TotalHoursWasted</strong>
-                        <p style="margin-top: 5px; color: #757575; font-size: 14px;">
+                        <h4 style="margin: 0; color: #007acc; font-weight: 600; margin-left: 110px;">Razem:</h4>
+                        <strong style="font-size: 24px; color: #3a3a3a; margin-left: 100px;">@TotalHoursWasted</strong>
+                        <p style="margin-top: 5px; color: #757575; font-size: 14px; margin-left: 110px;">
                             godzin
                         </p>
                     </div>
@@ -184,13 +184,13 @@
     <!-- Widget - Ilość prądu zmarnowana -->
     <RadzenColumn Size="3">
         <RadzenCard Style="padding: 20px; border-radius: 8px; border: 1px solid #e0e0e0; width: 100%; height: auto;">
-            <h4 style="color: #3a3a3a; font-weight: 600; margin-top: 0px">Ilość prądu zmarnowana</h4>
+            <h4 style="color: #3a3a3a; font-weight: 600; margin-top: 0px; margin-left: 50px;">Ilość prądu zmarnowana</h4>
             <RadzenRow>
                 <RadzenColumn Size="12">
                     <div style="display: flex; flex-direction: column; align-items: start;">
-                        <h4 style="margin: 0; color: #007acc; font-weight: 600;">Zużycie:</h4>
-                        <strong style="font-size: 24px; color: #3a3a3a;">@PowerUsage</strong>
-                        <p style="margin-top: 5px; color: #757575; font-size: 14px;">
+                        <h4 style="margin: 0; color: #007acc; font-weight: 600; margin-left: 100px; ">Zużycie:</h4>
+                        <strong style="font-size: 24px; color: #3a3a3a; margin-left: 110px;">@PowerUsage</strong>
+                        <p style="margin-top: 5px; color: #757575; font-size: 14px; margin-left: 70px; ">
                             kWh w tym miesiącu
                         </p>
                     </div>
@@ -202,13 +202,13 @@
     <!-- Widget - Łzy wylane nad kodem -->
     <RadzenColumn Size="3">
         <RadzenCard Style="padding: 20px; border-radius: 8px; border: 1px solid #e0e0e0; width: 100%; height: auto;">
-            <h4 style="color: #3a3a3a; font-weight: 600; margin-top: 0px">Łzy wylane nad kodem</h4>
+            <h4 style="color: #3a3a3a; font-weight: 600; margin-top: 0px; margin-left: 50px;">Łzy wylane nad kodem</h4>
             <RadzenRow>
                 <RadzenColumn Size="12">
                     <div style="display: flex; flex-direction: column; align-items: start;">
-                        <h4 style="margin: 0; color: #007acc; font-weight: 600;">Łzy:</h4>
-                        <strong style="font-size: 24px; color: #3a3a3a;">@TearsShed</strong>
-                        <p style="margin-top: 5px; color: #757575; font-size: 14px;">
+                        <h4 style="margin: 0; color: #007acc; font-weight: 600; margin-left: 110px;">Łzy:</h4>
+                        <strong style="font-size: 24px; color: #3a3a3a; margin-left: 120px;">@TearsShed</strong>
+                        <p style="margin-top: 5px; color: #757575; font-size: 14px; margin-left: 80px;">
                             litry w tym miesiącu
                         </p>
                     </div>
@@ -220,13 +220,13 @@
     <!-- Widget - Koszt leczenia dla programisty -->
     <RadzenColumn Size="3">
         <RadzenCard Style="padding: 20px; border-radius: 8px; border: 1px solid #e0e0e0; width: 100%; height: auto;">
-            <h4 style="color: #3a3a3a; font-weight: 600; margin-top: 0px">Koszt leczenia dla programisty</h4>
+            <h4 style="color: #3a3a3a; font-weight: 600; margin-top: 0px; margin-left: 20px;">Koszt leczenia dla programisty</h4>
             <RadzenRow>
                 <RadzenColumn Size="12">
                     <div style="display: flex; flex-direction: column; align-items: start;">
-                        <h4 style="margin: 0; color: #007acc; font-weight: 600;">Koszt:</h4>
-                        <strong style="font-size: 24px; color: #3a3a3a;">@TreatmentCost?.ToString("C")</strong>
-                        <p style="margin-top: 5px; color: #757575; font-size: 14px;">
+                        <h4 style="margin: 0; color: #007acc; font-weight: 600; margin-left: 110px;">Koszt:</h4>
+                        <strong style="font-size: 24px; color: #3a3a3a; margin-left: 60px;">@TreatmentCost?.ToString("C")</strong>
+                        <p style="margin-top: 5px; color: #757575; font-size: 14px; margin-left: 70px;">
                             PLN (w tym miesiącu)
                         </p>
                     </div>
