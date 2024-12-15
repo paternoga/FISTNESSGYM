@@ -25,5 +25,6 @@ namespace FISTNESSGYM.Models.database
         public DateTime CreatedDate { get; set; }
 
         public ICollection<WorkoutExercise> WorkoutExercises { get; set; }
+        public string InstructorEmail { get; set; }
     }
 }

@@ -58,21 +58,38 @@ namespace FISTNESSGYM.Components.Pages.Training.TrainingPlans.WorkoutPlans
         }
         protected override async Task OnInitializedAsync()
         {
-            if (AuthorizationService.IsAdmin || AuthorizationService.IsTrainer || AuthorizationService.IsWorker)
+            if (AuthorizationService.IsAdmin || AuthorizationService.IsWorker)
             {
-                workoutPlans = await databaseService.GetWorkoutPlans(new Query { Filter = $@"i => i.Name.Contains(@0) || i.Description.Contains(@0) || i.UserId.Contains(@0)", FilterParameters = new object[] { search }, Expand = "AspNetUser" });
+                // Admin i pracownik widz¹ wszystkie plany
+                workoutPlans = await databaseService.GetWorkoutPlans(new Query
+                {
+                    Filter = $@"i => i.Name.Contains(@0) || i.Description.Contains(@0) || i.UserId.Contains(@0)",
+                    FilterParameters = new object[] { search },
+                    Expand = "AspNetUser"
+                });
             }
-            else if(AuthorizationService.IsClient) 
+            else if (AuthorizationService.IsTrainer)
             {
+                // Trener widzi tylko swoje plany
+                string trainerEmail = GetLoggedInUserEmail();
+                workoutPlans = await databaseService.GetWorkoutPlans(new Query
+                {
+                    Filter = $@"i => i.InstructorEmail == @0",
+                    FilterParameters = new object[] { trainerEmail },
+                    Expand = "AspNetUser"
+                });
+            }
+            else if (AuthorizationService.IsClient)
+            {
+                // Klient widzi tylko swoje plany
                 string userId = Security.User?.Id;
                 if (!string.IsNullOrEmpty(userId))
                 {
                     workoutPlans = (await databaseService.GetWorkoutPlansForUser(userId)).ToList() ?? new List<WorkoutPlan>();
                 }
             }
-
-            
         }
+
 
         protected async Task AddButtonClick(MouseEventArgs args)
         {
@@ -194,6 +211,10 @@ namespace FISTNESSGYM.Components.Pages.Training.TrainingPlans.WorkoutPlans
                 workoutPlans = await databaseService.GetWorkoutPlansForUser(Security.User?.Id); // Ponowne za³adowanie
                 StateHasChanged(); // Odœwie¿enie widoku
             }
+        }
+        public string GetLoggedInUserEmail()
+        {
+            return Security.User?.Email;
         }
 
 

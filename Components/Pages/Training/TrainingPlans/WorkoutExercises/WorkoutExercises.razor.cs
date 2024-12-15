@@ -52,9 +52,22 @@ namespace FISTNESSGYM.Components.Pages.Training.TrainingPlans.WorkoutExercises
         }
         protected override async Task OnInitializedAsync()
         {
-            if (AuthorizationService.IsAdmin || AuthorizationService.IsTrainer || AuthorizationService.IsWorker)
+            string trainerEmail = Security.User?.Email;
+
+            if (AuthorizationService.IsAdmin || AuthorizationService.IsWorker)
             {
+                // Admin lub pracownik widzi wszystko
                 workoutExercises = await databaseService.GetWorkoutExercises(new Query { Expand = "Exercise,WorkoutPlan" });
+            }
+            else if (AuthorizationService.IsTrainer && !string.IsNullOrEmpty(trainerEmail))
+            {
+                // Trener widzi tylko swoje ćwiczenia
+                workoutExercises = await databaseService.GetWorkoutExercises(new Query
+                {
+                    Filter = $@"i => i.WorkoutPlan.InstructorEmail == @0",
+                    FilterParameters = new object[] { trainerEmail },
+                    Expand = "Exercise,WorkoutPlan"
+                });
             }
             else if (AuthorizationService.IsClient)
             {
@@ -62,11 +75,12 @@ namespace FISTNESSGYM.Components.Pages.Training.TrainingPlans.WorkoutExercises
 
                 if (!string.IsNullOrEmpty(userId))
                 {
-                    // Pobiera �wiczenia dla plan�w treningowych przypisanych do zalogowanego u�ytkownika
+                    // Klient widzi tylko ćwiczenia przypisane do swoich planów treningowych
                     workoutExercises = await databaseService.GetWorkoutExercisesForUser(userId);
                 }
             }
         }
+
 
         protected async Task AddButtonClick(MouseEventArgs args)
         {

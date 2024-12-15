@@ -41,14 +41,14 @@ namespace FISTNESSGYM.Components.Pages.Training.TrainingPlans.WorkoutExercises
 
             exercisesForExerciseId = (await databaseService.GetExercises()).ToList() ?? new List<FISTNESSGYM.Models.database.Exercise>();
 
-            // Je�li WorkoutPlanId jest ustawione, przypisujemy je do �wiczenia
+            // Jeśli WorkoutPlanId jest ustawione, przypisujemy je do ćwiczenia
             if (WorkoutPlanId.HasValue)
             {
                 workoutExercise.WorkoutPlanId = WorkoutPlanId.Value;
             }
             else
             {
-                // Je�li nie ma WorkoutPlanId, za�aduj plany dla wyboru przez u�ytkownika
+                // Wczytaj plany treningowe w zależności od roli użytkownika
                 if (AuthorizationService.IsClient)
                 {
                     string userId = Security.User?.Id;
@@ -61,12 +61,31 @@ namespace FISTNESSGYM.Components.Pages.Training.TrainingPlans.WorkoutExercises
                         workoutPlansForWorkoutPlanId = new List<FISTNESSGYM.Models.database.WorkoutPlan>();
                     }
                 }
-                else if (AuthorizationService.IsWorker || AuthorizationService.IsTrainer || AuthorizationService.IsAdmin)
+                else if (AuthorizationService.IsTrainer)
                 {
+                    string trainerEmail = Security.User?.Email;
+                    if (!string.IsNullOrEmpty(trainerEmail))
+                    {
+                        // Tylko plany treningowe przypisane do tego trenera
+                        workoutPlansForWorkoutPlanId = (await databaseService.GetWorkoutPlans(new Query
+                        {
+                            Filter = $@"i => i.InstructorEmail == @0",
+                            FilterParameters = new object[] { trainerEmail }
+                        })).ToList() ?? new List<FISTNESSGYM.Models.database.WorkoutPlan>();
+                    }
+                    else
+                    {
+                        workoutPlansForWorkoutPlanId = new List<FISTNESSGYM.Models.database.WorkoutPlan>();
+                    }
+                }
+                else if (AuthorizationService.IsWorker || AuthorizationService.IsAdmin)
+                {
+                    // Administratorzy i pracownicy widzą wszystkie plany treningowe
                     workoutPlansForWorkoutPlanId = (await databaseService.GetWorkoutPlans()).ToList() ?? new List<FISTNESSGYM.Models.database.WorkoutPlan>();
                 }
             }
         }
+
 
         protected bool errorVisible;
         protected FISTNESSGYM.Models.database.WorkoutExercise workoutExercise;

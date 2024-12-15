@@ -50,6 +50,13 @@ namespace FISTNESSGYM.Components.Pages.Training.TrainingPlans.WorkoutPlans
         {
             try
             {
+                if (AuthorizationService.IsTrainer)
+                {
+                    workoutPlan.InstructorEmail = Security.User?.Email;
+                }
+
+                workoutPlan.CreatedDate = DateTime.Now;
+
                 await databaseService.CreateWorkoutPlan(workoutPlan);
                 DialogService.Close(workoutPlan);
             }
@@ -58,6 +65,7 @@ namespace FISTNESSGYM.Components.Pages.Training.TrainingPlans.WorkoutPlans
                 errorVisible = true;
             }
         }
+
 
         protected async Task CancelButtonClick(MouseEventArgs args)
         {
