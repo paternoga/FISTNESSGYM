@@ -3789,6 +3789,48 @@ namespace FISTNESSGYM
             await Context.SaveChangesAsync(); // Zapisanie zmian w bazie danych
         }
 
+        public async Task<int> GetTotalUsersCountAsync()
+        {
+            return await Context.AspNetUsers.CountAsync();
+        }
+
+        // Zwraca liczbê u¿ytkowników w roli "Klient" (np. rola o ID "86cb68e7-01a4-4325-a118-f39d9e8510c9")
+        public async Task<int> GetClientsCountAsync(string roleId)
+        {
+            return await Context.AspNetUserRoles
+                .Where(ur => ur.RoleId == roleId)
+                .CountAsync();
+        }
+
+        public async Task<decimal> GetAdminWidgetProfitThisMonthAsync()
+        {
+            var startOfMonth = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+            var endOfMonth = startOfMonth.AddMonths(1).AddDays(-1); // ostatni dzieñ miesi¹ca
+
+            return await Context.OrderItems
+                .Where(oi => oi.CreationDate >= startOfMonth && oi.CreationDate <= endOfMonth)
+                .SumAsync(oi => oi.Quantity * oi.UnitPrice);  // Sumowanie wartoœci sprzeda¿y
+        }
+
+        public async Task<decimal> GetProfitFromSubscriptionsThisMonthAsync()
+        {
+            try
+            {
+                // Pobieramy daty pocz¹tkowe i statusy aktywnych karnetów w tym miesi¹cu
+                var result = await Context.Subscriptions
+                    .Where(s => s.StartDate.Year == DateTime.Now.Year && s.StartDate.Month == DateTime.Now.Month) // Tylko subskrypcje z tego miesi¹ca
+                    .Where(s => s.SubscriptionStatusId == 1 || s.SubscriptionStatusId == 2) // Tylko aktywne subskrypcje
+                    .SumAsync(s => s.Price); // Sumujemy ceny subskrypcji
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"B³¹d podczas pobierania danych: {ex.Message}");
+                return 0;
+            }
+        }
+
 
     }
 }
