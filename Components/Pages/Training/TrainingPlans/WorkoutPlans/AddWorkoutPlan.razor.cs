@@ -78,6 +78,7 @@ namespace FISTNESSGYM.Components.Pages.Training.TrainingPlans.WorkoutPlans
                 // Ustawiamy UserId na aktualnego u¿ytkownika i datê utworzenia
                 workoutPlan.UserId = Security.User?.Id;
                 workoutPlan.CreatedDate = DateTime.Now;
+                workoutPlan.InstructorEmail = "";
 
                 await databaseService.CreateWorkoutPlan(workoutPlan);
                 DialogService.Close(workoutPlan);
