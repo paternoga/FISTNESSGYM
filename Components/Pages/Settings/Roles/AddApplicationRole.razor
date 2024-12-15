@@ -8,11 +8,11 @@
 
             <RadzenRow style="margin-bottom: 1rem">
                 <RadzenColumn SizeMD="3">
-                    <RadzenLabel Component="Name" style="width: 100%" Text="Name" />
+                    <RadzenLabel Component="Name" style="width: 100%" Text="Nazwa" />
                 </RadzenColumn>
                 <RadzenColumn SizeMD="9">
                     <RadzenTextBox style="display: block; width: 100%" @bind-Value="@(role.Name)" Name="Name" />
-                    <RadzenRequiredValidator Component="Name" Text="Name is required" />
+                    <RadzenRequiredValidator Component="Name" Text="Nazwa jest wymagana" />
                 </RadzenColumn>
             </RadzenRow>
             <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.End" Gap="0.5rem">

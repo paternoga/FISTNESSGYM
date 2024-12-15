@@ -45,7 +45,7 @@ namespace FISTNESSGYM.Components.Pages.Settings.Roles
 
         protected async Task AddClick()
         {
-            await DialogService.OpenAsync<AddApplicationRole>("Add Application Role");
+            await DialogService.OpenAsync<AddApplicationRole>("Dodaj role");
 
             roles = await Security.GetRoles();
         }
@@ -54,7 +54,7 @@ namespace FISTNESSGYM.Components.Pages.Settings.Roles
         {
             try
             {
-                if (await DialogService.Confirm("Are you sure you want to delete this role?") == true)
+                if (await DialogService.Confirm("Jesteœ pewny, ¿e chcesz usun¹æ ten rekord?") == true)
                 {
                     await Security.DeleteRole($"{role.Id}");
 

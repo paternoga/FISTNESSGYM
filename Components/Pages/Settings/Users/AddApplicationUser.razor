@@ -12,12 +12,12 @@
                 </RadzenColumn>
                 <RadzenColumn SizeMD="9">
                     <RadzenTextBox style="display: block; width: 100%" @bind-Value="@(user.Email)" Name="Email" />
-                    <RadzenRequiredValidator Component="Email" Text="Email is required" />
+                    <RadzenRequiredValidator Component="Email" Text="Email jest wymagany" />
                 </RadzenColumn>
             </RadzenRow>
             <RadzenRow style="margin-bottom: 1rem">
                 <RadzenColumn SizeMD="3">
-                    <RadzenLabel Component="RoleNames" style="width: 100%" Text="Roles" />
+                    <RadzenLabel Component="RoleNames" style="width: 100%" Text="Rola" />
                 </RadzenColumn>
                 <RadzenColumn SizeMD="9">
                     <RadzenDropDown Data="@roles" Multiple="true" style="width: 100%" TextProperty="Name"
@@ -26,23 +26,23 @@
             </RadzenRow>
              <RadzenRow style="margin-bottom: 1rem">
                 <RadzenColumn SizeMD="3">
-                    <RadzenLabel Component="Password" style="width: 100%" Text="Password" />
+                    <RadzenLabel Component="Password" style="width: 100%" Text="Has³o" />
                 </RadzenColumn>
                 <RadzenColumn SizeMD="9">
                     <RadzenPassword style="display: block; width: 100%" @bind-Value="@(user.Password)"
                         Name="Password" />
-                    <RadzenRequiredValidator Component="Password" Text="Password is required" />
+                    <RadzenRequiredValidator Component="Password" Text="Has³o jest wymagane" />
                 </RadzenColumn>
             </RadzenRow>
              <RadzenRow style="margin-bottom: 1rem">
                 <RadzenColumn SizeMD="3">
-                    <RadzenLabel Component="ConfirmPassword" style="width: 100%" Text="Confirm password" />
+                    <RadzenLabel Component="ConfirmPassword" style="width: 100%" Text="PotwierdŸ Has³o" />
                 </RadzenColumn>
                 <RadzenColumn SizeMD="9">
                     <RadzenPassword style="display: block; width: 100%" @bind-Value="@(user.ConfirmPassword)"
                         Name="ConfirmPassword" />
-                    <RadzenRequiredValidator Component="ConfirmPassword" Text="ConfirmPassword is required" />
-                    <RadzenCompareValidator Text="Passwords must match" Component="ConfirmPassword" Value="@user.Password" />
+                    <RadzenRequiredValidator Component="ConfirmPassword" Text="Has³o jest wymagane" />
+                    <RadzenCompareValidator Text="Has³a musz¹ pasowaæ do siebie" Component="ConfirmPassword" Value="@user.Password" />
                 </RadzenColumn>
             </RadzenRow>
             <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.End" Gap="0.5rem">
