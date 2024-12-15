@@ -24,7 +24,7 @@
                     <Columns>
                         <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.WorkoutExercise" Property="Id" Title="Id">
                         </RadzenDataGridColumn>
-                        <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.WorkoutExercise" Property="Exercise.Category" Title="Ćwiczenie">
+                        <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.WorkoutExercise" Property="Exercise.Name" Title="Ćwiczenie">
                         </RadzenDataGridColumn>
                         <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.WorkoutExercise" Property="WorkoutPlan.Name" Title="Plan treningowy">
                         </RadzenDataGridColumn>
@@ -70,7 +70,7 @@ else if (AuthorizationService.IsClient)
                 <RadzenDataGrid @ref="grid0" ColumnWidth="200px" AllowFiltering="true" FilterMode="FilterMode.Advanced" AllowPaging="true" AllowSorting="true" ShowPagingSummary="true" PageSizeOptions=@(new int[]{5, 10, 20, 30})
                                 Data="@workoutExercises" TItem="FISTNESSGYM.Models.database.WorkoutExercise">
                     <Columns>
-                        <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.WorkoutExercise" Property="Exercise.Category" Title="Ćwiczenie">
+                        <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.WorkoutExercise" Property="Exercise.Name" Title="Ćwiczenie">
                         </RadzenDataGridColumn>
                         <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.WorkoutExercise" Property="WorkoutPlan.Name" Title="Plan treningowy">
                         </RadzenDataGridColumn>
