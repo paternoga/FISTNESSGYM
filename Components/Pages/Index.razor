@@ -71,26 +71,7 @@
 }
 
 
-@if (AuthorizationService.IsWorker)
-{
-    <RadzenRow>
-        <RadzenColumn Size="3">
-            <GymOccupancy />
-        </RadzenColumn>
 
-        <RadzenColumn Size="3">
-            <Weather />
-        </RadzenColumn>
-
-        <RadzenColumn Size="3">
-            <p>widget ostatniej osoby zalogowanej?</p>
-        </RadzenColumn>
-
-        <RadzenColumn Size="3">
-            <p>widget sprzedanych dzisiaj  przedmiotow</p>
-        </RadzenColumn>
-    </RadzenRow>
-}
 
 @if (AuthorizationService.IsTrainer)
 {
@@ -103,7 +84,7 @@
     </RadzenRow>
 }
 
-@if (AuthorizationService.IsAdmin)
+@if (AuthorizationService.IsAdmin || AuthorizationService.IsWorker)
 {
     <RadzenRow>
         <RadzenColumn Size="12">
