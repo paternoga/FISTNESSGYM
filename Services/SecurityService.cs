@@ -12,7 +12,6 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Radzen;
 using FISTNESSGYM.Models;
-using DocumentFormat.OpenXml.Spreadsheet;
 
 namespace FISTNESSGYM
 {
@@ -25,26 +24,25 @@ namespace FISTNESSGYM
 
         private readonly NavigationManager navigationManager;
 
-        private readonly UserManager<ApplicationUser> _userManager;
-
         public ApplicationUser User { get; private set; } = new ApplicationUser { Name = "Anonymous" };
 
         public ClaimsPrincipal Principal { get; private set; }
 
-        public SecurityService(NavigationManager navigationManager, IHttpClientFactory factory, UserManager<ApplicationUser> userManager)
+        public SecurityService(NavigationManager navigationManager, IHttpClientFactory factory)
         {
             this.baseUri = new Uri($"{navigationManager.BaseUri}odata/Identity/");
             this.httpClient = factory.CreateClient("FISTNESSGYM");
             this.navigationManager = navigationManager;
-            this._userManager = userManager;
         }
 
         public bool IsInRole(params string[] roles)
         {
+#if DEBUG
             if (User.Name == "admin")
             {
                 return true;
             }
+#endif
 
             if (roles.Contains("Everybody"))
             {
@@ -72,12 +70,14 @@ namespace FISTNESSGYM
         public async Task<bool> InitializeAsync(AuthenticationState result)
         {
             Principal = result.User;
+#if DEBUG
             if (Principal.Identity.Name == "admin")
             {
                 User = new ApplicationUser { Name = "Admin" };
 
                 return true;
             }
+#endif
             var userId = Principal?.FindFirstValue(ClaimTypes.NameIdentifier);
 
             if (userId != null && User?.Id != userId)
@@ -250,23 +250,8 @@ namespace FISTNESSGYM
             if (!response.IsSuccessStatusCode)
             {
                 var message = await response.Content.ReadAsStringAsync();
+
                 throw new ApplicationException(message);
-            }
-
-            var newUser = new ApplicationUser
-            {
-                UserName = userName,
-                Email = userName
-            };
-
-            var user = await _userManager.FindByNameAsync(userName);
-
-            if (user != null)
-            {
-                if (!await _userManager.IsInRoleAsync(user, "U¿ytkownik"))
-                {
-                    await _userManager.AddToRoleAsync(user, "U¿ytkownik");
-                }
             }
         }
 
