@@ -24,15 +24,18 @@ namespace FISTNESSGYM
 
         private readonly NavigationManager navigationManager;
 
+        private readonly UserManager<ApplicationUser> _userManager;
+
         public ApplicationUser User { get; private set; } = new ApplicationUser { Name = "Anonymous" };
 
         public ClaimsPrincipal Principal { get; private set; }
 
-        public SecurityService(NavigationManager navigationManager, IHttpClientFactory factory)
+        public SecurityService(NavigationManager navigationManager, IHttpClientFactory factory, UserManager<ApplicationUser> userManager)
         {
             this.baseUri = new Uri($"{navigationManager.BaseUri}odata/Identity/");
             this.httpClient = factory.CreateClient("FISTNESSGYM");
             this.navigationManager = navigationManager;
+            this._userManager = userManager;
         }
 
         public bool IsInRole(params string[] roles)
@@ -91,7 +94,7 @@ namespace FISTNESSGYM
 
         public async Task<ApplicationAuthenticationState> GetAuthenticationStateAsync()
         {
-            var uri =  new Uri($"{navigationManager.BaseUri}Account/CurrentUser");
+            var uri = new Uri($"{navigationManager.BaseUri}Account/CurrentUser");
 
             var response = await httpClient.SendAsync(new HttpRequestMessage(HttpMethod.Post, uri));
 
@@ -200,7 +203,7 @@ namespace FISTNESSGYM
         }
         public async Task ChangePassword(string oldPassword, string newPassword)
         {
-            var uri =  new Uri($"{navigationManager.BaseUri}Account/ChangePassword");
+            var uri = new Uri($"{navigationManager.BaseUri}Account/ChangePassword");
 
             var content = new FormUrlEncodedContent(new Dictionary<string, string> {
                 { "oldPassword", oldPassword },
@@ -219,18 +222,18 @@ namespace FISTNESSGYM
 
         public async Task ChangeUsername(string newUsername)
         {
-            var uri = new Uri($"{navigationManager.BaseUri}Account/ChangeUsername"); 
+            var uri = new Uri($"{navigationManager.BaseUri}Account/ChangeUsername");
 
             var content = new FormUrlEncodedContent(new Dictionary<string, string>
             {
                 { "newUsername", newUsername }
             });
 
-            var response = await httpClient.PostAsync(uri, content); 
+            var response = await httpClient.PostAsync(uri, content);
 
             if (!response.IsSuccessStatusCode)
             {
-                var message = await response.Content.ReadAsStringAsync(); 
+                var message = await response.Content.ReadAsStringAsync();
                 throw new ApplicationException(message);
             }
         }
@@ -238,7 +241,7 @@ namespace FISTNESSGYM
 
         public async Task Register(string userName, string password)
         {
-            var uri =  new Uri($"{navigationManager.BaseUri}Account/Register");
+            var uri = new Uri($"{navigationManager.BaseUri}Account/Register");
 
             var content = new FormUrlEncodedContent(new Dictionary<string, string> {
                 { "userName", userName },
@@ -250,14 +253,29 @@ namespace FISTNESSGYM
             if (!response.IsSuccessStatusCode)
             {
                 var message = await response.Content.ReadAsStringAsync();
-
                 throw new ApplicationException(message);
+            }
+
+            var newUser = new ApplicationUser
+            {
+                UserName = userName,
+                Email = userName
+            };
+
+            var user = await _userManager.FindByNameAsync(userName);
+
+            if (user != null)
+            {
+                if (!await _userManager.IsInRoleAsync(user, "U¿ytkownik"))
+                {
+                    await _userManager.AddToRoleAsync(user, "U¿ytkownik");
+                }
             }
         }
 
         public async Task ResetPassword(string userName)
         {
-            var uri =  new Uri($"{navigationManager.BaseUri}Account/ResetPassword");
+            var uri = new Uri($"{navigationManager.BaseUri}Account/ResetPassword");
 
             var content = new FormUrlEncodedContent(new Dictionary<string, string> {
                 { "userName", userName }
