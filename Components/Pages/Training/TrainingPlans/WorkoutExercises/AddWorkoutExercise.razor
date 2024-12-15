@@ -105,7 +105,15 @@ else if (AuthorizationService.IsClient)
                 <RadzenRequiredValidator Component="Reps" Text="Powtórzenia są wymagane" />
             </RadzenColumn>
         </RadzenRow>
-
+        <RadzenRow style="margin-bottom: 1rem">
+            <RadzenColumn SizeMD="3">
+                <RadzenLabel Text="Ciężar (kg)" Component="Weights" style="width: 100%" />
+            </RadzenColumn>
+            <RadzenColumn SizeMD="9">
+                <RadzenNumeric style="display: block; width: 100%" @bind-Value="@workoutExercise.Weights" Name="Weights" />
+                <RadzenRequiredValidator Component="Weights" Text="Ciężar jest wymagany" />
+            </RadzenColumn>
+        </RadzenRow>
         <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.End" Gap="0.5rem">
             <RadzenButton ButtonStyle="ButtonStyle.Primary" ButtonType="ButtonType.Submit" Icon="save" Text="Zapisz" Variant="Variant.Flat" />
             <RadzenButton ButtonStyle="ButtonStyle.Light" Text="Anuluj" Variant="Variant.Flat" Click="@CancelButtonClick" />
