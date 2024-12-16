@@ -3933,6 +3933,94 @@ namespace FISTNESSGYM
 
             return employeeCount;
         }
+        public async Task<double> GetAttendanceRateForInstructor(string instructorEmail)
+        {
+            var currentMonth = DateTime.Now.Month;
+            var currentYear = DateTime.Now.Year;
+
+            var events = await Context.Events
+                .Where(e => e.InstructorEmail == instructorEmail &&
+                            e.EventStartDate.Month == currentMonth &&
+                            e.EventStartDate.Year == currentYear)
+                .ToListAsync();
+
+            if (events.Count == 0)
+                return 0;
+
+            double totalMaxParticipants = events.Sum(e => e.MaxParticipants);
+            double totalParticipants = events.Sum(e => e.Participants);
+
+            if (totalMaxParticipants == 0)
+                return 0;
+
+            return Math.Round((totalParticipants / totalMaxParticipants) * 100, 2);
+        }
+
+        public async Task<int> GetEventCountForInstructorInMonth(string instructorEmail, int month, int year)
+        {
+            return await Context.Events
+                .Where(e => e.InstructorEmail == instructorEmail &&
+                            e.EventStartDate.Month == month &&
+                            e.EventStartDate.Year == year)
+                .CountAsync();
+        }
+
+        public async Task<double> GetWorkHoursForInstructor(string instructorEmail)
+        {
+            var currentMonth = DateTime.Now.Month;
+            var currentYear = DateTime.Now.Year;
+
+            var events = await Context.Events
+                .Where(e => e.InstructorEmail == instructorEmail &&
+                            e.EventStartDate.Month == currentMonth &&
+                            e.EventStartDate.Year == currentYear)
+                .ToListAsync();
+
+            if (events.Count == 0)
+                return 0;
+
+            double totalHours = events.Sum(e => (e.EventEndDate - e.EventStartDate).TotalHours);
+
+            return Math.Round(totalHours, 2);
+        }
+
+        public async Task<int> GetRemainingTrainingsForToday(string instructorEmail)
+        {
+            var today = DateTime.Today;
+            var now = DateTime.Now;
+
+            // Dodaj tolerancjê, aby uwzglêdniaæ treningi rozpoczête do 30 minut temu
+            var toleranceTime = now.AddMinutes(-60);
+
+            var remainingEvents = await Context.Events
+                .Where(e => e.InstructorEmail == instructorEmail &&
+                            e.EventStartDate.Date == today &&
+                            e.EventStartDate >= toleranceTime)
+                .ToListAsync();
+
+            return remainingEvents.Count;
+        }
+
+        public async Task<List<Event>> GetTodayEventsForTrainerAsync(string instructorEmail)
+        {
+            var today = DateTime.Today;
+
+            return await Context.Events
+                .Where(e => e.InstructorEmail == instructorEmail &&
+                            e.EventStartDate.Date == today)
+                .OrderBy(e => e.EventStartDate)
+                .ToListAsync();
+        }
+
+        public async Task<Dictionary<int, int>> GetRegistrationCountsByDayForTrainerAsync(string trainerEmail, int year, int month)
+        {
+            return await Context.Events
+                .Where(e => e.InstructorEmail == trainerEmail && e.EventStartDate.Year == year && e.EventStartDate.Month == month)
+                .GroupBy(e => e.EventStartDate.Day)
+                .Select(group => new { Day = group.Key, Count = group.Sum(e => e.Participants) })
+                .ToDictionaryAsync(g => g.Day, g => g.Count);
+        }
+
 
     }
 }

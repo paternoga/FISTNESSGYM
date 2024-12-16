@@ -80,13 +80,7 @@
                     </RadzenCard>
                 </RadzenColumn>
             </RadzenRow>
-
-            <!-- Nowy widget z kalendarzem aktywności -->
-            <!-- Nowy widget z kalendarzem aktywności -->
-
         </RadzenColumn>
-
-
 
         <RadzenColumn Size="3">
             <HeartRate />
@@ -121,6 +115,158 @@
         </RadzenColumn>
     </RadzenRow>
 }
+else if (AuthorizationService.IsTrainer)
+{
+    <RadzenRow>
+        <!-- Widget: Średnia frekwencja na zajęciach -->
+        <RadzenColumn Size="3">
+            <RadzenCard Style="padding: 20px; border-radius: 8px; border: 1px solid #e0e0e0; width: 340px; height: 160px;">
+                <h4 style="color: #3a3a3a; font-weight: 600; margin-top: 0px; text-align: center;">Frekwencja na Twoich zajęciach</h4>
+                <p style="color: #757575; font-size: 24px; font-weight: bold; text-align: center;">
+                    @if (loadingAttendanceRate)
+                    {
+                        <span>Ładowanie...</span>
+                    }
+                    else
+                    {
+                        @($"{attendanceRate}%")
+                    }
+                </p>
+                <p style="color: #757575; font-size: 14px; text-align: center;">W tym miesiącu</p>
+            </RadzenCard>
+        </RadzenColumn>
+
+        <!-- Widget: Liczba zajęć -->
+        <RadzenColumn Size="3">
+            <RadzenCard Style="padding: 20px; border-radius: 8px; border: 1px solid #e0e0e0; width: 340px; height: 160px;">
+                <h4 style="color: #3a3a3a; font-weight: 600; margin-top: 0px; text-align: center;">Liczba Twoich zajęć</h4>
+                <p style="color: #757575; font-size: 24px; font-weight: bold; text-align: center;">
+                    @if (loadingEventCount)
+                    {
+                        <span>Ładowanie...</span>
+                    }
+                    else
+                    {
+                        @eventCount
+                    }
+                </p>
+                <p style="color: #757575; font-size: 14px; text-align: center;">W tym miesiącu</p>
+            </RadzenCard>
+        </RadzenColumn>
+        <!-- Widget: Liczba godzin w miesiącu na trening -->
+        <RadzenColumn Size="3">
+            <RadzenCard Style="padding: 20px; border-radius: 8px; border: 1px solid #e0e0e0; width: 340px; height: 160px;">
+                <h4 style="color: #3a3a3a; font-weight: 600; margin-top: 0px; text-align: center;">Podsumowanie czasu pracy</h4>
+                <p style="color: #757575; font-size: 24px; font-weight: bold; text-align: center;">
+                    @if (loadingWorkHours)
+                    {
+                        <span>Ładowanie...</span>
+                    }
+                    else
+                    {
+                        @($"{workHours} h")
+                    }
+                </p>
+                <p style="color: #757575; font-size: 14px; text-align: center;">W tym miesiącu</p>
+            </RadzenCard>
+        </RadzenColumn>
+        <!-- Widget: Pozostałych dzisiaj -->
+        <RadzenColumn Size="3">
+            <RadzenCard Style="padding: 20px; border-radius: 8px; border: 1px solid #e0e0e0; width: 340px; height: 160px;">
+                <h4 style="color: #3a3a3a; font-weight: 600; margin-top: 0px; text-align: center;">Treningi do zrealizowania</h4>
+                <p style="color: #757575; font-size: 24px; font-weight: bold; text-align: center;">
+                    @if (loadingRemainingTrainings)
+                    {
+                        <span>Ładowanie...</span>
+                    }
+                    else
+                    {
+                        @remainingTrainings
+                    }
+                </p>
+                <p style="color: #757575; font-size: 14px; text-align: center;">Pozostałe dzisiaj</p>
+            </RadzenCard>
+        </RadzenColumn>
+
+        <RadzenColumn Size="12">
+            <RadzenCard Style="padding: 20px; border-radius: 8px; border: 1px solid #e0e0e0; margin-top: 20px;">
+                <h4 style="color: #3a3a3a; font-weight: 600; margin-top: 0px; text-align: center;">Harmonogram zajęć dzisiaj</h4>
+
+                @if (TodayEventList != null && TodayEventList.Any())
+                {
+                    <RadzenTimeline Orientation="Orientation.Horizontal" LinePosition="LinePosition.Center" class="rz-m-4">
+                        <Items>
+                            @foreach (var evt in TodayEventList.OrderBy(e => e.EventStartDate))
+                            {
+                                <RadzenTimelineItem PointStyle="@(GetPointStyle(evt))">
+                                    <LabelContent>
+                                        <RadzenText TextStyle="TextStyle.Subtitle2" class="rz-m-0 rz-color-primary">
+                                            @evt.EventStartDate.ToString("HH:mm")
+                                        </RadzenText>
+                                    </LabelContent>
+                                    <ChildContent>
+                                        <div style="text-align: center;">
+                                            <h4 style="margin: 0; font-weight: 600;">@evt.EventName</h4>
+                                            <p style="margin: 4px 0; color: #3a3a3a;">Zapisanych: @evt.Participants/@evt.MaxParticipants</p>
+                                        </div>
+                                    </ChildContent>
+                                </RadzenTimelineItem>
+                            }
+                        </Items>
+                    </RadzenTimeline>
+                }
+                else
+                {
+                    <div style="text-align: center; padding: 20px;">
+                        <p style="color: #757575; font-size: 16px;">Brak zajęć na dzisiaj.</p>
+                    </div>
+                }
+            </RadzenCard>
+        </RadzenColumn>
+    </RadzenRow>
+    <RadzenRow>
+        <RadzenColumn Size="12">
+            <RadzenCard Style="padding: 20px; border-radius: 8px; border: 1px solid #e0e0e0; margin-top: 20px;">
+                <h4 style="color: #3a3a3a; font-weight: 600; margin-top: 0px;">Rejestracje na Twoje zajęcia w poszczególne dni</h4>
+
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <RadzenButton Icon="chevron_left" Click="OnTrainerPreviousMonthClick" Style="width: 40px; height: 40px;" />
+                    <h4 style="margin: 0;">@trainerCurrentMonthName @trainerCurrentYear</h4>
+                    <RadzenButton Icon="chevron_right" Click="OnTrainerNextMonthClick" Style="width: 40px; height: 40px;" />
+                </div>
+
+                @if (trainerChartData != null && trainerChartData.Values.Any(value => value > 0))
+                {
+                    <RadzenChart>
+                        <RadzenColumnSeries Data="@trainerChartData"
+                                            CategoryProperty="Key"
+                                            ValueProperty="Value"
+                                            Title="Ilość osób">
+                            <RadzenSeriesDataLabels Visible="true" />
+                            <RadzenLegend Visible="false" />
+                        </RadzenColumnSeries>
+
+                        <RadzenCategoryAxis Min="0" Max="@trainerDaysInMonthForChart" Step="1">
+                            <RadzenAxisTitle Text="Dzień miesiąca" />
+                            <RadzenGridLines Visible="true" />
+                        </RadzenCategoryAxis>
+
+                        <RadzenValueAxis Min="0">
+                            <RadzenAxisTitle Text="Ilość zapisanych osób" />
+                            <RadzenGridLines Visible="true" />
+                        </RadzenValueAxis>
+                    </RadzenChart>
+                }
+                else
+                {
+                    <div style="text-align: center; padding: 20px;">
+                        <p style="font-size: 16px; color: #757575;">Brak danych na ten miesiąc.</p>
+                    </div>
+                }
+            </RadzenCard>
+        </RadzenColumn>
+    </RadzenRow>
+}
 else
 {
     <p>Brak uprawnień do wyświetlenia tej strony.</p>
@@ -136,6 +282,28 @@ else
     private bool loadingNextTraining = true;
     private bool loadingTopWeights = true;
 
+    private double attendanceRate;
+    private bool loadingAttendanceRate = true;
+
+    private int eventCount;
+    private bool loadingEventCount = true;
+
+    private double workHours;
+    private bool loadingWorkHours = true;
+
+    private int remainingTrainings;
+    private bool loadingRemainingTrainings = true;
+
+    private List<Event> TodayEventList;
+    private bool loadingTodayEvents = true;
+    //trenerski wykres
+    private Dictionary<int, int> trainerChartData = new();
+    private int trainerCurrentMonth = DateTime.Today.Month;
+    private int trainerCurrentYear = DateTime.Today.Year;
+    private double trainerDaysInMonthForChart;
+    private bool loadingTrainerChartData = true;
+
+    private string trainerCurrentMonthName => new DateTime(trainerCurrentYear, trainerCurrentMonth, 1).ToString("MMMM");
     protected override async Task OnInitializedAsync()
     {
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
@@ -144,6 +312,7 @@ else
         if (user.Identity.IsAuthenticated)
         {
             var userId = user.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            var userEmail = user.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value;
 
             if (!string.IsNullOrEmpty(userId))
             {
@@ -169,14 +338,126 @@ else
                                     .ToList();
 
                 trainingDates = await DatabaseService.GetTrainingDatesForUser(userId);
+
+                // Pobierz procentową frekwencję na zajęciach
+                if (!string.IsNullOrEmpty(userEmail))
+                {
+                    loadingAttendanceRate = true;
+                    attendanceRate = await DatabaseService.GetAttendanceRateForInstructor(userEmail);
+                    loadingAttendanceRate = false;
+                    // Pobierz liczbę zajęć dla trenera w tym miesiącu
+                    loadingEventCount = true;
+                    eventCount = await DatabaseService.GetEventCountForInstructorInMonth(userEmail, currentMonth.Month, currentMonth.Year);
+                    loadingEventCount = false;
+                    // Pobierz czas pracy w godzinach
+                    loadingWorkHours = true;
+                    workHours = await DatabaseService.GetWorkHoursForInstructor(userEmail);
+                    loadingWorkHours = false;
+                    // Pobierz treningi pozostałe do zrealizowania
+                    loadingRemainingTrainings = true;
+                    remainingTrainings = await DatabaseService.GetRemainingTrainingsForToday(userEmail);
+                    loadingRemainingTrainings = false;
+                    // Pobierz dzisiejsze wydarzenia
+                    loadingTodayEvents = true;
+                    TodayEventList = await DatabaseService.GetTodayEventsForTrainerAsync(userEmail);
+                    loadingTodayEvents = false;
+                    //wykres trenerski
+                    await LoadTrainerChartData(userEmail);
+                }
             }
         }
         else
         {
+            remainingTrainings = 0;
+            workHours = 0;
+            eventCount = 0;
+            attendanceRate = 0;
             trainingCount = 0;
             nextTraining = null;
             topWeights = null;
             allDays = new List<DateTime>();
+            TodayEventList = new List<Event>();
+        }
+    }
+    private PointStyle GetPointStyle(Event evt)
+    {
+        var now = DateTime.Now;
+
+        if (evt.EventStartDate > now)
+        {
+            return PointStyle.Primary; // Nie zaczęte (niebieska kropka)
+        }
+        else if (evt.EventStartDate <= now && evt.EventEndDate >= now)
+        {
+            return PointStyle.Success; // Aktualnie trwające (zielona kropka)
+        }
+        else
+        {
+            return PointStyle.Base; // Już zakończone (szara kropka)
+        }
+    }
+    private async Task LoadTrainerChartData(string trainerEmail)
+    {
+        trainerDaysInMonthForChart = DateTime.DaysInMonth(trainerCurrentYear, trainerCurrentMonth) + 0.9;
+
+        // Poprawne wywołanie databaseService
+        var data = await DatabaseService.GetRegistrationCountsByDayForTrainerAsync(trainerEmail, trainerCurrentYear, trainerCurrentMonth);
+
+        if (data == null || !data.Any())
+        {
+            trainerChartData = Enumerable.Range(1, DateTime.DaysInMonth(trainerCurrentYear, trainerCurrentMonth))
+                                         .ToDictionary(day => day, day => 0);
+        }
+        else
+        {
+            trainerChartData = Enumerable.Range(1, DateTime.DaysInMonth(trainerCurrentYear, trainerCurrentMonth))
+                                         .ToDictionary(day => day, day => data.ContainsKey(day) ? data[day] : 0);
+        }
+
+        loadingTrainerChartData = false;
+    }
+
+
+    private async Task OnTrainerPreviousMonthClick()
+    {
+        if (trainerCurrentMonth == 1)
+        {
+            trainerCurrentMonth = 12;
+            trainerCurrentYear -= 1;
+        }
+        else
+        {
+            trainerCurrentMonth -= 1;
+        }
+
+        var user = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var userEmail = user.User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value;
+
+        if (!string.IsNullOrEmpty(userEmail))
+        {
+            await LoadTrainerChartData(userEmail);
+        }
+    }
+
+    private async Task OnTrainerNextMonthClick()
+    {
+        if (trainerCurrentMonth == 12)
+        {
+            trainerCurrentMonth = 1;
+            trainerCurrentYear += 1;
+        }
+        else
+        {
+            trainerCurrentMonth += 1;
+        }
+
+        var user = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var userEmail = user.User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value;
+
+        if (!string.IsNullOrEmpty(userEmail))
+        {
+            await LoadTrainerChartData(userEmail);
         }
     }
 }
+
