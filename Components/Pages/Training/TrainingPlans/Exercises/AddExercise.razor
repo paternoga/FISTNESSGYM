@@ -1,8 +1,10 @@
 @page "/add-exercise"
-
+@using FISTNESSGYM.Services
+@inject AuthorizationService AuthorizationService
 @attribute [Authorize]
-
-<PageTitle>DODAJ ÆWICZENIE</PageTitle>
+@if (AuthorizationService.IsWorker || AuthorizationService.IsTrainer || AuthorizationService.IsAdmin)
+{
+    <PageTitle>DODAJ ÆWICZENIE</PageTitle>
     <RadzenColumn SizeMD=12>
         <RadzenAlert Shade="Shade.Lighter" Variant="Variant.Flat" Size="AlertSize.Small" AlertStyle="AlertStyle.Danger" Visible="@errorVisible">Cannot save Exercise</RadzenAlert>
         <RadzenTemplateForm TItem="FISTNESSGYM.Models.database.Exercise" Data="@exercise" Visible="@(exercise != null)" Submit="@FormSubmit">
@@ -31,10 +33,12 @@
                     <RadzenTextBox style="display: block; width: 100%" @bind-Value="@exercise.Category" Name="Category" />
                 </RadzenColumn>
             </RadzenRow>
-          <RadzenStack  Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.End" Gap="0.5rem">
-                    <RadzenButton ButtonStyle="ButtonStyle.Primary" ButtonType="ButtonType.Submit" Icon="save" Text="Save" Variant="Variant.Flat" />
-                    <RadzenButton ButtonStyle="ButtonStyle.Light" Text="Cancel" Variant="Variant.Flat" Click="@CancelButtonClick"  />
-          </RadzenStack>
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.End" Gap="0.5rem">
+                <RadzenButton ButtonStyle="ButtonStyle.Primary" ButtonType="ButtonType.Submit" Icon="save" Text="Save" Variant="Variant.Flat" />
+                <RadzenButton ButtonStyle="ButtonStyle.Light" Text="Cancel" Variant="Variant.Flat" Click="@CancelButtonClick" />
+            </RadzenStack>
         </RadzenTemplateForm>
     </RadzenColumn>
+}
+
 
