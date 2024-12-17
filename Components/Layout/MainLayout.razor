@@ -184,7 +184,7 @@
                     <RadzenPanelMenuItem Path="settings/profile" Icon="person" Text="Profil" />
                 }
 
-                @if (AuthorizationService.IsClient || AuthorizationService.IsWorker || AuthorizationService.IsTrainer || AuthorizationService.IsAdmin)
+                @if (AuthorizationService.IsUser || AuthorizationService.IsClient || AuthorizationService.IsWorker || AuthorizationService.IsTrainer || AuthorizationService.IsAdmin)
                 {
                     <RadzenPanelMenuItem Path="settings/measurement" Icon="straighten" Text="Pomiary" />
                     
