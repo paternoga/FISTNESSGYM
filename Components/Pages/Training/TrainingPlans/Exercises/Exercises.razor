@@ -1,5 +1,6 @@
 @page "/training/exercises"
-
+@using FISTNESSGYM.Services
+@inject AuthorizationService AuthorizationService
 @attribute [Authorize]
 
 <PageTitle>ÆWICZENIA</PageTitle>
@@ -8,37 +9,46 @@
         <RadzenColumn Size="12" SizeMD="6">
             <RadzenText Text="Æwiczenia" TextStyle="TextStyle.H3" TagName="TagName.H1" style="margin: 0" />
         </RadzenColumn>
-        <RadzenColumn Size="12" SizeMD="6">
-            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.End" Gap="0.5rem">
-                <RadzenButton Icon="add_circle_outline" Text="Dodaj" Click="@AddButtonClick" Variant="Variant.Flat" />
-            </RadzenStack>
-        </RadzenColumn>
+
+        <!-- Przycisk "Dodaj" dostêpny tylko dla Worker, Trainer i Admin -->
+        @if (AuthorizationService.IsWorker || AuthorizationService.IsTrainer || AuthorizationService.IsAdmin)
+        {
+            <RadzenColumn Size="12" SizeMD="6">
+                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.End" Gap="0.5rem">
+                    <RadzenButton Icon="add_circle_outline" Text="Dodaj" Click="@AddButtonClick" Variant="Variant.Flat" />
+                </RadzenStack>
+            </RadzenColumn>
+        }
     </RadzenRow>
+
     <RadzenTextBox Placeholder="Wyszukaj ..." style="display: block; width: 100%" @oninput="@Search" aria-label="Search by all string columns" />
     <RadzenRow>
-      <RadzenColumn SizeMD=12>
-        <RadzenDataGrid @ref="grid0" ColumnWidth="200px"   AllowFiltering="true" FilterMode="FilterMode.Advanced" AllowPaging="true" AllowSorting="true" ShowPagingSummary="true" PageSizeOptions=@(new int[]{5, 10, 20, 30})
-            Data="@exercises" TItem="FISTNESSGYM.Models.database.Exercise" RowSelect="@EditRow">
-            <Columns>
-                
-                <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.Exercise" Property="Name" Title="Nazwa æwiczenia">
-                </RadzenDataGridColumn>
-                <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.Exercise" Property="Description" Title="Opis æwiczenia">
-                </RadzenDataGridColumn>
-                <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.Exercise" Property="Category" Title="Kategoria æwiczenia">
-                </RadzenDataGridColumn>
-                <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.Exercise" Filterable="false" Sortable="false" Width="70px" TextAlign="TextAlign.Center">
-                    <Template Context="exercise">
+        <RadzenColumn SizeMD="12">
+            <RadzenDataGrid @ref="grid0" ColumnWidth="200px" AllowFiltering="true" FilterMode="FilterMode.Advanced"
+                            AllowPaging="true" AllowSorting="true" ShowPagingSummary="true" PageSizeOptions=@(new int[]{5, 10, 20, 30})
+                            Data="@exercises" TItem="FISTNESSGYM.Models.database.Exercise"
+                            RowSelect="@(AuthorizationService.IsClient ? null : EditRow)">
+                <!-- Wy³¹cz edycjê dla IsClient -->
 
-                        <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="delete" Size="ButtonSize.Medium"
-                            Shade="Shade.Lighter" Variant="Variant.Flat"
-                            Click=@(args => GridDeleteButtonClick(args, exercise)) @onclick:stopPropagation="true" />
-                    </Template>
-                </RadzenDataGridColumn>
-            </Columns>
+                <Columns>
+                    <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.Exercise" Property="Name" Title="Nazwa æwiczenia" />
+                    <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.Exercise" Property="Description" Title="Opis æwiczenia" />
+                    <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.Exercise" Property="Category" Title="Kategoria æwiczenia" />
 
-        </RadzenDataGrid>
+                    <!-- Przycisk Usuñ tylko dla Worker, Trainer i Admin -->
+                    @if (AuthorizationService.IsWorker || AuthorizationService.IsTrainer || AuthorizationService.IsAdmin)
+                    {
+                        <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.Exercise" Filterable="false" Sortable="false" Width="70px" TextAlign="TextAlign.Center">
+                            <Template Context="exercise">
+                                <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="delete" Size="ButtonSize.Medium"
+                                              Shade="Shade.Lighter" Variant="Variant.Flat"
+                                              Click=@(args => GridDeleteButtonClick(args, exercise)) @onclick:stopPropagation="true" />
+                            </Template>
+                        </RadzenDataGridColumn>
+                    }
+                </Columns>
 
-    </RadzenColumn>
-  </RadzenRow>
+            </RadzenDataGrid>
+        </RadzenColumn>
+    </RadzenRow>
 </RadzenStack>
