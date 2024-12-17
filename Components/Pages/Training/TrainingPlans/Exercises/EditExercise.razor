@@ -12,7 +12,7 @@
                     <RadzenLabel Text="Name" Component="Name" style="width: 100%" />
                 </RadzenColumn>
                 <RadzenColumn SizeMD="9">
-                    <RadzenTextBox style="display: block; width: 100%" @bind-Value="@exercise.Name" Name="Name" />
+                <RadzenTextBox style="display: block; width: 100%" @bind-Value="@exercise.Name" Name="Nazwa æwiczenia" />
                     <RadzenRequiredValidator Component="Name" Text="Name is required" />
                 </RadzenColumn>
             </RadzenRow>
@@ -21,7 +21,7 @@
                     <RadzenLabel Text="Description" Component="Description" style="width: 100%" />
                 </RadzenColumn>
                 <RadzenColumn SizeMD="9">
-                    <RadzenTextBox style="display: block; width: 100%" @bind-Value="@exercise.Description" Name="Description" />
+                <RadzenTextBox style="display: block; width: 100%" @bind-Value="@exercise.Description" Name="Opis æwiczenia" />
                 </RadzenColumn>
             </RadzenRow>
             <RadzenRow style="margin-bottom: 1rem">
@@ -29,7 +29,7 @@
                     <RadzenLabel Text="Category" Component="Category" style="width: 100%" />
                 </RadzenColumn>
                 <RadzenColumn SizeMD="9">
-                    <RadzenTextBox style="display: block; width: 100%" @bind-Value="@exercise.Category" Name="Category" />
+                    <RadzenTextBox style="display: block; width: 100%" @bind-Value="@exercise.Category" Name="Kategoria æwiczenia" />
                 </RadzenColumn>
             </RadzenRow>
           <RadzenStack  Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.End" Gap="0.5rem">

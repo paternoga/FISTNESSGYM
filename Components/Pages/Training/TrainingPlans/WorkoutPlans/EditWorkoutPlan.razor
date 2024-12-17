@@ -15,7 +15,7 @@
                     <RadzenLabel Text="Name" Component="Name" style="width: 100%" />
                 </RadzenColumn>
                 <RadzenColumn SizeMD="9">
-                    <RadzenTextBox style="display: block; width: 100%" @bind-Value="@workoutPlan.Name" Name="Name" />
+                    <RadzenTextBox style="display: block; width: 100%" @bind-Value="@workoutPlan.Name" Name="Nazwa planu" />
                     <RadzenRequiredValidator Component="Name" Text="Name is required" />
                 </RadzenColumn>
             </RadzenRow>
@@ -24,7 +24,7 @@
                     <RadzenLabel Text="Description" Component="Description" style="width: 100%" />
                 </RadzenColumn>
                 <RadzenColumn SizeMD="9">
-                    <RadzenTextBox style="display: block; width: 100%" @bind-Value="@workoutPlan.Description" Name="Description" />
+                    <RadzenTextBox style="display: block; width: 100%" @bind-Value="@workoutPlan.Description" Name="Opis planu" />
                 </RadzenColumn>
             </RadzenRow>
             <RadzenRow style="margin-bottom: 1rem">
@@ -33,7 +33,7 @@
                 </RadzenColumn>
                 <RadzenColumn SizeMD="9">
                     <RadzenDropDown Data="@aspNetUsersForUserId" TextProperty="UserName" ValueProperty="Id" AllowClear=true
-                                    Placeholder="Choose AspNetUser" style="display: block; width: 100%" @bind-Value="@workoutPlan.UserId" Name="UserId" />
+                                    Placeholder="Choose AspNetUser" style="display: block; width: 100%" @bind-Value="@workoutPlan.UserId" Name="Id klienta" />
                 </RadzenColumn>
             </RadzenRow>
             <RadzenRow style="margin-bottom: 1rem">
@@ -41,7 +41,7 @@
                     <RadzenLabel Text="Created Date" Component="CreatedDate" style="width: 100%" />
                 </RadzenColumn>
                 <RadzenColumn SizeMD="9">
-                    <RadzenDatePicker DateFormat="MM/dd/yyyy" style="display: block; width: 100%" @bind-Value="@workoutPlan.CreatedDate" Name="CreatedDate" />
+                    <RadzenDatePicker DateFormat="MM/dd/yyyy" style="display: block; width: 100%" @bind-Value="@workoutPlan.CreatedDate" Name="Data utworzenia" />
                 </RadzenColumn>
             </RadzenRow>
             <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.End" Gap="0.5rem">
@@ -64,7 +64,7 @@ else if (AuthorizationService.IsClient)
                     <RadzenLabel Text="Name" Component="Name" style="width: 100%" />
                 </RadzenColumn>
                 <RadzenColumn SizeMD="9">
-                    <RadzenTextBox style="display: block; width: 100%" @bind-Value="@workoutPlan.Name" Name="Name" />
+                    <RadzenTextBox style="display: block; width: 100%" @bind-Value="@workoutPlan.Name" Name="Nazwa" />
                     <RadzenRequiredValidator Component="Name" Text="Name is required" />
                 </RadzenColumn>
             </RadzenRow>
@@ -74,7 +74,7 @@ else if (AuthorizationService.IsClient)
                     <RadzenLabel Text="Description" Component="Description" style="width: 100%" />
                 </RadzenColumn>
                 <RadzenColumn SizeMD="9">
-                    <RadzenTextBox style="display: block; width: 100%" @bind-Value="@workoutPlan.Description" Name="Description" />
+                    <RadzenTextBox style="display: block; width: 100%" @bind-Value="@workoutPlan.Description" Name="Opis" />
                 </RadzenColumn>
             </RadzenRow>
 
