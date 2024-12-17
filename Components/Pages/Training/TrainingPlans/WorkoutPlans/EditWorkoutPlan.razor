@@ -12,7 +12,7 @@
         <RadzenTemplateForm TItem="FISTNESSGYM.Models.database.WorkoutPlan" Data="@workoutPlan" Visible="@(workoutPlan != null)" Submit="@FormSubmit">
             <RadzenRow style="margin-bottom: 1rem">
                 <RadzenColumn SizeMD="3">
-                    <RadzenLabel Text="Name" Component="Name" style="width: 100%" />
+                    <RadzenLabel Text="Nazwa" Component="Name" style="width: 100%" />
                 </RadzenColumn>
                 <RadzenColumn SizeMD="9">
                     <RadzenTextBox style="display: block; width: 100%" @bind-Value="@workoutPlan.Name" Name="Name" />
@@ -21,7 +21,7 @@
             </RadzenRow>
             <RadzenRow style="margin-bottom: 1rem">
                 <RadzenColumn SizeMD="3">
-                    <RadzenLabel Text="Description" Component="Description" style="width: 100%" />
+                    <RadzenLabel Text="Opis" Component="Description" style="width: 100%" />
                 </RadzenColumn>
                 <RadzenColumn SizeMD="9">
                     <RadzenTextBox style="display: block; width: 100%" @bind-Value="@workoutPlan.Description" Name="Description" />
@@ -29,16 +29,16 @@
             </RadzenRow>
             <RadzenRow style="margin-bottom: 1rem">
                 <RadzenColumn SizeMD="3">
-                    <RadzenLabel Text="Asp Net User" Component="AspNetUser" style="width: 100%" />
+                    <RadzenLabel Text="Klient" Component="AspNetUser" style="width: 100%" />
                 </RadzenColumn>
                 <RadzenColumn SizeMD="9">
                     <RadzenDropDown Data="@aspNetUsersForUserId" TextProperty="UserName" ValueProperty="Id" AllowClear=true
-                                    Placeholder="Choose AspNetUser" style="display: block; width: 100%" @bind-Value="@workoutPlan.UserId" Name="UserId" />
+                                    Placeholder="Choose AspNetUser" style="display: block; width: 100%" @bind-Value="@workoutPlan.UserId" Name="AspNetUser" />
                 </RadzenColumn>
             </RadzenRow>
             <RadzenRow style="margin-bottom: 1rem">
                 <RadzenColumn SizeMD="3">
-                    <RadzenLabel Text="Created Date" Component="CreatedDate" style="width: 100%" />
+                    <RadzenLabel Text="Data utworzenia" Component="CreatedDate" style="width: 100%" />
                 </RadzenColumn>
                 <RadzenColumn SizeMD="9">
                     <RadzenDatePicker DateFormat="MM/dd/yyyy" style="display: block; width: 100%" @bind-Value="@workoutPlan.CreatedDate" Name="CreatedDate" />
@@ -61,7 +61,7 @@ else if (AuthorizationService.IsClient)
         <RadzenTemplateForm TItem="FISTNESSGYM.Models.database.WorkoutPlan" Data="@workoutPlan" Visible="@(workoutPlan != null)" Submit="@FormSubmit">
             <RadzenRow style="margin-bottom: 1rem">
                 <RadzenColumn SizeMD="3">
-                    <RadzenLabel Text="Name" Component="Name" style="width: 100%" />
+                    <RadzenLabel Text="Nazwa" Component="Name" style="width: 100%" />
                 </RadzenColumn>
                 <RadzenColumn SizeMD="9">
                     <RadzenTextBox style="display: block; width: 100%" @bind-Value="@workoutPlan.Name" Name="Name" />
@@ -71,7 +71,7 @@ else if (AuthorizationService.IsClient)
 
             <RadzenRow style="margin-bottom: 1rem">
                 <RadzenColumn SizeMD="3">
-                    <RadzenLabel Text="Description" Component="Description" style="width: 100%" />
+                    <RadzenLabel Text="Opis" Component="Description" style="width: 100%" />
                 </RadzenColumn>
                 <RadzenColumn SizeMD="9">
                     <RadzenTextBox style="display: block; width: 100%" @bind-Value="@workoutPlan.Description" Name="Description" />
