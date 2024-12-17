@@ -20,8 +20,7 @@
         <RadzenDataGrid @ref="grid0" ColumnWidth="200px"   AllowFiltering="true" FilterMode="FilterMode.Advanced" AllowPaging="true" AllowSorting="true" ShowPagingSummary="true" PageSizeOptions=@(new int[]{5, 10, 20, 30})
             Data="@exercises" TItem="FISTNESSGYM.Models.database.Exercise" RowSelect="@EditRow">
             <Columns>
-                <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.Exercise" Property="Id" Title="Id">
-                </RadzenDataGridColumn>
+                
                 <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.Exercise" Property="Name" Title="Nazwa æwiczenia">
                 </RadzenDataGridColumn>
                 <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.Exercise" Property="Description" Title="Opis æwiczenia">
