@@ -9,7 +9,7 @@
         <RadzenColumn Size="12" SizeMD="6">
             <RadzenText Text="Pomiary ciała (cm)" TextStyle="TextStyle.H3" TagName="TagName.H1" style="margin: 0" />
         </RadzenColumn>
-        @if (AuthorizationService.IsClient)
+        @if (AuthorizationService.IsClient || AuthorizationService.IsUser)
         {
             <RadzenColumn Size="12" SizeMD="6">
                 <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.End" Gap="0.5rem">
@@ -26,7 +26,7 @@
             <RadzenDataGrid @ref="grid0" AllowPaging="true" AllowSorting="true"
                             ShowPagingSummary="true" PageSizeOptions=@(new int[]{5, 10, 20, 30}) Data="@measurements" TItem="FISTNESSGYM.Models.database.Measurement" >
                 <Columns>
-                    @if (!AuthorizationService.IsClient)
+                    @if (!AuthorizationService.IsClient || AuthorizationService.IsUser)
                     {
                         <RadzenDataGridColumn TItem="FISTNESSGYM.Models.database.Measurement" Property="UserId" Title="Id" />
                     }
@@ -75,7 +75,7 @@
         {
             measurements = await DatabaseService.GetMeasurementsAsync();
         }
-        else if(AuthorizationService.IsClient)
+        else if (AuthorizationService.IsClient || AuthorizationService.IsUser)
         {
             var userId = SecurityService.User.Id;
             measurements = await DatabaseService.GetMeasurementsByUserAsync(userId);
