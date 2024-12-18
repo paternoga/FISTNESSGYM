@@ -10,7 +10,7 @@
         </RadzenColumn>
         <RadzenColumn Size="12" SizeMD="6">
             <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.End" Gap="0.5rem">
-                @if (AuthorizationService.IsAdmin || AuthorizationService.IsTrainer || AuthorizationService.IsWorker)
+                @if (AuthorizationService.IsAdmin  || AuthorizationService.IsWorker)
                 {
                     <RadzenButton Icon="add_circle_outline" Text="Dodaj" Click="@AddButtonClick" Variant="Variant.Flat" />
                 }
@@ -18,7 +18,7 @@
         </RadzenColumn>
     </RadzenRow>
     <RadzenRow>
-        @if (AuthorizationService.IsAdmin || AuthorizationService.IsTrainer || AuthorizationService.IsWorker)
+        @if (AuthorizationService.IsAdmin  || AuthorizationService.IsWorker)
         {
             <RadzenColumn SizeMD=6>
                 <RadzenCard style="height: 100%">
@@ -113,5 +113,6 @@
                 </RadzenCard>
             </RadzenColumn>
         }
+        
     </RadzenRow>
 </RadzenStack>

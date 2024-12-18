@@ -1,7 +1,7 @@
 ﻿@page "/settings/subscriptions"
 
 @attribute [Authorize]
-
+@if (AuthorizationService.IsAdmin || AuthorizationService.IsWorker){
 <PageTitle>SUBSKRYPCJE</PageTitle>
 <RadzenStack>
     <RadzenRow AlignItems="AlignItems.Center">
@@ -59,3 +59,4 @@
         </RadzenColumn>
     </RadzenRow>
 </RadzenStack>
+}

@@ -42,9 +42,15 @@ namespace FISTNESSGYM.Components.Pages.Settings.Subscription
         protected RadzenDataGrid<FISTNESSGYM.Models.database.Subscription> grid0;
 
         protected string search = "";
+        [Inject]
+        AuthorizationService AuthorizationService { get; set; }
 
         protected override async Task OnInitializedAsync()
         {
+            if (!(AuthorizationService.IsAdmin || AuthorizationService.IsWorker))
+            {
+                NavigationManager.NavigateTo("/");
+            }
             subscriptions = await databaseService.GetSubscriptions(new Query { Expand = "AspNetUser,SubscriptionStatus" });
         }
 

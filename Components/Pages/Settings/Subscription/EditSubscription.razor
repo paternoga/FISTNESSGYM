@@ -1,8 +1,9 @@
 @page "/edit-subscription"
 
 @attribute [Authorize]
-
-<PageTitle>EDYTUJ SUBSKRYPCJÊ</PageTitle>
+@if (AuthorizationService.IsAdmin || AuthorizationService.IsWorker)
+{
+    <PageTitle>EDYTUJ SUBSKRYPCJÊ</PageTitle>
 
     <RadzenColumn SizeMD=12>
         <RadzenAlert Shade="Shade.Lighter" Variant="Variant.Flat" Size="AlertSize.Small" AlertStyle="AlertStyle.Danger" Visible="@errorVisible">Cannot save Subscription</RadzenAlert>
@@ -70,3 +71,4 @@
         </RadzenTemplateForm>
     </RadzenColumn>
 
+}

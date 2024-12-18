@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Components.Web;
 using Radzen;
 using Radzen.Blazor;
 using FISTNESSGYM.Models.database;
+using FISTNESSGYM.Services;
 
 namespace FISTNESSGYM.Components.Pages.Settings.Subscription
 {
@@ -32,12 +33,17 @@ namespace FISTNESSGYM.Components.Pages.Settings.Subscription
         protected NotificationService NotificationService { get; set; }
         [Inject]
         public databaseService databaseService { get; set; }
+        [Inject]
+        AuthorizationService AuthorizationService { get; set; }
 
         private List<SubscriptionType> SubscriptionTypes;
 
         protected override async Task OnInitializedAsync()
         {
-
+            if (!(AuthorizationService.IsAdmin || AuthorizationService.IsWorker))
+            {
+                NavigationManager.NavigateTo("/");
+            }
             SubscriptionTypes = await LoadSubscriptionTypesAsync();
             subscription = new FISTNESSGYM.Models.database.Subscription();
 
