@@ -5,7 +5,7 @@
 @using FISTNESSGYM.Models
 @using FISTNESSGYM.Models.Database
 @using FISTNESSGYM.Models.database
-
+@if (AuthorizationService.IsAdmin || AuthorizationService.IsWorker){
 <div style="display: flex; gap: 20px; flex-wrap: wrap; justify-content: space-between; margin-bottom: 20px;">
     <!-- Wybór Roku -->
     <div style="flex: 1 1 200px;">
@@ -111,7 +111,7 @@
     
 </div>
 
-
+}
 
 
 
@@ -121,6 +121,8 @@
 @code {
     [Inject]
     public NavigationManager NavigationManager { get; set; }
+    [Inject]
+    AuthorizationService AuthorizationService { get; set; }
     private int selectedYear = DateTime.Today.Year;
     private decimal totalRevenueYear;
     private List<FISTNESSGYM.Models.Database.TopBuyer> topBuyers = new();
@@ -138,6 +140,10 @@
 
     protected override async Task OnInitializedAsync()
     {
+        if (!(AuthorizationService.IsAdmin || AuthorizationService.IsWorker))
+        {
+            NavigationManager.NavigateTo("/");
+        }
         // Generowanie listy lat
         yearList = Enumerable.Range(DateTime.Today.Year - 5, 6)
                              .Select(y => new DropDownItem { Text = y.ToString(), Value = y })

@@ -1,8 +1,9 @@
 @page "/store/product-categories"
 
 @attribute [Authorize]
-
-<PageTitle>KATEGORIE</PageTitle>
+@if (AuthorizationService.IsAdmin || AuthorizationService.IsWorker)
+{
+    <PageTitle>KATEGORIE</PageTitle>
 <RadzenStack>
     <RadzenRow AlignItems="AlignItems.Center">
         <RadzenColumn Size="12" SizeMD="6">
@@ -58,3 +59,4 @@
     </RadzenColumn>
   </RadzenRow>
 </RadzenStack>
+}

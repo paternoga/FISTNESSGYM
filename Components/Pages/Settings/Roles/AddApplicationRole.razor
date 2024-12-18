@@ -1,6 +1,6 @@
 @page "/add-application-role"
 @attribute [Authorize]
-
+@if (AuthorizationService.IsAdmin){
 <RadzenRow>
     <RadzenColumn SizeMD="12">
         <RadzenTemplateForm TItem="FISTNESSGYM.Models.ApplicationRole" Data="@role" Visible="@(role != null)" Submit="@FormSubmit">
@@ -22,3 +22,4 @@
         </RadzenTemplateForm>
     </RadzenColumn>
 </RadzenRow>
+}

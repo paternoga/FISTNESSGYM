@@ -2,13 +2,14 @@
 @inject ICartService CartService
 @inject IProductService ProductService
 @inject AuthenticationStateProvider AuthenticationStateProvider
+@inject AuthorizationService AuthorizationService
 @using FISTNESSGYM.Models.database
 @using FISTNESSGYM.Models.Database
 @using FISTNESSGYM.Services
 @using Radzen
 
 @attribute [Authorize]
-
+@if (AuthorizationService.IsAdmin || AuthorizationService.IsWorker){
 <div style="display: flex; gap: 20px; flex-wrap: wrap; justify-content: space-between;">
     <!-- Wybór Miesi¹ca i Roku -->
     <div style="flex: 1 1 200px;">
@@ -222,7 +223,9 @@
             </RadzenValueAxis>
         </RadzenChart>
     </RadzenCard>
-</RadzenStack>
+    </RadzenStack>
+}
+
 
 
 @code {
@@ -275,6 +278,10 @@
 
     protected override async Task OnInitializedAsync()
     {
+        if (!(AuthorizationService.IsAdmin || AuthorizationService.IsWorker))
+        {
+            NavigationManager.NavigateTo("/");
+        }
         await LoadSalesData();
         await LoadTotalSoldToday();
         await LoadTotalRevenueToday();

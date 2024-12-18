@@ -1,7 +1,8 @@
 @page "/settings/application-roles"
 @attribute [Authorize]
-
-<PageTitle>ROLE</PageTitle>
+@if (AuthorizationService.IsAdmin)
+{
+    <PageTitle>ROLE</PageTitle>
 <RadzenStack>
     <RadzenRow AlignItems="AlignItems.Center">
         <RadzenColumn Size="12" SizeMD="6">
@@ -30,3 +31,4 @@
         </RadzenColumn>
     </RadzenRow>
 </RadzenStack>
+}
