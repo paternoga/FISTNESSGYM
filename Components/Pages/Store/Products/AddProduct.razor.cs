@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Radzen;
 using Radzen.Blazor;
+using FISTNESSGYM.Services;
 
 namespace FISTNESSGYM.Components.Pages.Store.Products
 {
@@ -31,9 +32,15 @@ namespace FISTNESSGYM.Components.Pages.Store.Products
         protected NotificationService NotificationService { get; set; }
         [Inject]
         public databaseService databaseService { get; set; }
+        [Inject]
+        AuthorizationService AuthorizationService { get; set; }
 
         protected override async Task OnInitializedAsync()
         {
+            if (!(AuthorizationService.IsAdmin || AuthorizationService.IsWorker))
+            {
+                NavigationManager.NavigateTo("/");
+            }
             product = new FISTNESSGYM.Models.database.Product();
 
             productCategoriesForCategoryId = await databaseService.GetProductCategories();

@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Radzen;
 using Radzen.Blazor;
+using FISTNESSGYM.Services;
 
 namespace FISTNESSGYM.Components.Pages.Settings.Roles
 {
@@ -29,6 +30,8 @@ namespace FISTNESSGYM.Components.Pages.Settings.Roles
 
         [Inject]
         protected NotificationService NotificationService { get; set; }
+        [Inject]
+        AuthorizationService AuthorizationService { get; set; }
 
         protected FISTNESSGYM.Models.ApplicationRole role;
         protected string error;
@@ -39,6 +42,10 @@ namespace FISTNESSGYM.Components.Pages.Settings.Roles
 
         protected override async Task OnInitializedAsync()
         {
+            if (!AuthorizationService.IsAdmin)
+            {
+                NavigationManager.NavigateTo("/");
+            }
             role = new FISTNESSGYM.Models.ApplicationRole();
         }
 

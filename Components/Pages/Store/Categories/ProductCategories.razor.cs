@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Radzen;
 using Radzen.Blazor;
+using FISTNESSGYM.Services;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace FISTNESSGYM.Components.Pages.Store.Categories
 {
@@ -32,6 +34,8 @@ namespace FISTNESSGYM.Components.Pages.Store.Categories
 
         [Inject]
         public databaseService databaseService { get; set; }
+        [Inject]
+        AuthorizationService AuthorizationService { get; set; }
 
         protected IEnumerable<FISTNESSGYM.Models.database.ProductCategory> productCategories;
 
@@ -52,6 +56,10 @@ namespace FISTNESSGYM.Components.Pages.Store.Categories
         }
         protected override async Task OnInitializedAsync()
         {
+            if (!(AuthorizationService.IsAdmin || AuthorizationService.IsWorker))
+            {
+                NavigationManager.NavigateTo("/");
+            }
             productCategories = await databaseService.GetProductCategories(new Query { Filter = $@"i => i.Name.Contains(@0)", FilterParameters = new object[] { search } });
         }
 
