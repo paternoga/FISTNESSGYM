@@ -34,7 +34,14 @@ namespace FISTNESSGYM.Components.Pages.Training.TrainingPlans.Exercises
 
         protected override async Task OnInitializedAsync()
         {
-            exercise = new Models.database.Exercise();
+            if (AuthorizationService.IsWorker || AuthorizationService.IsTrainer || AuthorizationService.IsAdmin)
+            {
+                exercise = new Models.database.Exercise();
+            }
+            else
+            {
+                NavigationManager.NavigateTo("/");
+            }    
         }
         protected bool errorVisible;
         protected Models.database.Exercise exercise;
