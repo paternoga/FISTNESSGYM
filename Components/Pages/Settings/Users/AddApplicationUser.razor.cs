@@ -41,9 +41,18 @@ namespace FISTNESSGYM.Components.Pages.Settings.Users
 
         protected override async Task OnInitializedAsync()
         {
-            user = new FISTNESSGYM.Models.ApplicationUser();
+            if(AuthorizationService.IsWorker || AuthorizationService.IsAdmin)
+            {
+                user = new FISTNESSGYM.Models.ApplicationUser();
 
-            roles = await Security.GetRoles();
+                roles = await Security.GetRoles();
+            }
+            else
+            {
+                navigationManager.NavigateTo("/");
+            }
+
+
         }
 
         protected async Task FormSubmit(FISTNESSGYM.Models.ApplicationUser user)

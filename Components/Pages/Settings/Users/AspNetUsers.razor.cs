@@ -45,7 +45,15 @@ namespace FISTNESSGYM.Components.Pages.Settings.Users
 
         protected override async Task OnInitializedAsync()
         {
-            aspNetUsers = await databaseService.GetAspNetUsers();
+            if (AuthorizationService.IsWorker || AuthorizationService.IsAdmin)
+            {
+                aspNetUsers = await databaseService.GetAspNetUsers();
+            }
+            else
+            {
+                navigationManager.NavigateTo("/");
+            }
+
         }
 
         protected async Task Search(ChangeEventArgs args)

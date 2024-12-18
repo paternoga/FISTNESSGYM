@@ -40,7 +40,15 @@ namespace FISTNESSGYM.Components.Pages.Settings.Users
 
         protected override async Task OnInitializedAsync()
         {
-            users = await Security.GetUsers();
+            if (AuthorizationService.IsWorker || AuthorizationService.IsAdmin)
+            {
+                users = await Security.GetUsers();
+            }
+            else
+            {
+                navigationManager.NavigateTo("/");
+            }
+                
         }
 
         protected async Task AddClick()

@@ -34,7 +34,14 @@ namespace FISTNESSGYM.Components.Pages.Settings.Users
 
         protected override async Task OnInitializedAsync()
         {
-            aspNetUser = new FISTNESSGYM.Models.database.AspNetUser();
+            if (AuthorizationService.IsWorker || AuthorizationService.IsAdmin)
+            {
+                aspNetUser = new FISTNESSGYM.Models.database.AspNetUser();
+            }
+            else
+            {
+                navigationManager.NavigateTo("/");
+            }
         }
         protected bool errorVisible;
         protected FISTNESSGYM.Models.database.AspNetUser aspNetUser;

@@ -1,137 +1,142 @@
 @page "/edit-asp-net-user"
-
 @attribute [Authorize]
+@using FISTNESSGYM.Services
+@inject AuthorizationService AuthorizationService
+@inject NavigationManager navigationManager
+@if (AuthorizationService.IsWorker || AuthorizationService.IsAdmin)
+{
+    <PageTitle>EDYTUJ U¯YTKOWNIKA</PageTitle>
+    <RadzenColumn SizeMD=12>
+        <RadzenAlert Shade="Shade.Lighter" Variant="Variant.Flat" Size="AlertSize.Small" AlertStyle="AlertStyle.Danger" Visible="@errorVisible">Nie mo¿na zapisaæ u¿ytkownika</RadzenAlert>
+        <RadzenTemplateForm TItem="FISTNESSGYM.Models.database.AspNetUser" Data="@aspNetUser" Visible="@(aspNetUser != null)" Submit="@FormSubmit">
+            <RadzenRow style="margin-bottom: 1rem">
+                <RadzenColumn SizeMD="3">
+                    <RadzenLabel Text="Identyfikator" Component="Id" style="width: 100%" />
+                </RadzenColumn>
+                <RadzenColumn SizeMD="9">
+                    <RadzenTextBox style="display: block; width: 100%" @bind-Value="@aspNetUser.Id" Name="Id" />
+                    <RadzenRequiredValidator Component="Id" Text="Identyfikator jest wymagany" />
+                </RadzenColumn>
+            </RadzenRow>
+            <RadzenRow style="margin-bottom: 1rem">
+                <RadzenColumn SizeMD="3">
+                    <RadzenLabel Text="Liczba nieudanych prób logowania" Component="AccessFailedCount" style="width: 100%" />
+                </RadzenColumn>
+                <RadzenColumn SizeMD="9">
+                    <RadzenNumeric style="display: block; width: 100%" @bind-Value="@aspNetUser.AccessFailedCount" Name="AccessFailedCount" />
+                    <RadzenRequiredValidator Component="AccessFailedCount" Text="Liczba nieudanych prób logowania jest wymagana" />
+                </RadzenColumn>
+            </RadzenRow>
+            <RadzenRow style="margin-bottom: 1rem">
+                <RadzenColumn SizeMD="3">
+                    <RadzenLabel Text="Znak zgodnoœci" Component="ConcurrencyStamp" style="width: 100%" />
+                </RadzenColumn>
+                <RadzenColumn SizeMD="9">
+                    <RadzenTextBox style="display: block; width: 100%" @bind-Value="@aspNetUser.ConcurrencyStamp" Name="ConcurrencyStamp" />
+                </RadzenColumn>
+            </RadzenRow>
+            <RadzenRow style="margin-bottom: 1rem">
+                <RadzenColumn SizeMD="3">
+                    <RadzenLabel Text="E-mail" Component="Email" style="width: 100%" />
+                </RadzenColumn>
+                <RadzenColumn SizeMD="9">
+                    <RadzenTextBox style="display: block; width: 100%" @bind-Value="@aspNetUser.Email" Name="Email" />
+                </RadzenColumn>
+            </RadzenRow>
+            <RadzenRow style="margin-bottom: 1rem">
+                <RadzenColumn SizeMD="3">
+                    <RadzenLabel Text="E-mail potwierdzony" Component="EmailConfirmed" style="width: 100%" />
+                </RadzenColumn>
+                <RadzenColumn SizeMD="9">
+                    <RadzenCheckBox @bind-Value="@aspNetUser.EmailConfirmed" Name="EmailConfirmed" />
+                </RadzenColumn>
+            </RadzenRow>
+            <RadzenRow style="margin-bottom: 1rem">
+                <RadzenColumn SizeMD="3">
+                    <RadzenLabel Text="Blokada w³¹czona" Component="LockoutEnabled" style="width: 100%" />
+                </RadzenColumn>
+                <RadzenColumn SizeMD="9">
+                    <RadzenCheckBox @bind-Value="@aspNetUser.LockoutEnabled" Name="LockoutEnabled" />
+                </RadzenColumn>
+            </RadzenRow>
+            <RadzenRow style="margin-bottom: 1rem">
+                <RadzenColumn SizeMD="3">
+                    <RadzenLabel Text="Koniec blokady" Component="LockoutEnd" style="width: 100%" />
+                </RadzenColumn>
+                <RadzenColumn SizeMD="9">
+                    <RadzenDatePicker DateFormat="MM/dd/yyyy" style="display: block; width: 100%" @bind-Value="@aspNetUser.LockoutEnd" Name="LockoutEnd" />
+                </RadzenColumn>
+            </RadzenRow>
+            <RadzenRow style="margin-bottom: 1rem">
+                <RadzenColumn SizeMD="3">
+                    <RadzenLabel Text="Znormalizowany e-mail" Component="NormalizedEmail" style="width: 100%" />
+                </RadzenColumn>
+                <RadzenColumn SizeMD="9">
+                    <RadzenTextBox style="display: block; width: 100%" @bind-Value="@aspNetUser.NormalizedEmail" Name="NormalizedEmail" />
+                </RadzenColumn>
+            </RadzenRow>
+            <RadzenRow style="margin-bottom: 1rem">
+                <RadzenColumn SizeMD="3">
+                    <RadzenLabel Text="Znormalizowana nazwa u¿ytkownika" Component="NormalizedUserName" style="width: 100%" />
+                </RadzenColumn>
+                <RadzenColumn SizeMD="9">
+                    <RadzenTextBox style="display: block; width: 100%" @bind-Value="@aspNetUser.NormalizedUserName" Name="NormalizedUserName" />
+                </RadzenColumn>
+            </RadzenRow>
+            <RadzenRow style="margin-bottom: 1rem">
+                <RadzenColumn SizeMD="3">
+                    <RadzenLabel Text="Hash has³a" Component="PasswordHash" style="width: 100%" />
+                </RadzenColumn>
+                <RadzenColumn SizeMD="9">
+                    <RadzenTextBox style="display: block; width: 100%" @bind-Value="@aspNetUser.PasswordHash" Name="PasswordHash" />
+                </RadzenColumn>
+            </RadzenRow>
+            <RadzenRow style="margin-bottom: 1rem">
+                <RadzenColumn SizeMD="3">
+                    <RadzenLabel Text="Numer telefonu" Component="PhoneNumber" style="width: 100%" />
+                </RadzenColumn>
+                <RadzenColumn SizeMD="9">
+                    <RadzenTextBox style="display: block; width: 100%" @bind-Value="@aspNetUser.PhoneNumber" Name="PhoneNumber" />
+                </RadzenColumn>
+            </RadzenRow>
+            <RadzenRow style="margin-bottom: 1rem">
+                <RadzenColumn SizeMD="3">
+                    <RadzenLabel Text="Numer telefonu potwierdzony" Component="PhoneNumberConfirmed" style="width: 100%" />
+                </RadzenColumn>
+                <RadzenColumn SizeMD="9">
+                    <RadzenCheckBox @bind-Value="@aspNetUser.PhoneNumberConfirmed" Name="PhoneNumberConfirmed" />
+                </RadzenColumn>
+            </RadzenRow>
+            <RadzenRow style="margin-bottom: 1rem">
+                <RadzenColumn SizeMD="3">
+                    <RadzenLabel Text="Znak bezpieczeñstwa" Component="SecurityStamp" style="width: 100%" />
+                </RadzenColumn>
+                <RadzenColumn SizeMD="9">
+                    <RadzenTextBox style="display: block; width: 100%" @bind-Value="@aspNetUser.SecurityStamp" Name="SecurityStamp" />
+                </RadzenColumn>
+            </RadzenRow>
+            <RadzenRow style="margin-bottom: 1rem">
+                <RadzenColumn SizeMD="3">
+                    <RadzenLabel Text="W³¹czone uwierzytelnianie dwusk³adnikowe" Component="TwoFactorEnabled" style="width: 100%" />
+                </RadzenColumn>
+                <RadzenColumn SizeMD="9">
+                    <RadzenCheckBox @bind-Value="@aspNetUser.TwoFactorEnabled" Name="TwoFactorEnabled" />
+                </RadzenColumn>
+            </RadzenRow>
+            <RadzenRow style="margin-bottom: 1rem">
+                <RadzenColumn SizeMD="3">
+                    <RadzenLabel Text="Nazwa u¿ytkownika" Component="UserName" style="width: 100%" />
+                </RadzenColumn>
+                <RadzenColumn SizeMD="9">
+                    <RadzenTextBox style="display: block; width: 100%" @bind-Value="@aspNetUser.UserName" Name="UserName" />
+                </RadzenColumn>
+            </RadzenRow>
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.End" Gap="0.5rem">
+                <RadzenButton ButtonStyle="ButtonStyle.Primary" ButtonType="ButtonType.Submit" Icon="save" Text="Zapisz" Variant="Variant.Flat" />
+                <RadzenButton ButtonStyle="ButtonStyle.Light" Text="Anuluj" Variant="Variant.Flat" Click="@CancelButtonClick" />
+            </RadzenStack>
+        </RadzenTemplateForm>
+    </RadzenColumn>
 
-<PageTitle>EDYTUJ U¯YTKOWNIKA</PageTitle>
-<RadzenColumn SizeMD=12>
-    <RadzenAlert Shade="Shade.Lighter" Variant="Variant.Flat" Size="AlertSize.Small" AlertStyle="AlertStyle.Danger" Visible="@errorVisible">Nie mo¿na zapisaæ u¿ytkownika</RadzenAlert>
-    <RadzenTemplateForm TItem="FISTNESSGYM.Models.database.AspNetUser" Data="@aspNetUser" Visible="@(aspNetUser != null)" Submit="@FormSubmit">
-        <RadzenRow style="margin-bottom: 1rem">
-            <RadzenColumn SizeMD="3">
-                <RadzenLabel Text="Identyfikator" Component="Id" style="width: 100%" />
-            </RadzenColumn>
-            <RadzenColumn SizeMD="9">
-                <RadzenTextBox style="display: block; width: 100%" @bind-Value="@aspNetUser.Id" Name="Id" />
-                <RadzenRequiredValidator Component="Id" Text="Identyfikator jest wymagany" />
-            </RadzenColumn>
-        </RadzenRow>
-        <RadzenRow style="margin-bottom: 1rem">
-            <RadzenColumn SizeMD="3">
-                <RadzenLabel Text="Liczba nieudanych prób logowania" Component="AccessFailedCount" style="width: 100%" />
-            </RadzenColumn>
-            <RadzenColumn SizeMD="9">
-                <RadzenNumeric style="display: block; width: 100%" @bind-Value="@aspNetUser.AccessFailedCount" Name="AccessFailedCount" />
-                <RadzenRequiredValidator Component="AccessFailedCount" Text="Liczba nieudanych prób logowania jest wymagana" />
-            </RadzenColumn>
-        </RadzenRow>
-        <RadzenRow style="margin-bottom: 1rem">
-            <RadzenColumn SizeMD="3">
-                <RadzenLabel Text="Znak zgodnoœci" Component="ConcurrencyStamp" style="width: 100%" />
-            </RadzenColumn>
-            <RadzenColumn SizeMD="9">
-                <RadzenTextBox style="display: block; width: 100%" @bind-Value="@aspNetUser.ConcurrencyStamp" Name="ConcurrencyStamp" />
-            </RadzenColumn>
-        </RadzenRow>
-        <RadzenRow style="margin-bottom: 1rem">
-            <RadzenColumn SizeMD="3">
-                <RadzenLabel Text="E-mail" Component="Email" style="width: 100%" />
-            </RadzenColumn>
-            <RadzenColumn SizeMD="9">
-                <RadzenTextBox style="display: block; width: 100%" @bind-Value="@aspNetUser.Email" Name="Email" />
-            </RadzenColumn>
-        </RadzenRow>
-        <RadzenRow style="margin-bottom: 1rem">
-            <RadzenColumn SizeMD="3">
-                <RadzenLabel Text="E-mail potwierdzony" Component="EmailConfirmed" style="width: 100%" />
-            </RadzenColumn>
-            <RadzenColumn SizeMD="9">
-                <RadzenCheckBox @bind-Value="@aspNetUser.EmailConfirmed" Name="EmailConfirmed" />
-            </RadzenColumn>
-        </RadzenRow>
-        <RadzenRow style="margin-bottom: 1rem">
-            <RadzenColumn SizeMD="3">
-                <RadzenLabel Text="Blokada w³¹czona" Component="LockoutEnabled" style="width: 100%" />
-            </RadzenColumn>
-            <RadzenColumn SizeMD="9">
-                <RadzenCheckBox @bind-Value="@aspNetUser.LockoutEnabled" Name="LockoutEnabled" />
-            </RadzenColumn>
-        </RadzenRow>
-        <RadzenRow style="margin-bottom: 1rem">
-            <RadzenColumn SizeMD="3">
-                <RadzenLabel Text="Koniec blokady" Component="LockoutEnd" style="width: 100%" />
-            </RadzenColumn>
-            <RadzenColumn SizeMD="9">
-                <RadzenDatePicker DateFormat="MM/dd/yyyy" style="display: block; width: 100%" @bind-Value="@aspNetUser.LockoutEnd" Name="LockoutEnd" />
-            </RadzenColumn>
-        </RadzenRow>
-        <RadzenRow style="margin-bottom: 1rem">
-            <RadzenColumn SizeMD="3">
-                <RadzenLabel Text="Znormalizowany e-mail" Component="NormalizedEmail" style="width: 100%" />
-            </RadzenColumn>
-            <RadzenColumn SizeMD="9">
-                <RadzenTextBox style="display: block; width: 100%" @bind-Value="@aspNetUser.NormalizedEmail" Name="NormalizedEmail" />
-            </RadzenColumn>
-        </RadzenRow>
-        <RadzenRow style="margin-bottom: 1rem">
-            <RadzenColumn SizeMD="3">
-                <RadzenLabel Text="Znormalizowana nazwa u¿ytkownika" Component="NormalizedUserName" style="width: 100%" />
-            </RadzenColumn>
-            <RadzenColumn SizeMD="9">
-                <RadzenTextBox style="display: block; width: 100%" @bind-Value="@aspNetUser.NormalizedUserName" Name="NormalizedUserName" />
-            </RadzenColumn>
-        </RadzenRow>
-        <RadzenRow style="margin-bottom: 1rem">
-            <RadzenColumn SizeMD="3">
-                <RadzenLabel Text="Hash has³a" Component="PasswordHash" style="width: 100%" />
-            </RadzenColumn>
-            <RadzenColumn SizeMD="9">
-                <RadzenTextBox style="display: block; width: 100%" @bind-Value="@aspNetUser.PasswordHash" Name="PasswordHash" />
-            </RadzenColumn>
-        </RadzenRow>
-        <RadzenRow style="margin-bottom: 1rem">
-            <RadzenColumn SizeMD="3">
-                <RadzenLabel Text="Numer telefonu" Component="PhoneNumber" style="width: 100%" />
-            </RadzenColumn>
-            <RadzenColumn SizeMD="9">
-                <RadzenTextBox style="display: block; width: 100%" @bind-Value="@aspNetUser.PhoneNumber" Name="PhoneNumber" />
-            </RadzenColumn>
-        </RadzenRow>
-        <RadzenRow style="margin-bottom: 1rem">
-            <RadzenColumn SizeMD="3">
-                <RadzenLabel Text="Numer telefonu potwierdzony" Component="PhoneNumberConfirmed" style="width: 100%" />
-            </RadzenColumn>
-            <RadzenColumn SizeMD="9">
-                <RadzenCheckBox @bind-Value="@aspNetUser.PhoneNumberConfirmed" Name="PhoneNumberConfirmed" />
-            </RadzenColumn>
-        </RadzenRow>
-        <RadzenRow style="margin-bottom: 1rem">
-            <RadzenColumn SizeMD="3">
-                <RadzenLabel Text="Znak bezpieczeñstwa" Component="SecurityStamp" style="width: 100%" />
-            </RadzenColumn>
-            <RadzenColumn SizeMD="9">
-                <RadzenTextBox style="display: block; width: 100%" @bind-Value="@aspNetUser.SecurityStamp" Name="SecurityStamp" />
-            </RadzenColumn>
-        </RadzenRow>
-        <RadzenRow style="margin-bottom: 1rem">
-            <RadzenColumn SizeMD="3">
-                <RadzenLabel Text="W³¹czone uwierzytelnianie dwusk³adnikowe" Component="TwoFactorEnabled" style="width: 100%" />
-            </RadzenColumn>
-            <RadzenColumn SizeMD="9">
-                <RadzenCheckBox @bind-Value="@aspNetUser.TwoFactorEnabled" Name="TwoFactorEnabled" />
-            </RadzenColumn>
-        </RadzenRow>
-        <RadzenRow style="margin-bottom: 1rem">
-            <RadzenColumn SizeMD="3">
-                <RadzenLabel Text="Nazwa u¿ytkownika" Component="UserName" style="width: 100%" />
-            </RadzenColumn>
-            <RadzenColumn SizeMD="9">
-                <RadzenTextBox style="display: block; width: 100%" @bind-Value="@aspNetUser.UserName" Name="UserName" />
-            </RadzenColumn>
-        </RadzenRow>
-        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.End" Gap="0.5rem">
-            <RadzenButton ButtonStyle="ButtonStyle.Primary" ButtonType="ButtonType.Submit" Icon="save" Text="Zapisz" Variant="Variant.Flat" />
-            <RadzenButton ButtonStyle="ButtonStyle.Light" Text="Anuluj" Variant="Variant.Flat" Click="@CancelButtonClick" />
-        </RadzenStack>
-    </RadzenTemplateForm>
-</RadzenColumn>
+}
 

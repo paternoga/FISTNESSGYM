@@ -1,34 +1,41 @@
 @page "/settings/application-users"
 @attribute [Authorize]
+@using FISTNESSGYM.Services
+@inject AuthorizationService AuthorizationService
+@inject NavigationManager navigationManager
+@if (AuthorizationService.IsWorker || AuthorizationService.IsAdmin)
+{
+    <PageTitle>UŻYTKOWNICY</PageTitle>
+    <RadzenStack>
+        <RadzenRow AlignItems="AlignItems.Center">
+            <RadzenColumn Size="12" SizeMD="6">
+                <RadzenText Text="Użytkownicy" TextStyle="TextStyle.H3" TagName="TagName.H1" style="margin: 0" />
+            </RadzenColumn>
+            <RadzenColumn Size="12" SizeMD="6">
+                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.End" Gap="0.5rem">
+                    <RadzenButton Icon="add_circle_outline" Text="Dodaj" Click="@AddClick" Variant="Variant.Flat" />
+                </RadzenStack>
+            </RadzenColumn>
+        </RadzenRow>
+        <RadzenRow>
+            <RadzenColumn SizeMD="12">
+                <RadzenAlert Size="AlertSize.Large" Shade="Shade.Light" AlertStyle="AlertStyle.Danger" Variant="Variant.Flat" Title="Nie można usunąć użytkownika" Visible="@errorVisible">@error</RadzenAlert>
+                <RadzenDataGrid @ref="grid0" AllowFiltering="true" AllowPaging="true" ShowPagingSummary="true" PageSizeOptions=@(new int[]{5, 10, 20, 30}) AllowSorting="true" Data="@users"
+                                TItem="FISTNESSGYM.Models.ApplicationUser" RowSelect="@RowSelect">
+                    <Columns>
+                        <RadzenDataGridColumn TItem="FISTNESSGYM.Models.ApplicationUser" Property="UserName" Title="Nazwa użytkownika" />
+                        <RadzenDataGridColumn TItem="FISTNESSGYM.Models.ApplicationUser" Property="Email" Title="Email" />
+                        <RadzenDataGridColumn TItem="FISTNESSGYM.Models.ApplicationUser" Filterable="false" Sortable="false" TextAlign="TextAlign.Center" Width="70px">
+                            <Template Context="user">
+                                <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="close" Size="ButtonSize.Small"
+                                              Variant="Variant.Flat" Shade="Shade.Lighter" Click="@(() => DeleteClick(user))" @onclick:stopPropagation="true" />
+                            </Template>
+                        </RadzenDataGridColumn>
+                    </Columns>
+                </RadzenDataGrid>
+            </RadzenColumn>
+        </RadzenRow>
+    </RadzenStack>
 
-<PageTitle>UŻYTKOWNICY</PageTitle>
-<RadzenStack>
-    <RadzenRow AlignItems="AlignItems.Center">
-        <RadzenColumn Size="12" SizeMD="6">
-            <RadzenText Text="Użytkownicy" TextStyle="TextStyle.H3" TagName="TagName.H1" style="margin: 0" />
-        </RadzenColumn>
-        <RadzenColumn Size="12" SizeMD="6">
-            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.End" Gap="0.5rem">
-                <RadzenButton Icon="add_circle_outline" Text="Dodaj" Click="@AddClick" Variant="Variant.Flat" />
-            </RadzenStack>
-        </RadzenColumn>
-    </RadzenRow>
-    <RadzenRow>
-        <RadzenColumn SizeMD="12">
-            <RadzenAlert Size="AlertSize.Large" Shade="Shade.Light" AlertStyle="AlertStyle.Danger" Variant="Variant.Flat" Title="Nie można usunąć użytkownika" Visible="@errorVisible">@error</RadzenAlert>
-            <RadzenDataGrid @ref="grid0" AllowFiltering="true" AllowPaging="true" ShowPagingSummary="true" PageSizeOptions=@(new int[]{5, 10, 20, 30}) AllowSorting="true" Data="@users"
-                TItem="FISTNESSGYM.Models.ApplicationUser" RowSelect="@RowSelect">
-                <Columns>
-                    <RadzenDataGridColumn TItem="FISTNESSGYM.Models.ApplicationUser" Property="UserName" Title="Nazwa użytkownika" />
-                    <RadzenDataGridColumn TItem="FISTNESSGYM.Models.ApplicationUser" Property="Email" Title="Email" />
-                    <RadzenDataGridColumn TItem="FISTNESSGYM.Models.ApplicationUser" Filterable="false" Sortable="false" TextAlign="TextAlign.Center" Width="70px">
-                        <Template Context="user">
-                            <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="close" Size="ButtonSize.Small"
-                                Variant="Variant.Flat" Shade="Shade.Lighter" Click="@(() => DeleteClick(user))" @onclick:stopPropagation="true" />
-                        </Template>
-                    </RadzenDataGridColumn>
-                </Columns>
-            </RadzenDataGrid>
-        </RadzenColumn>
-    </RadzenRow>
-</RadzenStack>
+}
+
