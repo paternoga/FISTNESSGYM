@@ -27,7 +27,8 @@
             <RadzenDataGrid @ref="grid0" ColumnWidth="200px" AllowFiltering="true" FilterMode="FilterMode.Advanced"
                             AllowPaging="true" AllowSorting="true" ShowPagingSummary="true" PageSizeOptions=@(new int[]{5, 10, 20, 30})
                             Data="@exercises" TItem="FISTNESSGYM.Models.database.Exercise"
-                            RowSelect="@(AuthorizationService.IsClient ? null : EditRow)">
+                            RowSelect="@(AuthorizationService.IsAdmin || AuthorizationService.IsTrainer || AuthorizationService.IsWorker ? EditRow : null)">
+
                 <!-- Wy³¹cz edycjê dla IsClient -->
 
                 <Columns>
