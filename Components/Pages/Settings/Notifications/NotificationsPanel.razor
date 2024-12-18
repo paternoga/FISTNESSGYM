@@ -7,7 +7,7 @@
 @inject NavigationManager NavigationManager
 
 <PageTitle>PANEL POWIADOMIEŃ</PageTitle>
-@if (AuthorizationService.IsWorker || AuthorizationService.IsTrainer || AuthorizationService.IsAdmin)
+@if (AuthorizationService.IsWorker || AuthorizationService.IsAdmin)
 {
     <RadzenCard Style="padding: 20px;">
         <h3 style="margin-bottom: 20px;">Panel powiadomień</h3>
@@ -52,7 +52,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        @if (AuthorizationService.IsWorker || AuthorizationService.IsTrainer || AuthorizationService.IsAdmin)
+        @if (AuthorizationService.IsWorker || AuthorizationService.IsAdmin)
         {
             users = await databaseService.GetAllUsersAsync();
         }
