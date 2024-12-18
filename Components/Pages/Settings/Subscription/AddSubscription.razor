@@ -1,8 +1,9 @@
 @page "/add-subscription"
 
 @attribute [Authorize]
-
-<PageTitle>DODAJ SUBSKRYPCJÊ</PageTitle>
+@if (AuthorizationService.IsAdmin || AuthorizationService.IsWorker)
+{
+    <PageTitle>DODAJ SUBSKRYPCJÊ</PageTitle>
     <RadzenColumn SizeMD=12>
         <RadzenAlert Shade="Shade.Lighter" Variant="Variant.Flat" Size="AlertSize.Small" AlertStyle="AlertStyle.Danger" Visible="@errorVisible">Cannot save Subscription</RadzenAlert>
         <RadzenTemplateForm TItem="FISTNESSGYM.Models.database.Subscription" Data="@subscription" Visible="@(subscription != null)" Submit="@FormSubmit">
@@ -70,3 +71,4 @@
         </RadzenTemplateForm>
     </RadzenColumn>
 
+}

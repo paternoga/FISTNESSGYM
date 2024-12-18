@@ -194,7 +194,7 @@
                     <RadzenPanelMenuItem Path="settings/subscriptions" Icon="clear_all" Text="Lista subskrypcji" />
                 }
 
-                @if (AuthorizationService.IsUser || AuthorizationService.IsClient || AuthorizationService.IsWorker)
+                @if (AuthorizationService.IsUser || AuthorizationService.IsClient)
                 {
                     <RadzenPanelMenuItem Icon="universal_currency" Text="Subskrypcja">
                         @if (AuthorizationService.IsUser || AuthorizationService.IsClient)

@@ -1,33 +1,39 @@
 ﻿@page "/notifications/notificationspanel"
 @using FISTNESSGYM.Models.database
+@using FISTNESSGYM.Services
 @inject databaseService databaseService
 @inject NotificationService NotificationService
+@inject AuthorizationService AuthorizationService
+@inject NavigationManager NavigationManager
 
 <PageTitle>PANEL POWIADOMIEŃ</PageTitle>
+@if (AuthorizationService.IsWorker || AuthorizationService.IsAdmin)
+{
+    <RadzenCard Style="padding: 20px;">
+        <h3 style="margin-bottom: 20px;">Panel powiadomień</h3>
 
-<RadzenCard Style="padding: 20px;">
-    <h3 style="margin-bottom: 20px;">Panel powiadomień</h3>
+        <div style="margin-bottom: 20px;">
+            <RadzenDropDown AllowClear="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+            Placeholder="Wybierz użytkowników..." TValue="List<string>" Multiple="true"
+            TextProperty="Email" ValueProperty="Id" Data="@users" @bind-Value="selectedUserIds"
+            Style="width: 100%;" />
+        </div>
 
-    <div style="margin-bottom: 20px;">
-        <RadzenDropDown AllowClear="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
-                        Placeholder="Wybierz użytkowników..." TValue="List<string>" Multiple="true"
-                        TextProperty="Email" ValueProperty="Id" Data="@users" @bind-Value="selectedUserIds"
-                        Style="width: 100%;" />
-    </div>
+        <div style="margin-bottom: 20px; display: flex; align-items: center;">
+            <RadzenCheckBox @bind-Value="sendToAll" TriState="false" />
+            <label style="margin-left: 10px;">Wyślij do wszystkich użytkowników</label>
+        </div>
 
-    <div style="margin-bottom: 20px; display: flex; align-items: center;">
-        <RadzenCheckBox @bind-Value="sendToAll" TriState="false" />
-        <label style="margin-left: 10px;">Wyślij do wszystkich użytkowników</label>
-    </div>
+        <div style="margin-bottom: 20px;">
+            <RadzenTextBox Style="width: 100%" Placeholder="Wpisz treść powiadomienia..." @bind-Value="notificationTitle" />
+        </div>
 
-    <div style="margin-bottom: 20px;">
-        <RadzenTextBox Style="width: 100%" Placeholder="Wpisz treść powiadomienia..." @bind-Value="notificationTitle" />
-    </div>
+        <div style="margin-bottom: 20px;">
+            <RadzenButton Text="Wyślij powiadomienie" Click="@SendNotifications" Style="margin-right: 10px;" />
+        </div>
+    </RadzenCard>
+}
 
-    <div style="margin-bottom: 20px;">
-        <RadzenButton Text="Wyślij powiadomienie" Click="@SendNotifications" Style="margin-right: 10px;" />
-    </div>
-</RadzenCard>
 
 <RadzenCard Style="margin-top: 20px;">
     <RadzenDataGrid TItem="AspNetUser" Data="@users" PageSize="10" ShowPagination="true">
@@ -46,7 +52,14 @@
 
     protected override async Task OnInitializedAsync()
     {
-        users = await databaseService.GetAllUsersAsync();
+        @if (AuthorizationService.IsWorker || AuthorizationService.IsAdmin)
+        {
+            users = await databaseService.GetAllUsersAsync();
+        }
+        else
+        {
+            NavigationManager.NavigateTo("/");
+        }
     }
 
     async Task SendNotifications()

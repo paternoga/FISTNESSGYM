@@ -46,7 +46,7 @@ namespace FISTNESSGYM.Components.Pages.Store.Orders
         protected bool isEdit = true;
         protected override async Task OnInitializedAsync()
         {
-            if (AuthorizationService.IsAdmin || AuthorizationService.IsTrainer || AuthorizationService.IsWorker)
+            if (AuthorizationService.IsAdmin  || AuthorizationService.IsWorker)
             {
                 orders = await databaseService.GetOrders(new Query { Expand = "AspNetUser,OrderStatus" });
             }
@@ -59,8 +59,12 @@ namespace FISTNESSGYM.Components.Pages.Store.Orders
                     orders = await databaseService.GetOrdersForUser(userId);
                 }
             }
+            else if (AuthorizationService.IsTrainer)
+            {
+                NavigationManager.NavigateTo("/");
+            }
 
-            aspNetUsersForUserId = await databaseService.GetAspNetUsers();
+                aspNetUsersForUserId = await databaseService.GetAspNetUsers();
             orderStatusesForOrderStatusId = await databaseService.GetOrderStatuses();
         }
 
