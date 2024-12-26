@@ -47,23 +47,41 @@ namespace FISTNESSGYM.Components.Pages.Settings.Users
             if (AuthorizationService.IsWorker || AuthorizationService.IsAdmin)
             {
                 user = await Security.GetUserById($"{Id}");
-
                 userRoles = user.Roles.Select(role => role.Id);
 
-                roles = await Security.GetRoles();
+                if (AuthorizationService.IsWorker)
+                {
+                    // Pracownik widzi tylko wybrane role
+                    var allowedRoles = new List<string> { "Trener", "U¿ytkownik", "Klient" };
+                    roles = (await Security.GetRoles()).Where(role => allowedRoles.Contains(role.Name)).ToList();
+                }
+                else if (AuthorizationService.IsAdmin)
+                {
+                    // Administrator widzi wszystkie role
+                    roles = await Security.GetRoles();
+                }
             }
             else
             {
                 navigationManager.NavigateTo("/");
             }
-
         }
+
 
         protected async Task FormSubmit(FISTNESSGYM.Models.ApplicationUser user)
         {
             try
             {
+                if (userRoles.Count() > 1)
+                {
+                    error = "Nie mo¿esz nadaæ kilku ról dla jednej osoby.";
+                    errorVisible = true;
+                    return;
+                }
+
+                // Przypisz jedn¹ rolê
                 user.Roles = roles.Where(role => userRoles.Contains(role.Id)).ToList();
+
                 await Security.UpdateUser($"{Id}", user);
                 DialogService.Close(null);
             }
@@ -73,6 +91,7 @@ namespace FISTNESSGYM.Components.Pages.Settings.Users
                 error = ex.Message;
             }
         }
+
 
         protected async Task CancelClick()
         {

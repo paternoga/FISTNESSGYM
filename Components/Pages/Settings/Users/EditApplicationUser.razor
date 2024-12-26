@@ -8,7 +8,7 @@
     <RadzenRow>
         <RadzenColumn SizeMD="12">
             <RadzenTemplateForm TItem="FISTNESSGYM.Models.ApplicationUser" Data="@user" Visible="@(user != null)" Submit="@FormSubmit">
-                <RadzenAlert Title="Cannot update user" Shade="Shade.Lighter" Variant="Variant.Flat" Size="AlertSize.Small" AlertStyle="AlertStyle.Danger" Visible="@errorVisible">@error</RadzenAlert>
+                <RadzenAlert Title="Nie uda³o siê edytowaæ" Shade="Shade.Lighter" Variant="Variant.Flat" Size="AlertSize.Small" AlertStyle="AlertStyle.Danger" Visible="@errorVisible">@error</RadzenAlert>
 
                 <RadzenRow style="margin-bottom: 1rem">
                     <RadzenColumn SizeMD="3">
